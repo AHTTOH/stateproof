@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./proving": "./src/proving.ts"
   },
   "scripts": {
     "compact": "bash ../../scripts/compile.sh",

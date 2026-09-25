@@ -1,0 +1,218 @@
+{
+  "$comment": "Generated 2026-09-25T13:07:22.766Z by packages/issuer (personas). Fictional people; holder secrets are public on purpose so anyone can replay the demo.",
+  "personas": [
+    {
+      "id": "minji",
+      "displayName": "Minji Park (fictional)",
+      "holderSecret": "9caae3bf4fe2aaeda2c9fd9259c17e45a4126fadea3e7a664fdb7fd7bf770ae9",
+      "credentials": [
+        {
+          "format": "stateproof-credential/v1",
+          "type": [
+            "VerifiableCredential",
+            "EmploymentCredential"
+          ],
+          "schema": "employment",
+          "issuer": {
+            "id": "issuer:acme-hr",
+            "name": "ACME Corp HR (demo)"
+          },
+          "issuedAt": "2026-09-01T00:00:00Z",
+          "expiresAt": "2027-09-01T00:00:00Z",
+          "credentialSubject": {
+            "employmentStatus": "Active",
+            "jobCategory": "Engineering",
+            "employmentStartDate": "2024-07-01",
+            "employmentMonths": 26
+          },
+          "binding": {
+            "holderCommit": "0x1c1ca42f6c5570198a5f2ff4672fec68c713341b3821575e85584be0db435a18",
+            "salt": "6b7d9d3f96b1a56724a59f73d3ed1475c6e5e62d44bc6b1cb2f9f48a4575ca65"
+          },
+          "proof": {
+            "type": "StateProofJubjubSchnorr2026",
+            "r": {
+              "x": "0x107700cea2b7eff0cda8a3967cedf53a81c791e6244a2dd9ee0c66e1c0cb82a2",
+              "y": "0x14823167b58da44aacfb7cc7bc23359d5419a3c84763cef787b94598454e18b2"
+            },
+            "s": "0x4167db15e3666e556ff76feef415692993e70820a4c3862f83a6a3d52204cd5"
+          }
+        },
+        {
+          "format": "stateproof-credential/v1",
+          "type": [
+            "VerifiableCredential",
+            "IdentityCredential"
+          ],
+          "schema": "identity",
+          "issuer": {
+            "id": "issuer:gov-id-demo",
+            "name": "Demo Identity Authority"
+          },
+          "issuedAt": "2026-09-01T00:00:00Z",
+          "expiresAt": "2027-09-01T00:00:00Z",
+          "credentialSubject": {
+            "birthDate": "1995-03-14",
+            "ageYears": 31,
+            "nationality": "KR",
+            "region": "Gyeonggi"
+          },
+          "binding": {
+            "holderCommit": "0x1c1ca42f6c5570198a5f2ff4672fec68c713341b3821575e85584be0db435a18",
+            "salt": "e18ca524f5e6227ce2d6b4ebe0c07c37778c8550795200ddf9fb72fd994a27c1"
+          },
+          "proof": {
+            "type": "StateProofJubjubSchnorr2026",
+            "r": {
+              "x": "0x4b283e4a8c20c94149672de129657831cb04864d4bdfceee50154d7c5903fc46",
+              "y": "0x305c13ecc1f16147412eaba048dac57c99da43dbf5c0ba693d08b6f9ded9e529"
+            },
+            "s": "0x23746315103899467fda23c24fe98813ee419321d6e6a4bbec7acbb776fa5a1"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sora",
+      "displayName": "Sora Kim (fictional)",
+      "holderSecret": "30f179840dcde6cfdac2e524d3e76d87e5029046440cc15499b41983a3ca4bf3",
+      "credentials": [
+        {
+          "format": "stateproof-credential/v1",
+          "type": [
+            "VerifiableCredential",
+            "EmploymentCredential"
+          ],
+          "schema": "employment",
+          "issuer": {
+            "id": "issuer:acme-hr",
+            "name": "ACME Corp HR (demo)"
+          },
+          "issuedAt": "2026-09-01T00:00:00Z",
+          "expiresAt": "2027-09-01T00:00:00Z",
+          "credentialSubject": {
+            "employmentStatus": "Active",
+            "jobCategory": "Design",
+            "employmentStartDate": "2026-03-02",
+            "employmentMonths": 6
+          },
+          "binding": {
+            "holderCommit": "0x1bb1c34daa78ea431c019047a51f9d6d150a3721efba074e0a2b46cea0f6f1d8",
+            "salt": "d5c8f9ced9e89e2c6f1ccf27101f3dfd5e06a63591f9110cd35d179b917f348d"
+          },
+          "proof": {
+            "type": "StateProofJubjubSchnorr2026",
+            "r": {
+              "x": "0x1aa156cc282a445c2ea642884bf7bdb0552afa495698a44fd3b6f5ecd6fc0b1a",
+              "y": "0x24628ce419e078e154073504e3f04da854c45280e18eec5d8166e8401508402a"
+            },
+            "s": "0x5b9bdc11da24c92fd4fc87280db0f9323691c3ce3824a730d682bbdff0a2559"
+          }
+        },
+        {
+          "format": "stateproof-credential/v1",
+          "type": [
+            "VerifiableCredential",
+            "IdentityCredential"
+          ],
+          "schema": "identity",
+          "issuer": {
+            "id": "issuer:gov-id-demo",
+            "name": "Demo Identity Authority"
+          },
+          "issuedAt": "2026-09-01T00:00:00Z",
+          "expiresAt": "2027-09-01T00:00:00Z",
+          "credentialSubject": {
+            "birthDate": "2008-11-02",
+            "ageYears": 17,
+            "nationality": "KR",
+            "region": "Busan"
+          },
+          "binding": {
+            "holderCommit": "0x1bb1c34daa78ea431c019047a51f9d6d150a3721efba074e0a2b46cea0f6f1d8",
+            "salt": "51ca55a4ccc5ccf47eaba6aefe552054b6544be5614bc294f87dbb39d13d12d0"
+          },
+          "proof": {
+            "type": "StateProofJubjubSchnorr2026",
+            "r": {
+              "x": "0x9e5c05b323abeb8ee7696c51550a12fb20cf5cb68a2e5af9bba485bccae8df8",
+              "y": "0x2bf298aabca15c67efb2f348d4a6dd026d04d36cf5408a6834981440e25419a"
+            },
+            "s": "0x2b54e42e29289a097281697bddbaa30e3a0e9eb411198723d5b6ddba29bff8e"
+          }
+        }
+      ]
+    },
+    {
+      "id": "jun",
+      "displayName": "Jun Lee (fictional)",
+      "holderSecret": "1166436f0d7549f2d6db3490f5190a282705c8a9e2b47946c1d514ecbb13ee66",
+      "credentials": [
+        {
+          "format": "stateproof-credential/v1",
+          "type": [
+            "VerifiableCredential",
+            "EmploymentCredential"
+          ],
+          "schema": "employment",
+          "issuer": {
+            "id": "issuer:acme-hr",
+            "name": "ACME Corp HR (demo)"
+          },
+          "issuedAt": "2026-09-01T00:00:00Z",
+          "expiresAt": "2027-09-01T00:00:00Z",
+          "credentialSubject": {
+            "employmentStatus": "Terminated",
+            "jobCategory": "Sales",
+            "employmentStartDate": "2021-05-10",
+            "employmentMonths": 40
+          },
+          "binding": {
+            "holderCommit": "0x3e725edc87427178626a95f460e632aa4b93ed234b00d9496d863959524312fa",
+            "salt": "9805b73a847c465ad4a6d58e26d004f8fdb41fb2b3cebedf347d2674bc1dba0c"
+          },
+          "proof": {
+            "type": "StateProofJubjubSchnorr2026",
+            "r": {
+              "x": "0x5c6832078d2723526da937437ba069c0f49cf5e1b588ae6c45d83c2da9d4a848",
+              "y": "0xc3f3d6a9932590371714aa6d66edc0986738c06f005bdb28072f7641ec476cf"
+            },
+            "s": "0xddacc9b60c9d3a738918c701b8cdd8b05b493b865f9f5ca869338374894e39b"
+          }
+        },
+        {
+          "format": "stateproof-credential/v1",
+          "type": [
+            "VerifiableCredential",
+            "IdentityCredential"
+          ],
+          "schema": "identity",
+          "issuer": {
+            "id": "issuer:gov-id-demo",
+            "name": "Demo Identity Authority"
+          },
+          "issuedAt": "2026-09-01T00:00:00Z",
+          "expiresAt": "2027-09-01T00:00:00Z",
+          "credentialSubject": {
+            "birthDate": "1988-06-30",
+            "ageYears": 38,
+            "nationality": "KR",
+            "region": "Seoul"
+          },
+          "binding": {
+            "holderCommit": "0x3e725edc87427178626a95f460e632aa4b93ed234b00d9496d863959524312fa",
+            "salt": "24c1070b1bdfcad9eb5ab801ca4c1924de7fb5c72b181b81d703e01de2dd253d"
+          },
+          "proof": {
+            "type": "StateProofJubjubSchnorr2026",
+            "r": {
+              "x": "0x3e6d39d40ca00bdcde582bc5998aa469c381c7b690ac8aecfc5a70437050438c",
+              "y": "0x225380f2baff6fc506454f3e195ce3e6d2be1691af4c45d0b1162c1b2303a319"
+            },
+            "s": "0xcb936c0f4db12920c4c79ca3c74b64ec7e541719e403cbffe66f765a876f0e0"
+          }
+        }
+      ]
+    }
+  ]
+}

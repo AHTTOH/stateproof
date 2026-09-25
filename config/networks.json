@@ -1,5 +1,5 @@
 {
-  "$comment": "Single source of network endpoints (2026-09-25). Code reads these values and fails fast when one is missing. The proof server defaults to the Midnight Foundation public instance; point proofServer at http://localhost:6300 to keep witnesses on your machine (see infra/proof-server).",
+  "$comment": "Single source of network endpoints (2026-09-25). Code reads these values and fails fast when one is missing. proofServer is used only by the wallet for its own small proofs (DUST fees); the public instance rejects contract-circuit proofs (body > 8KB -> 403), so StateProof circuits are proved with the zkir-v2 WASM prover, which downloads public parameters from zkArtifacts. See docs/decisions/2026-09-25-proving-strategy.md.",
   "preprod": {
     "networkId": "preprod",
     "indexer": "https://indexer.preprod.midnight.network/api/v4/graphql",
@@ -8,7 +8,9 @@
     "nodeWS": "wss://rpc.preprod.midnight.network",
     "proofServer": "https://proof-server.preprod.midnight.network",
     "faucet": "https://midnight-tmnight-preprod.nethermind.dev/",
-    "explorer": "https://explorer.preprod.midnight.network"
+    "explorer": "https://explorer.preprod.midnight.network",
+    "zkArtifacts": "https://midnight-s3-fileshare-dev-eu-west-1.s3.eu-west-1.amazonaws.com",
+    "midnightKeyVersion": 9
   },
   "preview": {
     "networkId": "preview",
@@ -18,6 +20,8 @@
     "nodeWS": "wss://rpc.preview.midnight.network",
     "proofServer": "https://proof-server.preview.midnight.network",
     "faucet": "https://midnight-tmnight-preview.nethermind.dev/",
-    "explorer": "https://explorer.preview.midnight.network"
+    "explorer": "https://explorer.preview.midnight.network",
+    "zkArtifacts": "https://midnight-s3-fileshare-dev-eu-west-1.s3.eu-west-1.amazonaws.com",
+    "midnightKeyVersion": 9
   }
 }

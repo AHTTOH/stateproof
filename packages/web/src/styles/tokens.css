@@ -1,0 +1,44 @@
+/* StateProof design tokens (2026-09-25).
+   Palette: cool mist ground, one semantic green for "proven", one indigo for "stays private". */
+:root {
+  --c-ground: #e9edea;
+  --c-paper: #fbfcfa;
+  --c-ink: #17211d;
+  --c-ink-soft: #3a4641;
+  --c-muted: #5a6660;
+  --c-rule: #c9d1cc;
+  --c-proven: #0e7a5a;
+  --c-proven-wash: #dcefe6;
+  --c-sealed: #3b3a8f;
+  --c-sealed-wash: #e4e3f4;
+  --c-alert: #a4262c;
+  --c-alert-wash: #f6e1e1;
+  --c-pending: #8a5d00;
+  --c-pending-wash: #f5ead2;
+
+  --f-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --t-xs: 0.8125rem;
+  --t-sm: 0.9375rem;
+  --t-base: 1rem;
+  --t-lg: 1.25rem;
+  --t-xl: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+  --t-hero: clamp(2.25rem, 1.4rem + 3.6vw, 3.75rem);
+
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-12: 3rem;
+  --s-16: 4rem;
+
+  --r-control: 6px;
+  --r-panel: 14px;
+  --w-column: 58rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --d-fast: 140ms;
+}

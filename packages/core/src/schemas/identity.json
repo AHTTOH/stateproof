@@ -1,0 +1,53 @@
+{
+  "id": "identity",
+  "version": 1,
+  "title": "Identity Credential",
+  "label": "stateproof:identity:v1",
+  "claims": [
+    {
+      "key": "birthDate",
+      "slot": 0,
+      "label": "Date of birth",
+      "type": "date"
+    },
+    {
+      "key": "ageYears",
+      "slot": 1,
+      "label": "Age at issuance",
+      "type": "integer",
+      "unit": "years"
+    },
+    {
+      "key": "nationality",
+      "slot": 2,
+      "label": "Nationality",
+      "type": "enum",
+      "codes": { "KR": 410, "US": 840, "JP": 392, "CN": 156, "VN": 704 }
+    },
+    {
+      "key": "region",
+      "slot": 3,
+      "label": "Region of residence",
+      "type": "enum",
+      "codes": {
+        "Seoul": 11,
+        "Busan": 26,
+        "Daegu": 27,
+        "Incheon": 28,
+        "Gwangju": 29,
+        "Daejeon": 30,
+        "Ulsan": 31,
+        "Sejong": 36,
+        "Gyeonggi": 41,
+        "Chungbuk": 43,
+        "Chungnam": 44,
+        "Jeonnam": 46,
+        "Gyeongbuk": 47,
+        "Gyeongnam": 48,
+        "Jeju": 50,
+        "Gangwon": 51,
+        "Jeonbuk": 52
+      }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "$comment": "Fictional demo people (2026-09-25). No real personal data. Each persona gets one holder secret and one credential per entry.",
+  "validity": { "issuedAt": "2026-09-01T00:00:00Z", "expiresAt": "2027-09-01T00:00:00Z" },
+  "personas": [
+    {
+      "id": "minji",
+      "displayName": "Minji Park (fictional)",
+      "credentials": [
+        {
+          "issuer": "issuer:acme-hr",
+          "schema": "employment",
+          "subject": { "employmentStatus": "Active", "jobCategory": "Engineering", "employmentStartDate": "2024-07-01", "employmentMonths": 26 }
+        },
+        {
+          "issuer": "issuer:gov-id-demo",
+          "schema": "identity",
+          "subject": { "birthDate": "1995-03-14", "ageYears": 31, "nationality": "KR", "region": "Gyeonggi" }
+        }
+      ]
+    },
+    {
+      "id": "sora",
+      "displayName": "Sora Kim (fictional)",
+      "credentials": [
+        {
+          "issuer": "issuer:acme-hr",
+          "schema": "employment",
+          "subject": { "employmentStatus": "Active", "jobCategory": "Design", "employmentStartDate": "2026-03-02", "employmentMonths": 6 }
+        },
+        {
+          "issuer": "issuer:gov-id-demo",
+          "schema": "identity",
+          "subject": { "birthDate": "2008-11-02", "ageYears": 17, "nationality": "KR", "region": "Busan" }
+        }
+      ]
+    },
+    {
+      "id": "jun",
+      "displayName": "Jun Lee (fictional)",
+      "credentials": [
+        {
+          "issuer": "issuer:acme-hr",
+          "schema": "employment",
+          "subject": { "employmentStatus": "Terminated", "jobCategory": "Sales", "employmentStartDate": "2021-05-10", "employmentMonths": 40 }
+        },
+        {
+          "issuer": "issuer:gov-id-demo",
+          "schema": "identity",
+          "subject": { "birthDate": "1988-06-30", "ageYears": 38, "nationality": "KR", "region": "Seoul" }
+        }
+      ]
+    }
+  ]
+}

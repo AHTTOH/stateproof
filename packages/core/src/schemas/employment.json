@@ -1,0 +1,35 @@
+{
+  "id": "employment",
+  "version": 1,
+  "title": "Employment Credential",
+  "label": "stateproof:employment:v1",
+  "claims": [
+    {
+      "key": "employmentStatus",
+      "slot": 0,
+      "label": "Employment status",
+      "type": "enum",
+      "codes": { "Active": 1, "Leave": 2, "Terminated": 3 }
+    },
+    {
+      "key": "jobCategory",
+      "slot": 1,
+      "label": "Job category",
+      "type": "enum",
+      "codes": { "Engineering": 1, "Design": 2, "Sales": 3, "Operations": 4, "Research": 5 }
+    },
+    {
+      "key": "employmentStartDate",
+      "slot": 2,
+      "label": "Employment start date",
+      "type": "date"
+    },
+    {
+      "key": "employmentMonths",
+      "slot": 3,
+      "label": "Months employed",
+      "type": "integer",
+      "unit": "months"
+    }
+  ]
+}
