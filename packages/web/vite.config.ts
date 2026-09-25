@@ -99,6 +99,7 @@ export default defineConfig({
     commonjsOptions: { transformMixedEsModules: true, extensions: ['.js', '.cjs'], ignoreDynamicRequires: true },
   },
   plugins: [react(), wasm(), zkAssets()],
+  worker: { format: 'es', plugins: () => [wasm()] },
   optimizeDeps: {
     include: ['@midnight-ntwrk/compact-runtime'],
     exclude: [
