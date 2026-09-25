@@ -1,0 +1,30 @@
+// StateProof shared enums and domain-separation tags.
+// Sizes that Compact needs as literals (claim slots = 8, conditions = 4, set values = 4)
+// live in the struct definitions of credential.compact / policy.compact and are mirrored
+// by packages/core/src/constants.ts. A contract test binds the two together.
+
+export enum Op {
+  ignore,
+  gte,
+  lte,
+  eq,
+  neq,
+  between,
+  inSet
+}
+
+export pure circuit credentialDomain(): Bytes<32> {
+  return pad(32, "stateproof:credential:v1");
+}
+
+export pure circuit signatureDomain(): Bytes<32> {
+  return pad(32, "stateproof:signature:v1");
+}
+
+export pure circuit holderDomain(): Bytes<32> {
+  return pad(32, "stateproof:holder:v1");
+}
+
+export pure circuit adminDomain(): Bytes<32> {
+  return pad(32, "stateproof:admin:v1");
+}

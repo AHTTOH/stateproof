@@ -1,0 +1,23 @@
+{
+  "$comment": "Single source of network endpoints (2026-09-25). Code reads these values and fails fast when one is missing. The proof server defaults to the Midnight Foundation public instance; point proofServer at http://localhost:6300 to keep witnesses on your machine (see infra/proof-server).",
+  "preprod": {
+    "networkId": "preprod",
+    "indexer": "https://indexer.preprod.midnight.network/api/v4/graphql",
+    "indexerWS": "wss://indexer.preprod.midnight.network/api/v4/graphql/ws",
+    "node": "https://rpc.preprod.midnight.network",
+    "nodeWS": "wss://rpc.preprod.midnight.network",
+    "proofServer": "https://proof-server.preprod.midnight.network",
+    "faucet": "https://midnight-tmnight-preprod.nethermind.dev/",
+    "explorer": "https://explorer.preprod.midnight.network"
+  },
+  "preview": {
+    "networkId": "preview",
+    "indexer": "https://indexer.preview.midnight.network/api/v4/graphql",
+    "indexerWS": "wss://indexer.preview.midnight.network/api/v4/graphql/ws",
+    "node": "https://rpc.preview.midnight.network",
+    "nodeWS": "wss://rpc.preview.midnight.network",
+    "proofServer": "https://proof-server.preview.midnight.network",
+    "faucet": "https://midnight-tmnight-preview.nethermind.dev/",
+    "explorer": "https://explorer.preview.midnight.network"
+  }
+}

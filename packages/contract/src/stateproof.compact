@@ -1,0 +1,93 @@
+// StateProof: prove that a credential satisfies a verifier's policy without revealing it.
+// SPDX-License-Identifier: Apache-2.0
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+include "modules/constants";
+include "modules/credential";
+include "modules/policy";
+
+export struct Request {
+  policy: Policy,
+  referenceTime: Uint<64>,
+  expiresAt: Uint<64>,
+}
+
+export struct VerificationResult {
+  revealed: Maybe<Uint<64>>,
+}
+
+// Hash of the deployer's admin secret. Only the admin registers trusted issuers.
+export ledger admin: Bytes<32>;
+// issuerId -> issuer Schnorr public key.
+export ledger issuers: Map<Bytes<32>, JubjubPoint>;
+// requestId -> request. The policy is public on purpose: holders see exactly what is asked.
+export ledger requests: Map<Bytes<32>, Request>;
+// requestId -> result. Presence means VERIFIED; failed proofs never reach the chain.
+export ledger results: Map<Bytes<32>, VerificationResult>;
+
+witness adminSecret(): Bytes<32>;
+witness credential(): Credential;
+witness credentialSignature(): Signature;
+witness holderSecret(): Bytes<32>;
+
+circuit adminKey(secret: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([adminDomain(), secret]);
+}
+
+constructor() {
+  admin = disclose(adminKey(adminSecret()));
+}
+
+export circuit registerIssuer(issuerId: Bytes<32>, publicKey: JubjubPoint): [] {
+  assert(adminKey(adminSecret()) == admin, "Only the admin can register issuers");
+  assertUsablePoint(publicKey);
+  issuers.insert(disclose(issuerId), disclose(publicKey));
+}
+
+export circuit createRequest(
+  requestId: Bytes<32>,
+  policy: Policy,
+  referenceTime: Uint<64>,
+  expiresAt: Uint<64>
+): [] {
+  const id = disclose(requestId);
+  const publicPolicy = disclose(policy);
+  assert(!requests.member(id), "Request id already used");
+  assert(issuers.member(publicPolicy.issuerId), "Policy issuer is not registered");
+  assertWellFormedPolicy(publicPolicy);
+  assert(blockTimeLt(disclose(expiresAt)), "Request expiry must be in the future");
+  requests.insert(id, Request {
+    policy: publicPolicy,
+    referenceTime: disclose(referenceTime),
+    expiresAt: disclose(expiresAt)
+  });
+}
+
+export circuit submitProof(requestId: Bytes<32>): [] {
+  const id = disclose(requestId);
+  assert(requests.member(id), "Unknown request");
+  assert(!results.member(id), "Request already answered");
+  const request = requests.lookup(id);
+  assert(blockTimeLt(request.expiresAt), "Request expired");
+
+  const cred = credential();
+  const signature = credentialSignature();
+  assert(cred.schemaId == request.policy.schemaId, "Credential schema does not match the policy");
+  assert(cred.issuerId == request.policy.issuerId, "Credential issuer does not match the policy");
+
+  const issuerKey = issuers.lookup(request.policy.issuerId);
+  const challenge = signingChallenge(credentialRoot(cred), issuerKey, signature.r);
+  assert(isValidSignature(issuerKey, signature, challenge), "Invalid issuer signature");
+
+  assert(cred.issuedAt <= request.referenceTime, "Credential is not valid yet");
+  assert(request.referenceTime < cred.expiresAt, "Credential expired");
+  assert(holderCommitment(holderSecret()) == cred.holderCommit, "Credential is bound to another holder");
+  assert(policyHolds(cred.claims, request.policy), "Policy conditions are not satisfied");
+
+  results.insert(id, VerificationResult {
+    revealed: disclose(revealedClaim(cred.claims, request.policy.revealSlot))
+  });
+}

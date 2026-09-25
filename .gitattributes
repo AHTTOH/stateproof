@@ -1,0 +1,7 @@
+# Keep LF everywhere so scripts and compiled artifacts are identical on every OS.
+* text=auto eol=lf
+
+# Compiled ZK artifacts
+*.prover binary
+*.verifier binary
+*.bzkir binary

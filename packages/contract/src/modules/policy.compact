@@ -1,0 +1,69 @@
+// Generic predicate engine (PRD §14).
+// The policy is a public circuit input. Compact has no dynamic indexing or
+// dynamic-length loops, so every slot and every operator is computed and the
+// result is selected by the condition's own fields. One fixed circuit therefore
+// evaluates any policy the verifier composes at request time.
+
+export struct Condition {
+  claimIndex: Uint<8>,
+  op: Op,
+  value: Uint<64>,
+  value2: Uint<64>,
+  set: Vector<4, Uint<64>>,
+}
+
+export struct Policy {
+  schemaId: Bytes<32>,
+  issuerId: Bytes<32>,
+  conditions: Vector<4, Condition>,
+  revealSlot: Maybe<Uint<8>>,
+}
+
+export pure circuit selectClaim(claims: Vector<8, Uint<64>>, index: Uint<8>): Uint<64> {
+  assert(index < 8, "Claim index out of range");
+  const slots: Vector<8, Uint<8>> = [0, 1, 2, 3, 4, 5, 6, 7];
+  return fold(
+    (acc: Uint<64>, value: Uint<64>, slot: Uint<8>): Uint<64> => slot == index ? value : acc,
+    0 as Uint<64>,
+    claims,
+    slots
+  );
+}
+
+export pure circuit conditionHolds(claims: Vector<8, Uint<64>>, condition: Condition): Boolean {
+  const value = selectClaim(claims, condition.claimIndex);
+  const inSet = fold(
+    (acc: Boolean, member: Uint<64>): Boolean => acc || member == value,
+    false,
+    condition.set
+  );
+  return condition.op == Op.ignore ? true
+    : condition.op == Op.gte ? value >= condition.value
+    : condition.op == Op.lte ? value <= condition.value
+    : condition.op == Op.eq ? value == condition.value
+    : condition.op == Op.neq ? value != condition.value
+    : condition.op == Op.between ? (value >= condition.value && value <= condition.value2)
+    : inSet;
+}
+
+export pure circuit policyHolds(claims: Vector<8, Uint<64>>, policy: Policy): Boolean {
+  return fold(
+    (acc: Boolean, condition: Condition): Boolean => acc && conditionHolds(claims, condition),
+    true,
+    policy.conditions
+  );
+}
+
+export pure circuit assertWellFormedPolicy(policy: Policy): [] {
+  for (const condition of policy.conditions) {
+    assert(condition.claimIndex < 8, "Condition claim index out of range");
+    assert(condition.op != Op.between || condition.value <= condition.value2, "Between bounds are reversed");
+  }
+  assert(!policy.revealSlot.is_some || policy.revealSlot.value < 8, "Reveal slot out of range");
+}
+
+export pure circuit revealedClaim(claims: Vector<8, Uint<64>>, revealSlot: Maybe<Uint<8>>): Maybe<Uint<64>> {
+  return revealSlot.is_some
+    ? some<Uint<64>>(selectClaim(claims, revealSlot.value))
+    : none<Uint<64>>();
+}

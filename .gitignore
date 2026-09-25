@@ -1,0 +1,38 @@
+# Dependencies and build output
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+coverage/
+**/reports/
+
+# Logs and local wallet / private state stores
+logs/
+*.log
+midnight-level-db/
+*-private-state*/
+
+# Secrets. Only .env.example is committed.
+.env
+.env.*
+!.env.example
+
+# Scratch output of compact --skip-zk runs
+.compact-cache/
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local assistant settings
+.claude/
+.midnight-expert/
+
+# Firebase local cache
+.firebase/
+
+# NOTE: packages/contract/src/managed/ is committed on purpose (decision 5):
+# reviewers can run tests and the UI without installing the Compact compiler.

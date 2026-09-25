@@ -1,0 +1,19 @@
+{
+  "name": "@stateproof/issuer",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "issue": "tsx src/cli.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@stateproof/contract": "0.1.0",
+    "@stateproof/core": "0.1.0"
+  }
+}

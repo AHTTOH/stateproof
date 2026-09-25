@@ -1,0 +1,20 @@
+{
+  "name": "@stateproof/cli",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "tsx src/deploy.ts",
+    "register-issuer": "tsx src/register-issuer.ts",
+    "e2e": "tsx src/e2e-preprod.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/zkir-v2": "2.1.0",
+    "@stateproof/contract": "0.1.0",
+    "@stateproof/core": "0.1.0",
+    "@stateproof/issuer": "0.1.0",
+    "dotenv": "^17.2.3"
+  }
+}
