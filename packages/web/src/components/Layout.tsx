@@ -1,5 +1,5 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import { NETWORK, contractAddress } from '../app/env';
+import { NETWORK, contractAddress, explorerContractUrl } from '../app/env';
 
 export const Layout = () => {
   const address = contractAddress();
@@ -27,7 +27,8 @@ export const Layout = () => {
           Lace only pays the network fee and submits the transaction.
         </p>
         <p>
-          Contract <span className="hash">{address ?? `not deployed on ${NETWORK}`}</span>. Test network data only. All
+          Contract{' '}
+          {address === null ? <span className="hash">not deployed on {NETWORK}</span> : <a className="hash" href={explorerContractUrl(address)}>{address}</a>}. Test network data only. All
           people and issuers in the demo are fictional.
         </p>
       </footer>

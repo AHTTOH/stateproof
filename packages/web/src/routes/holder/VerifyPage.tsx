@@ -42,7 +42,7 @@ export const VerifyPage = () => {
   const [wallet, setWallet] = useState<HolderWallet | null>(loadHolderWallet());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [txId, setTxId] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   const request = view.data?.request ?? null;
   const doc = useMemo(() => (wallet && request ? matchingCredential(wallet, request) : null), [wallet, request]);
@@ -60,7 +60,7 @@ export const VerifyPage = () => {
     try {
       const session = await lace.connect();
       const result = await submitProof(session.providers, session.contract, fromHex32(requestId), proofInputs(wallet, doc));
-      setTxId(result.txId);
+      setTxHash(result.txHash);
       view.reload();
     } catch (e) {
       setError(errorMessage(e));
@@ -118,9 +118,9 @@ export const VerifyPage = () => {
       )}
 
       {error && <p className="notice error" role="alert">{error}</p>}
-      {txId && (
+      {txHash && (
         <p className="notice ok">
-          Proof accepted on chain. <a href={explorerTxUrl(txId)}>Transaction</a>. <Link to={`/request/${requestId}`}>View receipt</Link>
+          Proof accepted on chain. <a href={explorerTxUrl(txHash)}>Transaction</a>. <Link to={`/request/${requestId}`}>View receipt</Link>
         </p>
       )}
     </>

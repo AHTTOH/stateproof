@@ -36,7 +36,25 @@
 
 - 두 번째 요청 직후 faucet 헬스가 `NOT_SERVING / WALLET_BALANCE_LOW` 로 바뀌었다. 심사자가 faucet 을 못 쓰는 상황에 대비해, README 에 "Lace 에 tNIGHT 가 없으면 데모 영상과 온체인 기록으로 확인" 경로를 둔다.
 
+## Lace 실측 (2026-09-25 22:30~22:45 KST, Lace 2.4.0 Chrome 확장을 Playwright Chromium 에 올려 자동 조작)
+
+| 항목 | 결과 |
+|---|---|
+| 새 지갑 생성 | 비밀번호 → 계정 선택(Cardano·Bitcoin·Midnight 토글) → 완료. 복구 문구 확인 단계 없음 |
+| 네트워크 | Settings → Network → **Testnet** 을 고르면 체인별 선택지가 나온다. Midnight 기본값은 **Preview**(`DEFAULT_MIDNIGHT_TESTNET_NETWORK_ID`). 같은 화면에서 Midnight **Preprod** 를 따로 골라야 한다 |
+| 동기화 | faucet 5000 tNIGHT 수령 후 1~2분 안에 잔액 표시. 헤드리스 SDK 지갑(수 시간)과 달리 새 Lace 지갑은 빠르다 |
+| tDUST | 지갑 화면의 DUST 버튼 → 자기 DUST 주소로 지정(designation) → 비밀번호. 증명 서버 호출 없이 완료 |
+| proof server | Settings → Midnight 의 선택지는 **Local `http://localhost:6300` 하나뿐**. 화면에도 "Midnight 에서 자산을 보내려면 Docker 로컬 proof server 가 필수" 라고 표시된다 |
+| DApp `getProvingProvider` | 코드상 지갑의 proof server 주소로 `httpClientProvingProvider` 를 만든다. 즉 로컬 6300 필수 |
+
+결정 보강:
+
+5. **웹 앱은 Lace 의 `getProvingProvider` 를 쓰지 않는다.** StateProof 회로 증명은 브라우저 WASM 으로 만들고, Lace 에는 `balanceUnsealedTransaction`(DUST 수수료)과 `submitTransaction` 만 맡긴다. 회로 파라미터(k=12·13, 합계 2.4MB)는 S3 에 CORS 헤더가 없어 브라우저가 직접 받을 수 없으므로 앱과 같은 출처(`/zk/params`)로 함께 배포한다.
+6. **Lace 사용자는 여전히 `localhost:6300` 이 필요하다**(Lace 자체의 수수료 증명용). 두 가지를 안내한다.
+   - 권장: `docker compose -f infra/proof-server/docker-compose.yml up -d` (proof-server 8.1.0, 모든 입력이 내 PC 에 남음)
+   - Docker 가 없을 때: `node scripts/proof-server-proxy.mjs preprod` 가 6300 요청을 공용 서버로 넘긴다. 수수료 증명 요청은 작아서 공용 서버가 받는다(배포 tx 로 확인). 대신 지갑의 수수료 증명 입력이 공용 서버로 간다는 점을 README 에 적는다.
+
 ## 남은 확인
 
 - [ ] WASM 증명기로 Preprod 회로 호출 tx 1건 성공 (spike 실행 중, 지갑 동기화 대기)
-- [ ] Lace `getProvingProvider` 동작 확인 (D1')
+- [ ] Lace + 웹 앱으로 createRequest·submitProof 성공 (컨트랙트 배포 후)

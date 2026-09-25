@@ -51,7 +51,7 @@ exitOnError(
     const now = BigInt(Math.floor(Date.now() / 1000));
     let t = Date.now();
     const created = await createRequest(contract, requestId, buildPolicy(DEMO_POLICY), now, now + REQUEST_TTL_SECONDS);
-    logger.info(`createRequest ${toHex(requestId)} tx ${created.txId} in ${Math.round((Date.now() - t) / 1000)}s`);
+    logger.info(`createRequest ${toHex(requestId)} tx ${created.txHash} in ${Math.round((Date.now() - t) / 1000)}s`);
 
     const sora = await loadPersona('sora');
     try {
@@ -65,7 +65,7 @@ exitOnError(
     const minji = await loadPersona('minji');
     t = Date.now();
     const proved = await submitProof(providers, contract, requestId, proofInputsFor(minji, 'employment'));
-    logger.info(`submitProof tx ${proved.txId} (block ${proved.blockHeight}) in ${Math.round((Date.now() - t) / 1000)}s`);
+    logger.info(`submitProof tx ${proved.txHash} (block ${proved.blockHeight}) in ${Math.round((Date.now() - t) / 1000)}s`);
 
     const ledger = await readLedger(providers.publicDataProvider, contractAddress);
     const receipt = buildReceipt(requestId, ledger.requests.lookup(requestId), ledger.results.member(requestId) ? ledger.results.lookup(requestId) : null, BigInt(Math.floor(Date.now() / 1000)));

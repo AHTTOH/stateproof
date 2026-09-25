@@ -6,7 +6,7 @@ export interface StoredRequest {
   readonly requestId: string;
   readonly label: string;
   readonly createdAt: string;
-  readonly txId: string;
+  readonly txHash: string;
 }
 
 export const loadRequests = (): readonly StoredRequest[] => {

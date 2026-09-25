@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createRequest } from '@stateproof/contract';
 import { buildPolicy, describePolicy, randomBytes32, toHex, type PolicyInput } from '@stateproof/core';
 import { useLace } from '../../app/LaceContext';
-import { contractAddress, NETWORK } from '../../app/env';
+import { contractAddress, explorerTxUrl, NETWORK } from '../../app/env';
 import { errorMessage, useAsync } from '../../app/useAsync';
 import { StatusBadge } from '../../components/StatusBadge';
 import { fetchRequest } from '../../state/ledger';
@@ -75,7 +75,7 @@ export const VerifierPage = () => {
         requestId: toHex(requestId),
         label: description.conditions.join(' and '),
         createdAt: new Date().toISOString(),
-        txId: receipt.txId,
+        txHash: receipt.txHash,
       };
       setRequests(rememberRequest(stored));
       setCreated(stored);
@@ -135,7 +135,7 @@ export const VerifierPage = () => {
       {error && <p className="notice error" role="alert">{error}</p>}
       {created && (
         <div className="notice ok">
-          Request created (tx <span className="hash">{created.txId}</span>). Send this link to the holder:
+          Request created (<a href={explorerTxUrl(created.txHash)}>transaction</a>). Send this link to the holder:
           <div className="hash" style={{ marginTop: 'var(--s-2)' }}>
             <a href={holderLink(created.requestId)}>{holderLink(created.requestId)}</a>
           </div>

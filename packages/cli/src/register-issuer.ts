@@ -25,7 +25,7 @@ exitOnError(
       }
       const started = Date.now();
       const receipt = await registerIssuer(admin, id, key);
-      logger.info(`Registered ${entry.id} (tx ${receipt.txId}) in ${Math.round((Date.now() - started) / 1000)}s`);
+      logger.info(`Registered ${entry.id} (tx ${receipt.txHash}) in ${Math.round((Date.now() - started) / 1000)}s`);
     }
   }),
 );

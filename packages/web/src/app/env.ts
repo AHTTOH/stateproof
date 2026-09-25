@@ -51,4 +51,6 @@ export const issuerInfo = (id: string): IssuerInfo => {
 
 export const zkBaseUrl = (): string => new URL(`${import.meta.env.BASE_URL}${__STATEPROOF_ZK_ROUTE__}/`, window.location.origin).toString();
 
-export const explorerTxUrl = (txId: string): string => `${networkEndpoints().explorer}/transactions/${txId}`;
+export const explorerTxUrl = (txHash: string): string => `${networkEndpoints().explorer}/transactions/${txHash}`;
+
+export const explorerContractUrl = (address: string): string => `${networkEndpoints().explorer}/contracts/${address}`;

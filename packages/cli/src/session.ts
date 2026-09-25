@@ -39,7 +39,7 @@ export const exitOnError = (promise: Promise<void>): void => {
 export interface DeploymentRecord {
   readonly contractAddress: string;
   readonly deployedAt: string;
-  readonly deployTxId: string;
+  readonly deployTxHash: string;
   readonly compiler: string;
 }
 
