@@ -16,7 +16,7 @@ import type { StateProofCircuitId, StateProofPrivateState, StateProofProviders }
 import { fromHex, toHex } from '@stateproof/core';
 import { networkEndpoints, zkBaseUrl } from '../app/env';
 import { inMemoryPrivateStateProvider } from './in-memory-private-state-provider';
-import { createWorkerProofProvider } from './workerProving';
+import { workerProofProvider } from './workerProving';
 
 // The provider defaults to isomorphic-ws, whose browser build has no named WebSocket
 // export; without the browser's own WebSocket the tx-confirmation subscription never opens.
@@ -33,7 +33,7 @@ export const walletProviders = async (api: ConnectedAPI): Promise<StateProofProv
     privateStateProvider: inMemoryPrivateStateProvider<'stateproofPrivateState', StateProofPrivateState>(),
     publicDataProvider: publicDataProvider(),
     zkConfigProvider,
-    proofProvider: createWorkerProofProvider(base),
+    proofProvider: workerProofProvider(base),
     walletProvider: {
       getCoinPublicKey: () => addresses.shieldedCoinPublicKey,
       getEncryptionPublicKey: () => addresses.shieldedEncryptionPublicKey,

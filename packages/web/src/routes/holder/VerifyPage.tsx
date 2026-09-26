@@ -113,7 +113,7 @@ export const VerifyPage = () => {
           <span>
             Holder: <strong>{wallet.label}</strong>
           </span>
-          <button type="button" className="btn quiet" onClick={switchPersona}>
+          <button type="button" className="btn quiet" disabled={busy || dryBusy} onClick={switchPersona}>
             Use a different persona
           </button>
         </p>

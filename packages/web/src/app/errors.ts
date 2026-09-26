@@ -32,15 +32,15 @@ const RULES: readonly Rule[] = [
       'Lace could not reach a proof server at localhost:6300. Start one with "docker compose -f infra/proof-server/docker-compose.yml up -d" or "node scripts/proof-server-proxy.mjs preprod".',
   },
   {
-    match: /network ?id|mismatch|different network/i,
+    match: /network ?id|network mismatch|different network/i,
     summary: 'Lace is on a different Midnight network. In Lace: Settings, Network, Testnet, then choose Preprod for Midnight.',
   },
   {
-    match: /channel .* was shutdown|rejected|denied|cancel/i,
+    match: /channel .* was shutdown|user (rejected|denied|cancell?ed)|request was (rejected|denied|cancell?ed)|declined by the user/i,
     summary: 'The Lace window was closed or the request was declined. Try again and approve it in Lace.',
   },
   {
-    match: /not connected|locked/i,
+    match: /Lace is not connected|wallet is locked|is locked/i,
     summary: 'Lace is locked or disconnected. Unlock Lace and try again.',
   },
 ];

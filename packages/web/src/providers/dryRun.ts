@@ -16,7 +16,7 @@ import { randomBytes32 } from '@stateproof/core';
 import { requireContractAddress, zkBaseUrl } from '../app/env';
 import { inMemoryPrivateStateProvider } from './in-memory-private-state-provider';
 import { publicDataProvider } from './midnight';
-import { createWorkerProofProvider } from './workerProving';
+import { workerProofProvider } from './workerProving';
 
 export interface DryRunResult {
   readonly proveMs: number;
@@ -52,6 +52,6 @@ export const dryRunProof = async (requestId: Uint8Array, inputs: HolderProofInpu
   );
 
   const started = performance.now();
-  const proven = await createWorkerProofProvider(base).proveTx(unproven.private.unprovenTx);
+  const proven = await workerProofProvider(base).proveTx(unproven.private.unprovenTx);
   return { proveMs: Math.round(performance.now() - started), txBytes: proven.serialize().length };
 };
