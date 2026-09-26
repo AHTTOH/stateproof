@@ -21,7 +21,7 @@ https://stateproof-demo.web.app (Midnight Preprod)
 
 ## 실행 방법 / 데모 흐름
 
-**지갑 없이 확인 (브라우저만):** https://stateproof-demo.web.app/holder/verify/08da5a24a5528086cd5ca5079e641c2dae79238dbb27eb0bbfeaad5a5f40d91e 에서 Use Minji Park, Try the proof without a wallet(브라우저에서 실제 ZK 증명 생성, 제출 안 함), Use a different persona, Use Sora Kim(조건 불충족으로 증명 없이 차단) 순서로 누른다. 자세한 단계는 README 첫 절.
+**지갑 없이 확인 (브라우저만):** https://stateproof-demo.web.app/holder/verify/08da5a24a5528086cd5ca5079e641c2dae79238dbb27eb0bbfeaad5a5f40d91e 에서 Use Minji Park, Try the proof without a wallet(브라우저에서 실제 ZK 증명 생성, 제출 안 함), Use a different persona, Use Sora Kim(조건 불충족으로 증명 없이 차단) 순서로 누른다. 신원 조건(19세 이상, 거주지 서울·경기) 요청도 같은 방식으로 확인할 수 있다: https://stateproof-demo.web.app/holder/verify/5d21cc83a45e9552ad1b447cd0c6677654cb9c692d4e33ee381cdb28260c6073 . 자세한 단계는 README 첫 절.
 
 **Lace 로 실제 트랜잭션까지:**
 
