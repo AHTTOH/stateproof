@@ -56,7 +56,11 @@ Midnight 재단의 공용 proof server 는 요청 본문 8KB 이상을 403 으�
 | 데모 | https://stateproof-demo.web.app |
 | StateProof 컨트랙트 | [`4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3`](https://explorer.preprod.midnight.network/contracts/4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3) |
 | 배포 tx | [`9b5b3d77…729b60`](https://explorer.preprod.midnight.network/transactions/9b5b3d7728fa7baca2cd4aa9994e126e4e3e42ed09ad6143053a996f58729b60) (2026-09-26 06:22 KST, 컴파일러 0.31.1) |
-| 발급자 등록 `issuer:acme-hr` | [`bf69827e…f680549`](https://explorer.preprod.midnight.network/transactions/bf69827ee414acb764df5d86963ff6030a20532d3b9b36de08fb3471ff680549) (증명은 Node WASM) |
+| 발급자 등록 `issuer:acme-hr` | [`bf69827e…f680549`](https://explorer.preprod.midnight.network/transactions/bf69827ee414acb764df5d86963ff6030a20532d3b9b36de08fb3471ff680549) (CLI, Node WASM 증명) |
+| 발급자 등록 `issuer:gov-id-demo` | [`df1eaf69…ddccd70e`](https://explorer.preprod.midnight.network/transactions/df1eaf6978d0b1ea9e1262cb86383fdd07cb02693a7654b4f22b00b9ddccd70e) (웹 Operator tools, 브라우저 증명 + Lace) |
+| 검증 요청 생성 | [`d85c2733…8e4d2b61`](https://explorer.preprod.midnight.network/transactions/d85c27339ab97969a2facbdee8b84cc0e4c9ac3cb672acf828f96cd78e4d2b61) (웹 `/verifier`, Lace) |
+| 홀더 증명 → VERIFIED | [`a8498d4b…0a92012a`](https://explorer.preprod.midnight.network/transactions/a8498d4bbf12a5839a4d11105de0f1835fc0bbda3ef83bc3ab9a6bfa0a92012a) (웹 `/holder/verify`, 브라우저 증명 약 28초 + Lace) |
+| 영수증 | https://stateproof-demo.web.app/request/9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a |
 
 전체 기록은 [config/deployments.json](config/deployments.json) 과 [docs/demo](docs/demo) 에 있다.
 
@@ -87,7 +91,8 @@ STATEPROOF_NETWORK=preprod npm run dev -w @stateproof/web
 2. Settings → Network → **Testnet** → Midnight 항목에서 **Preprod** 선택(기본값은 Preview).
 3. Midnight Receive → Unshielded 주소로 [Preprod faucet](https://midnight-tmnight-preprod.nethermind.dev/) 에서 tNIGHT 받기.
 4. 지갑의 DUST 버튼으로 tDUST 생성 지정.
-5. Lace 는 수수료 증명을 `localhost:6300` 에서 만든다. 둘 중 하나를 띄운다.
+5. tDUST 는 지정 뒤 시간에 비례해 쌓인다. **데모 전날 미리** 1~4 를 해 두는 것을 권한다. tx 를 연달아 낼 때는 앞 tx 가 확정되고 1~2분 기다린다(Preprod 에서 직전 수수료가 반영되기 전에 다음 tx 를 내면 노드가 수수료 증명을 거부했다).
+6. Lace 는 수수료 증명을 `localhost:6300` 에서 만든다. 둘 중 하나를 띄운다.
    - 권장: `docker compose -f infra/proof-server/docker-compose.yml up -d`
    - Docker 가 없을 때: `node scripts/proof-server-proxy.mjs preprod` (6300 요청을 공용 proof server 로 전달. 지갑의 수수료 증명 입력이 공용 서버로 간다)
 
