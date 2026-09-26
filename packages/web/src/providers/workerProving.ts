@@ -1,7 +1,7 @@
 // ProofProvider backed by prover.worker.ts. The key location passed by Midnight.js is
 // ignored here because zkir reads it from the serialized preimage itself.
 import { createProofProvider, type ProofProvider } from '@midnight-ntwrk/midnight-js-types';
-import type { ProverRequest, ProverResponse } from './prover.worker';
+import { WORKER_READY, type ProverRequest, type ProverResponse } from './proverProtocol';
 
 type Pending = { resolve(r: ProverResponse): void; reject(e: Error): void };
 type RequestBody = ProverRequest extends infer R ? (R extends ProverRequest ? Omit<R, 'id' | 'zkBase'> : never) : never;
@@ -10,7 +10,17 @@ export const createWorkerProofProvider = (zkBase: string): ProofProvider => {
   const worker = new Worker(new URL('./prover.worker.ts', import.meta.url), { type: 'module' });
   const pending = new Map<number, Pending>();
   let nextId = 0;
-  worker.onmessage = (event: MessageEvent<ProverResponse>) => {
+  let markReady: () => void = () => {};
+  let markFailed: (e: Error) => void = () => {};
+  const ready = new Promise<void>((resolve, reject) => {
+    markReady = resolve;
+    markFailed = reject;
+  });
+  worker.onmessage = (event: MessageEvent<ProverResponse | typeof WORKER_READY>) => {
+    if (event.data === WORKER_READY) {
+      markReady();
+      return;
+    }
     const entry = pending.get(event.data.id);
     if (!entry) return;
     pending.delete(event.data.id);
@@ -18,10 +28,12 @@ export const createWorkerProofProvider = (zkBase: string): ProofProvider => {
   };
   worker.onerror = (event: ErrorEvent) => {
     const error = new Error(`Prover worker crashed: ${event.message}`);
+    markFailed(error);
     pending.forEach((entry) => entry.reject(error));
     pending.clear();
   };
-  const call = (req: RequestBody): Promise<ProverResponse> => {
+  const call = async (req: RequestBody): Promise<ProverResponse> => {
+    await ready;
     const id = nextId++;
     return new Promise((resolve, reject) => {
       pending.set(id, { resolve, reject });

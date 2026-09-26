@@ -21,7 +21,11 @@ https://stateproof-demo.web.app (Midnight Preprod)
 
 ## 실행 방법 / 데모 흐름
 
-1. 저장소를 받아 `npm ci`, `npm test` (컨트랙트 시뮬레이터 33건 + core 14건, Compact 컴파일러 없이 동작).
+**지갑 없이 확인 (브라우저만):** https://stateproof-demo.web.app/holder/verify/08da5a24a5528086cd5ca5079e641c2dae79238dbb27eb0bbfeaad5a5f40d91e 에서 Use Minji Park, Try the proof without a wallet(브라우저에서 실제 ZK 증명 생성, 제출 안 함), Use a different persona, Use Sora Kim(조건 불충족으로 증명 없이 차단) 순서로 누른다. 자세한 단계는 README 첫 절.
+
+**Lace 로 실제 트랜잭션까지:**
+
+1. 저장소를 받아 `npm ci`, `npm test` (컨트랙트 시뮬레이터 33건 + core 15건, Compact 컴파일러 없이 동작).
 2. 데모 사이트 `/verifier` 에서 조건(예: 재직 상태 = Active, 근속 12개월 이상)을 고르고 검증 요청을 만든다. Lace 가 수수료를 내고 요청이 온체인에 기록된다.
 3. 홀더 링크 `/holder/verify/<id>` 를 열면 "검증자가 알게 되는 것 / 받지 못하는 것" 이 나뉘어 보인다. 가상 인물 Minji 의 크리덴셜을 불러와 [Verify privately] 를 누르면 브라우저 안에서 ZK 증명이 만들어지고 Lace 가 제출한다.
 4. `/request/<id>` 영수증에 VERIFIED 와 증명된 조건, 공개되지 않은 항목이 표시된다.
@@ -38,4 +42,4 @@ https://stateproof-demo.web.app (Midnight Preprod)
 
 ## 데모 영상 (선택)
 
-https://github.com/AHTTOH/stateproof/blob/main/docs/demo/2026-09-26-walkthrough.mp4 (약 100초, 자막 포함. Lace 승인 단계는 빠져 있고, 그 단계를 포함한 실제 온체인 실행 기록은 README 의 Preprod 기록 표에 있다)
+https://github.com/AHTTOH/stateproof/blob/main/docs/demo/2026-09-26-walkthrough.mp4 (약 107초, 자막 포함. 정책 작성, 경계 화면, 브라우저 안 실제 증명 생성, 조건 미달 인물 차단, 온체인 영수증. Lace 승인 단계는 없으며 그 단계를 포함한 실제 온체인 실행 기록은 README 의 Preprod 기록 표에 있다)

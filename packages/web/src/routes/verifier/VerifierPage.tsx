@@ -9,6 +9,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { fetchRequest } from '../../state/ledger';
 import { loadRequests, rememberRequest, type StoredRequest } from '../../state/verifierRequests';
 import { PolicyBuilder } from './PolicyBuilder';
+import { ErrorNotice } from '../../components/ErrorNotice';
 
 const TTL_OPTIONS = [
   { label: '1 hour', seconds: 3_600 },
@@ -132,7 +133,7 @@ export const VerifierPage = () => {
           {busy ? 'Creating request in Lace' : 'Create verification request'}
         </button>
       </div>
-      {error && <p className="notice error" role="alert">{error}</p>}
+      {error && <ErrorNotice message={error} />}
       {created && (
         <div className="notice ok">
           Request created (<a href={explorerTxUrl(created.txHash)}>transaction</a>). Send this link to the holder:

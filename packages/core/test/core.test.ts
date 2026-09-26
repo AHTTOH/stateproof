@@ -105,6 +105,20 @@ describe('policy builder', () => {
     expect(d.notDisclosed).toEqual(['Date of birth', 'Age at issuance']);
   });
 
+  it('treats one-value conditions as disclosing that value', () => {
+    const d = describePolicy(
+      buildPolicy({
+        ...demo,
+        conditions: [
+          { claim: 'region', op: 'inSet', values: ['Seoul'] },
+          { claim: 'ageYears', op: 'between', value: 31, value2: 31 },
+        ],
+        reveal: null,
+      }),
+    );
+    expect(d.notDisclosed).toEqual(['Date of birth', 'Nationality']);
+  });
+
   it('rejects invalid policies', () => {
     expect(() => buildPolicy({ ...demo, conditions: [] })).toThrow(/at least one/);
     expect(() => buildPolicy({ ...demo, conditions: Array(MAX_CONDITIONS + 1).fill(demo.conditions[0]) })).toThrow(/At most/);

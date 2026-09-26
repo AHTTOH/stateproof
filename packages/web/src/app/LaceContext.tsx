@@ -1,8 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import type { ConnectedAPI } from '@midnight-ntwrk/dapp-connector-api';
-import { joinStateProof, emptyPrivateState, type DeployedStateProof, type StateProofProviders } from '@stateproof/contract';
-import { connectLace } from '../providers/lace';
-import { walletProviders } from '../providers/midnight';
+import type { DeployedStateProof, StateProofProviders } from '@stateproof/contract';
 import { NETWORK, requireContractAddress } from './env';
 
 export interface WalletConnection {
@@ -26,6 +24,15 @@ interface LaceState {
 
 const LaceContext = createContext<LaceState | null>(null);
 
+// Lace locks itself after idle time; a cached connection is only reused while it still answers.
+const stillConnected = async (c: WalletConnection): Promise<boolean> => {
+  try {
+    return (await c.api.getConnectionStatus()).status === 'connected';
+  } catch {
+    return false;
+  }
+};
+
 export const LaceProvider = ({ children }: { children: ReactNode }) => {
   const [wallet, setWallet] = useState<WalletConnection | null>(null);
   const [session, setSession] = useState<WalletSession | null>(null);
@@ -46,8 +53,12 @@ export const LaceProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const connectWallet = useCallback(async (): Promise<WalletConnection> => {
-    if (wallet) return wallet;
+    if (wallet && (await stillConnected(wallet))) return wallet;
+    setWallet(null);
+    setSession(null);
     return track(async () => {
+      // Loaded on demand: the wallet stack (ledger WASM) is only needed once someone transacts.
+      const [{ connectLace }, { walletProviders }] = await Promise.all([import('../providers/lace'), import('../providers/midnight')]);
       const api = await connectLace(NETWORK);
       const next = { api, providers: await walletProviders(api) };
       setWallet(next);
@@ -56,9 +67,10 @@ export const LaceProvider = ({ children }: { children: ReactNode }) => {
   }, [wallet, track]);
 
   const connect = useCallback(async (): Promise<WalletSession> => {
-    if (session) return session;
+    if (session && (await stillConnected(session))) return session;
     const base = await connectWallet();
     return track(async () => {
+      const { joinStateProof, emptyPrivateState } = await import('@stateproof/contract');
       const contract = await joinStateProof(base.providers, requireContractAddress(), emptyPrivateState());
       const next = { ...base, contract };
       setSession(next);

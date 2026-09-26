@@ -3,7 +3,19 @@
 **Prove the condition. Keep the data.**
 원본 개인정보를 넘기지 않고, 상대가 요구한 조건을 충족한다는 사실만 증명하는 Midnight 기반 ZK 크리덴셜 검증 서비스.
 
-> 문서 기준일: 2026-09-26. 네트워크: Midnight **Preprod**. 데모: https://stateproof-demo.web.app
+> 문서 기준일: 2026-09-27. 네트워크: Midnight **Preprod**. 데모: https://stateproof-demo.web.app
+
+## 지갑 없이 3분 안에 확인하기 (심사용)
+
+설치할 것도 지갑도 필요 없다. 브라우저 하나면 된다.
+
+1. 대기 중인 데모 요청을 연다: https://stateproof-demo.web.app/holder/verify/08da5a24a5528086cd5ca5079e641c2dae79238dbb27eb0bbfeaad5a5f40d91e (조건: 재직 Active, 근속 12개월 이상. 공개 요청 값: 직무. 2026-10-27 까지 유효)
+2. "The verifier will learn / They will NOT receive" 경계를 확인하고 **Use Minji Park (fictional)** 를 누른다.
+3. **Try the proof without a wallet** 를 누른다. 브라우저 Web Worker 가 실제 `submitProof` 트랜잭션을 만들고 ZK 증명을 생성한다(10~30초). 임시 키를 쓰고 제출하지 않는다.
+4. **Use a different persona** → **Use Sora Kim** (근속 6개월). 같은 회로가 먼저 로컬에서 돌아 "Not met: Months employed at least 12 months" 를 보여 주고, 증명도 트랜잭션도 만들지 않는다.
+5. 실제로 체인에 기록된 결과를 지갑 없이 본다: [영수증 1](https://stateproof-demo.web.app/request/9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a) (공개 값 없음), [영수증 2](https://stateproof-demo.web.app/request/04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f) (공개 값: 직무 Engineering). tx 는 아래 "Preprod 기록" 표에서 익스플로러로 열린다.
+
+누군가 Lace 로 이 대기 요청에 실제 증명을 제출하면 상태가 Verified 로 바뀌고, 그 뒤에는 3~4단계를 볼 수 없다(요청당 결과는 한 번).
 
 ## English summary
 
@@ -11,8 +23,9 @@ StateProof lets a verifier ask a question such as *"is this person actively empl
 
 - **Issuers** sign credentials with a Jubjub Schnorr key and bind them to the holder's secret commitment.
 - **Verifiers** compose a policy (up to 4 conditions, 6 operators, AND) in the browser and publish it on chain as a request.
-- **Holders** keep credentials in their own browser, see exactly what crosses over, and prove it. One Compact circuit, `submitProof`, verifies the issuer signature, expiry, holder binding and every condition **inside the proof**, with the policy as a public input and the credential as a private witness. Only `VERIFIED` (and at most one value the verifier explicitly asked to see) reaches the ledger.
-- Proofs for StateProof circuits are generated **locally** with the Midnight zkir WASM prover (in the browser or in Node). Lace pays the fee and submits.
+- **Holders** keep credentials in their own browser, see exactly what crosses over, and prove it. One Compact circuit, `submitProof`, verifies the issuer signature, expiry, holder binding and every condition **inside the proof**. The policy is public: `createRequest` writes it to the ledger and `submitProof` reads it from there. The credential, its signature and the holder secret are private witnesses.
+- The ledger holds the request (policy, reference time, expiry) and the result (VERIFIED plus at most one value the verifier explicitly asked to see). No other credential value is written anywhere.
+- Proofs for StateProof circuits are generated **locally** with the Midnight zkir WASM prover (in a browser Web Worker or in Node). Lace pays the fee and submits. Reviewers can generate a real proof without any wallet (see the first section).
 
 ## 무엇을 하는가
 
@@ -36,7 +49,27 @@ StateProof lets a verifier ask a question such as *"is this person actively empl
 | `submitProof` | requestId | **크리덴셜**, 발급자 서명, 홀더 비밀값 | 요청 존재·미응답, **체인 시간 기준 요청 미만료**, 스키마·발급자 일치, **Jubjub Schnorr 서명 검증**, 크리덴셜 유효기간(referenceTime 기준), **홀더 바인딩**(비밀값 커밋 일치), **정책의 모든 조건** | `results[requestId] = { revealed }` |
 
 - 정책은 컴파일 시점이 아니라 **요청 생성 시점에 정해지는 public 입력**이다. Compact 에 동적 인덱싱이 없으므로 8개 슬롯과 6개 연산자를 모두 계산한 뒤 선택한다. 회로 하나가 임의의 정책을 평가한다 ([modules/policy.compact](packages/contract/src/modules/policy.compact)).
-- 크리덴셜 원문, 서명, 홀더 비밀값은 witness 로만 쓰이고 ledger 에는 `disclose()` 된 공개 슬롯 하나(검증자가 요청한 경우)만 남는다.
+- 크리덴셜 원문, 서명, 홀더 비밀값은 witness 로만 쓰인다. 회로가 `disclose()` 하는 값은 아래 표가 전부다.
+
+| 회로 | 공개(`disclose`)되어 ledger·트랜스크립트에 남는 값 | 공개되지 않는 값 |
+|---|---|---|
+| constructor | 관리자 비밀값의 해시 | 관리자 비밀값 |
+| `registerIssuer` | issuerId, 발급자 공개키 | 관리자 비밀값 |
+| `createRequest` | requestId, 정책 전체, referenceTime, expiresAt | 없음 |
+| `submitProof` | requestId, 검증자가 요청한 슬롯 값 1개(요청한 경우) | 크리덴셜 8개 슬롯, 발급자 서명, 홀더 비밀값, 크리덴셜 해시, 홀더 커밋, 발급·만료 시각 |
+
+- 같은 크리덴셜로 여러 요청에 답해도 회로가 공개하는 것은 요청별 결과와 요청한 값뿐이다. 수수료는 홀더 지갑의 DUST 로 내는데, 그 트랜잭션과 홀더 지갑 사이의 연결 가능성은 이번 범위에서 분석하지 않았다.
+
+```
+발급자(CLI)            홀더 브라우저                                   Midnight Preprod
+ 서명·바인딩 ───JSON──▶ 크리덴셜 보관(localStorage)
+                        정책 읽기 ◀────────── requests[requestId] ◀──── 검증자 createRequest
+                        로컬 조건 검사(pure circuit)
+                        Web Worker: zkir WASM 증명
+                        Lace: 수수료(DUST)·서명·제출 ─── tx ───────▶ submitProof 검증
+                                                                        results[requestId] = VERIFIED
+                                                   영수증(지갑 불필요) ◀── 인덱서 조회
+```
 - 서명: 해시와 곡선 연산은 컴파일된 pure circuit 을 TS 에서 그대로 실행하고, 스칼라 `s = k + c·sk` 만 Jubjub 부분군 차수로 계산한다. 회로 challenge 는 `degradeToTransient` 로 248비트로 잘라 `ecMul` 스칼라 범위를 지킨다 ([ADR](docs/decisions/2026-09-25-circuit-design.md)).
 
 ### 증명 생성과 트랜잭션
@@ -54,7 +87,7 @@ Midnight 재단의 공용 proof server 는 요청 본문 8KB 이상을 403 으�
 | 항목 | 값 |
 |---|---|
 | 데모 | https://stateproof-demo.web.app |
-| 화면 녹화 (약 100초, 지갑 단계 제외) | [docs/demo/2026-09-26-walkthrough.mp4](docs/demo/2026-09-26-walkthrough.mp4) |
+| 화면 녹화 | [docs/demo/2026-09-26-walkthrough.mp4](docs/demo/2026-09-26-walkthrough.mp4) (자막 포함. 지갑 없는 흐름만 담았다: 정책 작성, 경계 화면, 브라우저 증명, Sora 차단, 영수증. Lace 승인 단계는 없다) |
 | StateProof 컨트랙트 | [`4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3`](https://explorer.preprod.midnight.network/contracts/4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3) |
 | 배포 tx | [`9b5b3d77…729b60`](https://explorer.preprod.midnight.network/transactions/9b5b3d7728fa7baca2cd4aa9994e126e4e3e42ed09ad6143053a996f58729b60) (2026-09-26 06:22 KST, 컴파일러 0.31.1) |
 | 발급자 등록 `issuer:acme-hr` | [`bf69827e…f680549`](https://explorer.preprod.midnight.network/transactions/bf69827ee414acb764df5d86963ff6030a20532d3b9b36de08fb3471ff680549) (CLI, Node WASM 증명) |
@@ -65,16 +98,26 @@ Midnight 재단의 공용 proof server 는 요청 본문 8KB 이상을 403 으�
 | 공개 슬롯 요청 생성 (직무 공개) | [`0af1b881…ed23ba74`](https://explorer.preprod.midnight.network/transactions/0af1b8816632de729d712035cbbfa55aa1d28beb1d85573eaee7f27aed23ba74) (CLI) |
 | 공개 슬롯 증명 → VERIFIED, 공개 값 Job category = Engineering | [`dcb1464a…d46ad545`](https://explorer.preprod.midnight.network/transactions/dcb1464adbf98f17aaf4981ba28e3340b659a4cd1ac0d15e2927cec5d46ad545) (CLI, Node WASM 증명). 영수증: https://stateproof-demo.web.app/request/04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f |
 
-전체 기록은 [config/deployments.json](config/deployments.json) 과 [docs/demo](docs/demo) 에 있다.
+배포 주소는 [config/deployments.json](config/deployments.json), 날짜별 실행 기록은 [docs/demo/2026-09-25-progress.md](docs/demo/2026-09-25-progress.md) 에 있다. 공개 슬롯 증명은 웹 + Lace 에서 먼저 시도했다가 DUST 문제로 실패해 CLI 로 제출했다.
 
 ## 실행 방법
+
+### 사전 준비
+
+| 항목 | 필요한 경우 | 버전 |
+|---|---|---|
+| Node.js | 항상 | 24.11 이상 (`.nvmrc`) |
+| git, bash | 항상 (Windows 는 Git Bash) | |
+| Compact 컴파일러 | 회로를 다시 컴파일할 때만 | **0.31.1** ([설치](https://docs.midnight.network/getting-started/installation), `compact update 0.31.1`) |
+| Chrome + Lace | 웹에서 실제 tx 를 낼 때만 | Lace 2.4.0 에서 확인 |
+| Docker | Lace 의 `localhost:6300` proof server 용 (또는 프록시 스크립트) | `midnightntwrk/proof-server:8.1.0` |
 
 ### 1. 설치와 테스트 (컴파일러 없이 가능)
 
 ```bash
 git clone https://github.com/AHTTOH/stateproof.git && cd stateproof
 npm ci
-npm test          # 컨트랙트 시뮬레이터 33건 + core 14건
+npm test          # 컨트랙트 시뮬레이터 33건 + core 15건
 npm run typecheck
 ```
 
@@ -99,12 +142,15 @@ STATEPROOF_NETWORK=preprod npm run dev -w @stateproof/web
    - 권장: `docker compose -f infra/proof-server/docker-compose.yml up -d`
    - Docker 가 없을 때: `node scripts/proof-server-proxy.mjs preprod` (6300 요청을 공용 proof server 로 전달. 지갑의 수수료 증명 입력이 공용 서버로 간다)
 
-### 4. 운영자 CLI (배포, 발급자 등록, E2E)
+### 4. 운영자 CLI (자기 인스턴스를 새로 띄울 때만)
 
-`.env.example` 을 `.env` 로 복사해 채운 뒤:
+> 심사에는 필요 없다. 아래 명령은 **새 발급자 키와 새 컨트랙트를 만들고** `config/issuers.json`, `config/deployments.json`, `packages/web/src/state/demo-personas.json` 을 덮어쓴다. 실행하면 로컬 웹이 공개 데모 컨트랙트가 아니라 새 컨트랙트를 가리킨다.
+
+`.env.example` 을 `.env` 로 복사해 채운 뒤(지갑 시드는 faucet 으로 tNIGHT 를 받은 지갑):
 
 ```bash
 npm run issue -w @stateproof/issuer -- keygen --issuer issuer:acme-hr
+npm run issue -w @stateproof/issuer -- keygen --issuer issuer:gov-id-demo
 npm run issue -w @stateproof/issuer -- personas
 npm run deploy -w @stateproof/cli
 npm run register-issuer -w @stateproof/cli
@@ -118,8 +164,9 @@ npm run e2e -w @stateproof/cli
 | `npm run status -w @stateproof/cli` | NIGHT·DUST 잔액과 DUST 코인 수 |
 | `npm run operator -w @stateproof/cli` | 지갑을 한 번 복원해 두고 `curl -X POST 127.0.0.1:$OPERATOR_PORT/status`, `/register-issuer`, `/e2e`, `/exit` 로 작업을 받는다 |
 | `npm run prove -w @stateproof/cli -- --request <id> --persona minji --schema employment` | 기존 요청에 데모 인물 증명 1건 제출 |
+| `npm run demo-request -w @stateproof/cli -- --policy employment --ttl-days 30` | 심사용 대기 요청 생성 (`employment`, `identity`) |
 
-## 데모 흐름 (화면 순서)
+## 데모 흐름 (Lace 로 실제 tx 까지, 화면 순서)
 
 1. `/verifier`: 기본 정책 "Employment status is Active, Months employed at least 12" 확인 → [Create verification request] → Lace 승인 → 홀더 링크가 나온다.
 2. 링크(`/holder/verify/<id>`)를 연다 → "The verifier will learn / They will NOT receive" 경계 확인 → **Use Minji Park (fictional)** 로 데모 크리덴셜을 불러온다.

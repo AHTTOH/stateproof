@@ -11,6 +11,7 @@
     "status": "tsx src/status.ts",
     "operator": "tsx src/operator.ts",
     "prove": "tsx src/prove.ts",
+    "demo-request": "tsx src/demo-requests.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

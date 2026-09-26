@@ -9,8 +9,10 @@ import { explorerTxUrl, issuerInfo } from '../../app/env';
 import { Boundary } from '../../components/Boundary';
 import { StatusBadge } from '../../components/StatusBadge';
 import { fetchRequest } from '../../state/ledger';
-import { loadHolderWallet, proofInputs, type HolderWallet } from '../../state/holderWallet';
+import { clearHolderWallet, loadHolderWallet, proofInputs, type HolderWallet } from '../../state/holderWallet';
+import type { DryRunResult } from '../../providers/dryRun';
 import { PersonaPicker } from './HolderPage';
+import { ErrorNotice } from '../../components/ErrorNotice';
 
 interface LocalCheck {
   readonly ok: boolean;
@@ -43,6 +45,8 @@ export const VerifyPage = () => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [dryRun, setDryRun] = useState<DryRunResult | null>(null);
+  const [dryBusy, setDryBusy] = useState(false);
 
   const request = view.data?.request ?? null;
   const doc = useMemo(() => (wallet && request ? matchingCredential(wallet, request) : null), [wallet, request]);
@@ -69,6 +73,29 @@ export const VerifyPage = () => {
     }
   };
 
+  // Same transaction as Verify privately, proved here with throwaway keys and never submitted.
+  const tryWithoutWallet = async () => {
+    if (!wallet || !doc) return;
+    setDryBusy(true);
+    setError(null);
+    setDryRun(null);
+    try {
+      const { dryRunProof } = await import('../../providers/dryRun');
+      setDryRun(await dryRunProof(fromHex32(requestId), proofInputs(wallet, doc)));
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setDryBusy(false);
+    }
+  };
+
+  const switchPersona = () => {
+    clearHolderWallet();
+    setWallet(null);
+    setDryRun(null);
+    setError(null);
+  };
+
   return (
     <>
       <h1 className="page-title">
@@ -80,6 +107,17 @@ export const VerifyPage = () => {
       </p>
 
       <Boundary description={receipt.policy} verifierLabel="The verifier" issuerName={issuerInfo(receipt.policy.issuerId).name} />
+
+      {receipt.status === 'pending' && wallet !== null && (
+        <p className="inline small">
+          <span>
+            Holder: <strong>{wallet.label}</strong>
+          </span>
+          <button type="button" className="btn quiet" onClick={switchPersona}>
+            Use a different persona
+          </button>
+        </p>
+      )}
 
       {receipt.status !== 'pending' ? (
         <p className="notice">
@@ -109,15 +147,29 @@ export const VerifyPage = () => {
             Using {wallet.label}’s {schema.title}. The proof is generated in this browser (about 30 seconds). Lace then asks
             you to approve the network fee.
           </p>
-          <div>
-            <button type="button" className="btn prove" disabled={busy} onClick={prove}>
+          <div className="inline">
+            <button type="button" className="btn prove" disabled={busy || dryBusy} onClick={prove}>
               {busy ? 'Proving privately…' : 'Verify privately'}
             </button>
+            <button type="button" className="btn quiet" disabled={busy || dryBusy} onClick={tryWithoutWallet}>
+              {dryBusy ? 'Generating the proof in this browser…' : 'Try the proof without a wallet'}
+            </button>
           </div>
+          <p className="small muted">
+            No Lace? The second button builds the same transaction with throwaway keys and generates the zero-knowledge proof
+            here. Nothing is signed or submitted.
+          </p>
         </div>
       )}
 
-      {error && <p className="notice error" role="alert">{error}</p>}
+      {dryRun && (
+        <p className="notice ok">
+          Zero-knowledge proof generated in this browser in {(dryRun.proveMs / 1000).toFixed(1)} s. The proven transaction is{' '}
+          {(dryRun.txBytes / 1024).toFixed(1)} KB and contains no credential data. It was not submitted; Verify privately
+          sends this same transaction through Lace.
+        </p>
+      )}
+      {error && <ErrorNotice message={error} />}
       {txHash && (
         <p className="notice ok">
           Proof accepted on chain. <a href={explorerTxUrl(txHash)}>Transaction</a>. <Link to={`/request/${requestId}`}>View receipt</Link>

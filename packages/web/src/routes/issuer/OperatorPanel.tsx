@@ -12,6 +12,7 @@ import { fromHex32, labelToBytes32, publicKeyFromJson, randomBytes32, toHex } fr
 import { ISSUERS, contractAddress, explorerTxUrl } from '../../app/env';
 import { useLace } from '../../app/LaceContext';
 import { errorMessage } from '../../app/useAsync';
+import { ErrorNotice } from '../../components/ErrorNotice';
 
 interface LogLine {
   readonly text: string;
@@ -81,7 +82,7 @@ export const OperatorPanel = () => {
       <div className="inline">
         <div className="field" style={{ flex: 1 }}>
           <label htmlFor="admin-secret">Admin secret (hex)</label>
-          <input id="admin-secret" type="text" autoComplete="off" spellCheck={false} value={secret} onChange={(e) => setSecret(e.target.value.trim())} />
+          <input id="admin-secret" type="password" autoComplete="off" spellCheck={false} value={secret} onChange={(e) => setSecret(e.target.value.trim())} />
         </div>
         <button type="button" className="btn quiet" onClick={() => setSecret(toHex(randomBytes32()))}>
           Generate
@@ -96,7 +97,7 @@ export const OperatorPanel = () => {
         </button>
         {busy && <span className="muted small">Waiting for Lace and the network…</span>}
       </div>
-      {error && <p className="notice error" role="alert">{error}</p>}
+      {error && <ErrorNotice message={error} />}
       {log.length > 0 && (
         <ul className="rows">
           {log.map((l, i) => (

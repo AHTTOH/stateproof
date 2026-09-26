@@ -1,14 +1,8 @@
 // Runs the zkir WASM prover off the main thread. Keys and parameters are fetched here
 // from the app origin, so the page stays responsive while a proof is generated.
 import { check, prove, type KeyMaterialProvider } from '@midnight-ntwrk/zkir-v2';
+import { WORKER_READY, type ProverRequest, type ProverResponse } from './proverProtocol';
 
-export type ProverRequest =
-  | { readonly id: number; readonly op: 'prove'; readonly preimage: Uint8Array; readonly overwriteBindingInput?: bigint; readonly zkBase: string }
-  | { readonly id: number; readonly op: 'check'; readonly preimage: Uint8Array; readonly zkBase: string };
-
-export type ProverResponse =
-  | { readonly id: number; readonly ok: true; readonly proof?: Uint8Array; readonly checked?: (bigint | undefined)[] }
-  | { readonly id: number; readonly ok: false; readonly error: string };
 
 const fetchBytes = async (url: string): Promise<Uint8Array> => {
   const res = await fetch(url);
@@ -44,3 +38,7 @@ self.onmessage = async (event: MessageEvent<ProverRequest>) => {
     self.postMessage({ id: req.id, ok: false, error: e instanceof Error ? e.message : String(e) } satisfies ProverResponse);
   }
 };
+
+// Messages posted while the module (and its WASM) is still initialising can be lost, so the
+// page waits for this signal before sending work.
+self.postMessage(WORKER_READY);

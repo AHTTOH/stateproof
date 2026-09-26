@@ -1,8 +1,10 @@
-import { NavLink, Outlet, Link } from 'react-router-dom';
+import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
+import { ErrorBoundary } from './ErrorBoundary';
 import { NETWORK, contractAddress, explorerContractUrl } from '../app/env';
 
 export const Layout = () => {
   const address = contractAddress();
+  const { pathname } = useLocation();
   return (
     <div className="shell">
       <header className="masthead">
@@ -19,7 +21,9 @@ export const Layout = () => {
         </span>
       </header>
       <main>
-        <Outlet />
+        <ErrorBoundary key={pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
       <footer className="footer">
         <p>

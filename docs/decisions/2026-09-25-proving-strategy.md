@@ -23,7 +23,7 @@
    - `provingProvider({ lookupKey, getParams })` 를 만들고 `createProofProvider()`(midnight-js-types)로 감싼다.
    - `lookupKey(회로명)` → `packages/contract/src/managed/stateproof/{keys,zkir}` 의 prover·verifier·bzkir.
    - `lookupKey('midnight/...')` 와 `getParams(k)` → Midnight 공개 S3 (`bls_midnight_2p{k}`, wallet-sdk-prover-client 의 기본값과 동일 출처). 로컬 캐시.
-2. **웹(브라우저)은 DApp Connector 4.0.1 의 `getProvingProvider(keyMaterialProvider)` 로 증명을 Lace 지갑에 위임한다.** `proverServerUri` 는 connector 에서 deprecated 다. Lace 가 위임을 지원하지 않는 경우의 대안은 같은 zkir-v2 WASM 증명기를 브라우저에서 돌리는 것이다(D1' 에 확인).
+2. ~~**웹(브라우저)은 DApp Connector 4.0.1 의 `getProvingProvider(keyMaterialProvider)` 로 증명을 Lace 지갑에 위임한다.**~~ **폐기(2026-09-25 22:40, 아래 결정 5 로 대체).** Lace 의 위임은 결국 `localhost:6300` HTTP proof server 로 가므로 쓰지 않는다. `proverServerUri` 는 connector 에서 deprecated 다. Lace 가 위임을 지원하지 않는 경우의 대안은 같은 zkir-v2 WASM 증명기를 브라우저에서 돌리는 것이다(D1' 에 확인).
 3. 지갑 자체 증명(DUST 수수료 등)은 지갑 설정의 공용 서버를 그대로 쓴다. 배포 tx 로 동작을 확인했다.
 4. 이 결정으로 "홀더의 witness 가 공용 서버로 전송된다" 는 계획서의 개인정보 주의 사항은 사라진다. 증명은 홀더의 브라우저 또는 지갑 안에서 만들어진다.
 
@@ -68,5 +68,6 @@ CLI 대응: 제출 실패 시 `revertTransaction`, 170 은 30초 간격 최대 3
 
 ## 남은 확인
 
-- [ ] WASM 증명기로 Preprod 회로 호출 tx 1건 성공 (spike 실행 중, 지갑 동기화 대기)
-- [ ] Lace + 웹 앱으로 createRequest·submitProof 성공 (컨트랙트 배포 후)
+- [x] WASM 증명기로 Preprod 회로 호출 tx 1건 성공 (2026-09-26 00:50 KST, bboard `post`, 56초)
+- [x] Lace + 웹 앱으로 createRequest·submitProof 성공 (2026-09-26 12:45~12:50 KST, README Preprod 기록 표)
+- [x] 지갑 없는 브라우저 증명(제출 안 함) 동작 (2026-09-27 03:30 KST, 헤드리스 Chromium 12초, 증명된 tx 4.1KB)

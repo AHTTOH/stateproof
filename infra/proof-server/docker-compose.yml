@@ -1,6 +1,7 @@
-# Optional local proof server (backup to the Midnight public instance).
+# Local proof server on localhost:6300, the only proof server Lace accepts for its own
+# fee (DUST) proofs. StateProof circuits are proved in the browser, not here.
 # Start: docker compose -f infra/proof-server/docker-compose.yml up -d
-# Then set "proofServer": "http://localhost:6300" in config/networks.json.
+# Without Docker: node scripts/proof-server-proxy.mjs preprod
 services:
   proof-server:
     image: midnightntwrk/proof-server:8.1.0

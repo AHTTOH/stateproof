@@ -1,5 +1,5 @@
 // Sizes fixed by the Compact struct definitions (packages/contract/src/modules).
-// test/constants.test.ts proves these match the compiled contract.
+// packages/core/test/core.test.ts ("constants match the compiled circuit") proves these match the contract.
 export const CLAIM_SLOTS = 8;
 export const MAX_CONDITIONS = 4;
 export const SET_SIZE = 4;
