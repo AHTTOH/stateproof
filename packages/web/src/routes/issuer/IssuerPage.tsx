@@ -1,11 +1,13 @@
 // Trusted issuers: public keys from config/issuers.json checked against the on-chain registry.
 import { getSchema, labelToBytes32 } from '@stateproof/core';
-import { ISSUERS } from '../../app/env';
+import { ISSUERS, NETWORK, contractAddress } from '../../app/env';
 import { useAsync } from '../../app/useAsync';
 import { fetchLedger } from '../../state/ledger';
+import { OperatorPanel } from './OperatorPanel';
 
 export const IssuerPage = () => {
-  const ledger = useAsync(fetchLedger, []);
+  const deployed = contractAddress() !== null;
+  const ledger = useAsync(() => (deployed ? fetchLedger() : Promise.resolve(null)), [deployed]);
   const onChain = (id: string, pk: { x: string; y: string } | null): 'registered' | 'missing' | 'mismatch' => {
     if (!ledger.data || pk === null) return 'missing';
     const key = labelToBytes32(id);
@@ -22,6 +24,7 @@ export const IssuerPage = () => {
         admin registers the issuer’s public key on chain; every proof checks the signature against that key inside the
         circuit.
       </p>
+      {!deployed && <p className="notice">StateProof is not deployed on {NETWORK} yet. Use the operator tools below.</p>}
       {ledger.error && <p className="notice error" role="alert">{ledger.error}</p>}
       <ul className="rows">
         {ISSUERS.map((i) => {
@@ -49,6 +52,7 @@ export const IssuerPage = () => {
 npm run issue -w @stateproof/issuer -- personas
 npm run register-issuer -w @stateproof/cli`}
       </pre>
+      <OperatorPanel />
     </>
   );
 };

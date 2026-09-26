@@ -1,1 +1,8 @@
-{}
+{
+  "preprod": {
+    "contractAddress": "4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3",
+    "deployedAt": "2026-09-25T21:22:27.787Z",
+    "deployTxHash": "9b5b3d7728fa7baca2cd4aa9994e126e4e3e42ed09ad6143053a996f58729b60",
+    "compiler": "0.31.1"
+  }
+}

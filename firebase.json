@@ -1,0 +1,24 @@
+{
+  "hosting": {
+    "site": "stateproof-demo",
+    "public": "packages/web/dist",
+    "ignore": ["firebase.json", "**/.*"],
+    "headers": [
+      {
+        "source": "/zk/**",
+        "headers": [
+          { "key": "Content-Type", "value": "application/octet-stream" },
+          { "key": "Cache-Control", "value": "public, max-age=86400" }
+        ]
+      },
+      {
+        "source": "**/*.wasm",
+        "headers": [{ "key": "Content-Type", "value": "application/wasm" }]
+      }
+    ],
+    "rewrites": [
+      { "source": "/zk/**", "destination": "/zk/__missing__" },
+      { "source": "**", "destination": "/index.html" }
+    ]
+  }
+}
