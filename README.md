@@ -3,7 +3,7 @@
 **Prove the condition. Keep the data.**
 원본 개인정보를 넘기지 않고, 상대가 요구한 조건을 충족한다는 사실만 증명하는 Midnight 기반 ZK 크리덴셜 검증 서비스.
 
-> 문서 기준일: 2026-09-25 (작업 중, 최종본은 2026-09-27). 네트워크: Midnight **Preprod**.
+> 문서 기준일: 2026-09-26. 네트워크: Midnight **Preprod**. 데모: https://stateproof-demo.web.app
 
 ## English summary
 
