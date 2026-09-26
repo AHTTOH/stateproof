@@ -54,6 +54,18 @@
    - 권장: `docker compose -f infra/proof-server/docker-compose.yml up -d` (proof-server 8.1.0, 모든 입력이 내 PC 에 남음)
    - Docker 가 없을 때: `node scripts/proof-server-proxy.mjs preprod` 가 6300 요청을 공용 서버로 넘긴다. 수수료 증명 요청은 작아서 공용 서버가 받는다(배포 tx 로 확인). 대신 지갑의 수수료 증명 입력이 공용 서버로 간다는 점을 README 에 적는다.
 
+## DUST 수수료 실측 (2026-09-26)
+
+| 관찰 | 근거 |
+|---|---|
+| `Custom error: 170` 은 `InvalidDustSpendProof`(수수료 DUST 지출 증명 거부) | Midnight 포럼·wallet 이슈 #767 |
+| 헤드리스 SDK 지갑(testkit facade)은 한 세션에서 첫 DUST 지출 뒤 거스름 DUST 코인을 추적하지 못했다. 다음 tx 는 170 또는 `could not balance dust` | status: 코인 2 → 1 → 0, 20초 간격으로 2분 관찰해도 거스름 코인이 나타나지 않음 |
+| 실패한 제출은 쓰인 코인을 지갑에서 지운다. `revertTransaction` 으로 되돌려야 한다 | 실패 뒤 total 코인 감소 |
+| 같은 시드로 처음부터 재동기화하면 체인 기준 코인이 다시 잡힌다(약 3시간) | 재동기화 뒤 코인 2개, 5.59e18 |
+| Lace 2.4.0 도 연속 3건 성공 뒤 4번째에서 실패했고 이후 0 / 0 tDUST 로 표시 | Lace 화면 |
+
+CLI 대응: 제출 실패 시 `revertTransaction`, 170 은 30초 간격 최대 3회 재시도, tx 뒤에는 "대기 코인 0개 + 사용 가능 코인 1개 이상" 을 기다린다. 그래도 한 세션 연속 tx 는 불안정하므로 운영 작업은 재동기화 직후 1건씩 한다.
+
 ## 남은 확인
 
 - [ ] WASM 증명기로 Preprod 회로 호출 tx 1건 성공 (spike 실행 중, 지갑 동기화 대기)

@@ -108,7 +108,13 @@ npm run register-issuer -w @stateproof/cli
 npm run e2e -w @stateproof/cli
 ```
 
-새 헤드리스 지갑은 Preprod 첫 동기화에 수 시간이 걸린다(DUST 지갑이 약 150만 이벤트를 재생). CLI 는 동기화 상태를 `WALLET_STATE_FILE` 에 저장하고 다음 실행에서 복원한다.
+새 헤드리스 지갑은 Preprod 첫 동기화에 수 시간이 걸린다(DUST 지갑이 약 150만 이벤트를 재생). CLI 는 동기화 상태를 `WALLET_STATE_FILE` 에 저장하고 다음 실행에서 복원한다(복원 3~7분).
+
+| 명령 | 하는 일 |
+|---|---|
+| `npm run status -w @stateproof/cli` | NIGHT·DUST 잔액과 DUST 코인 수 |
+| `npm run operator -w @stateproof/cli` | 지갑을 한 번 복원해 두고 `curl -X POST 127.0.0.1:$OPERATOR_PORT/status`, `/register-issuer`, `/e2e`, `/exit` 로 작업을 받는다 |
+| `npm run prove -w @stateproof/cli -- --request <id> --persona minji --schema employment` | 기존 요청에 데모 인물 증명 1건 제출 |
 
 ## 데모 흐름 (화면 순서)
 
@@ -141,6 +147,7 @@ docs/                   계획서, 결정 기록(ADR), 데모 기록
 - 발급자 취소(revocation)는 없다. 관리자가 같은 issuerId 로 키를 다시 등록하면 진행 중인 요청에도 새 키가 적용된다.
 - 요청 링크는 bearer 방식이다. 조건을 만족하는 다른 홀더가 먼저 응답할 수 있다. 결과는 요청당 한 번만 기록된다.
 - 데모 인물의 홀더 비밀값은 누구나 데모를 재현할 수 있도록 공개돼 있다.
+- Preprod 수수료(DUST): 헤드리스 SDK 지갑은 한 세션에서 첫 지출 뒤 거스름 DUST 를 추적하지 못했고, Lace 도 연속 tx 뒤 DUST 표시가 0 이 된 적이 있다. 원인은 지갑 쪽으로 보이며 StateProof 회로와는 무관하다. 자세한 관찰은 [ADR](docs/decisions/2026-09-25-proving-strategy.md) 에 있다.
 
 ## 로드맵
 
