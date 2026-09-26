@@ -1,16 +1,18 @@
 // Shared lifecycle for CLI commands: open wallet -> build providers -> run -> save state.
 import { readFile, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import type { StateProofProviders } from '@stateproof/contract';
 import { REPO_ROOT, loadCliConfig, type CliConfig } from './config.js';
 import { createLogger, type Logger } from './logger.js';
 import { buildProviders } from './providers.js';
-import { openOperatorWallet } from './wallet.js';
+import { openOperatorWallet, type OperatorWallet } from './wallet.js';
 
 export interface Session {
   readonly config: CliConfig;
   readonly logger: Logger;
   readonly providers: StateProofProviders;
+  readonly wallet: OperatorWallet;
 }
 
 export const runSession = async (name: string, body: (session: Session) => Promise<void>): Promise<void> => {
@@ -19,11 +21,15 @@ export const runSession = async (name: string, body: (session: Session) => Promi
   logger.info(`${name} on ${config.network.networkId}`);
   const wallet = await openOperatorWallet(config, logger);
   try {
-    await body({ config, logger, providers: buildProviders(config, wallet, logger) });
+    await body({ config, logger, wallet, providers: buildProviders(config, wallet, logger) });
   } finally {
     await wallet.stop();
   }
 };
+
+// True when the module is the script being run (tsx src/x.ts), false when imported.
+export const isMain = (moduleUrl: string): boolean =>
+  process.argv[1] !== undefined && path.resolve(fileURLToPath(moduleUrl)) === path.resolve(process.argv[1]);
 
 export const exitOnError = (promise: Promise<void>): void => {
   promise.then(

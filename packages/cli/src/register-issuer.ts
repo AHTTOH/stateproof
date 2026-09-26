@@ -4,28 +4,28 @@ import { adminPrivateState, joinStateProof, readLedger, registerIssuer } from '@
 import { fromHex32, labelToBytes32, publicKeyFromJson } from '@stateproof/core';
 import { loadRegistry } from '@stateproof/issuer';
 import { requireEnv } from './config.js';
-import { exitOnError, requireDeployment, runSession } from './session.js';
+import { exitOnError, isMain, requireDeployment, runSession, type Session } from './session.js';
 
-exitOnError(
-  runSession('register-issuer', async ({ config, logger, providers }) => {
-    const { contractAddress } = await requireDeployment(config.network.networkId);
-    const admin = await joinStateProof(providers, contractAddress, adminPrivateState(fromHex32(requireEnv('STATEPROOF_ADMIN_SECRET'))));
-    const registry = await loadRegistry();
-    for (const entry of registry.issuers) {
-      if (entry.publicKey === null) throw new Error(`${entry.id} has no public key; run the issuer keygen first`);
-      const id = labelToBytes32(entry.id);
-      const key = publicKeyFromJson(entry.publicKey);
-      const ledger = await readLedger(providers.publicDataProvider, contractAddress);
-      if (ledger.issuers.member(id)) {
-        const onChain = ledger.issuers.lookup(id);
-        if (onChain.x === key.x && onChain.y === key.y) {
-          logger.info(`${entry.id} already registered`);
-          continue;
-        }
+export const registerIssuers = async ({ config, logger, providers, wallet }: Session): Promise<void> => {
+  const { contractAddress } = await requireDeployment(config.network.networkId);
+  const admin = await joinStateProof(providers, contractAddress, adminPrivateState(fromHex32(requireEnv('STATEPROOF_ADMIN_SECRET'))));
+  const registry = await loadRegistry();
+  for (const entry of registry.issuers) {
+    if (entry.publicKey === null) throw new Error(`${entry.id} has no public key; run the issuer keygen first`);
+    const id = labelToBytes32(entry.id);
+    const key = publicKeyFromJson(entry.publicKey);
+    const ledger = await readLedger(providers.publicDataProvider, contractAddress);
+    if (ledger.issuers.member(id)) {
+      const onChain = ledger.issuers.lookup(id);
+      if (onChain.x === key.x && onChain.y === key.y) {
+        logger.info(`${entry.id} already registered`);
+        continue;
       }
-      const started = Date.now();
-      const receipt = await registerIssuer(admin, id, key);
-      logger.info(`Registered ${entry.id} (tx ${receipt.txHash}) in ${Math.round((Date.now() - started) / 1000)}s`);
     }
-  }),
-);
+    const started = Date.now();
+    const receipt = await wallet.runTx(`register ${entry.id}`, () => registerIssuer(admin, id, key));
+    logger.info(`Registered ${entry.id} (tx ${receipt.txHash}) in ${Math.round((Date.now() - started) / 1000)}s`);
+  }
+};
+
+if (isMain(import.meta.url)) exitOnError(runSession('register-issuer', registerIssuers));

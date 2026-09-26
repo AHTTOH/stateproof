@@ -22,6 +22,9 @@ import type { CliConfig } from './config.js';
 import type { Logger } from './logger.js';
 
 const PROGRESS_LOG_INTERVAL_MS = 30_000;
+// After a transaction, the DUST wallet must apply the block that spent its coin before the
+// next fee proof is built; otherwise the node rejects it (Custom error 170, InvalidDustSpendProof).
+const SETTLE_TIMEOUT_MS = 300_000;
 const FEE_BLOCKS_MARGIN = 5;
 const ADDITIONAL_FEE_OVERHEAD = 1_000n;
 
@@ -68,6 +71,8 @@ const readSavedState = async (file: string, networkId: string): Promise<SavedWal
 
 export interface OperatorWallet {
   readonly provider: MidnightWalletProvider;
+  // Runs one transaction and waits until the wallet has synced its effects.
+  runTx<T>(label: string, tx: () => Promise<T>): Promise<T>;
   saveState(): Promise<void>;
   stop(): Promise<void>;
 }
@@ -120,6 +125,13 @@ export const openOperatorWallet = async (config: CliConfig, logger: Logger): Pro
   await saveState();
   return {
     provider,
+    runTx: async <T,>(label: string, tx: () => Promise<T>): Promise<T> => {
+      const before = dustIndex(await Rx.firstValueFrom(facade.state()));
+      const result = await tx();
+      await settle(facade, before, label, logger);
+      await saveState();
+      return result;
+    },
     saveState,
     stop: async () => {
       await saveState();
@@ -134,6 +146,28 @@ const isComplete = (progress: unknown): boolean =>
   typeof (progress as { isStrictlyComplete?: unknown })?.isStrictlyComplete === 'function' &&
   (progress as { isStrictlyComplete: () => boolean }).isStrictlyComplete();
 
+type FacadeState = Rx.ObservedValueOf<ReturnType<Facade["state"]>>;
+
+const dustIndex = (s: FacadeState): bigint => {
+  const applied = (s.dust.state.progress as { appliedIndex?: unknown }).appliedIndex;
+  if (typeof applied !== "bigint") throw new Error(`DUST progress has no appliedIndex (${String(applied)})`);
+  return applied;
+};
+
+const allComplete = (s: FacadeState): boolean =>
+  isComplete(s.shielded.state.progress) && isComplete(s.unshielded.progress) && isComplete(s.dust.state.progress);
+
+const settle = async (facade: Facade, before: bigint, label: string, logger: Logger): Promise<void> => {
+  const started = Date.now();
+  await Rx.firstValueFrom(
+    facade.state().pipe(
+      Rx.filter((s) => allComplete(s) && dustIndex(s) > before),
+      Rx.timeout({ first: SETTLE_TIMEOUT_MS, with: () => Rx.throwError(() => new Error(`${label}: wallet did not sync the transaction within ${SETTLE_TIMEOUT_MS / 1000}s`)) }),
+    ),
+  );
+  logger.info(`${label}: wallet synced the transaction in ${Math.round((Date.now() - started) / 1000)}s`);
+};
+
 const waitForSync = async (facade: Facade, logger: Logger): Promise<void> => {
   const started = Date.now();
   await Rx.firstValueFrom(
@@ -145,7 +179,7 @@ const waitForSync = async (facade: Facade, logger: Logger): Promise<void> => {
           `sync ${Math.round((Date.now() - started) / 1000)}s: shielded=${isComplete(s.shielded.state.progress)} unshielded=${isComplete(s.unshielded.progress)} dust=${String(d.appliedIndex)}/${String(d.highestRelevantWalletIndex)}`,
         );
       }),
-      Rx.filter((s) => isComplete(s.shielded.state.progress) && isComplete(s.unshielded.progress) && isComplete(s.dust.state.progress)),
+      Rx.filter(allComplete),
     ),
   );
   logger.info(`Wallet synced in ${Math.round((Date.now() - started) / 1000)}s`);

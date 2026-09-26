@@ -16,10 +16,10 @@ const compilerVersion = async (): Promise<string> => {
 };
 
 exitOnError(
-  runSession('deploy', async ({ config, logger, providers }) => {
+  runSession('deploy', async ({ config, logger, providers, wallet }) => {
     const adminSecret = fromHex32(requireEnv('STATEPROOF_ADMIN_SECRET'));
     const started = Date.now();
-    const { address, receipt } = await deployStateProof(providers, adminSecret);
+    const { address, receipt } = await wallet.runTx('deploy', () => deployStateProof(providers, adminSecret));
     logger.info(`Deployed StateProof at ${address} (tx ${receipt.txHash}, block ${receipt.blockHeight}) in ${Math.round((Date.now() - started) / 1000)}s`);
     await writeDeployment(config.network.networkId, {
       contractAddress: address,

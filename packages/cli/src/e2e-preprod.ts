@@ -15,7 +15,7 @@ import {
   type PolicyInput,
 } from '@stateproof/core';
 import { DEMO_BUNDLE_FILE, type PersonaBundle } from '@stateproof/issuer';
-import { exitOnError, requireDeployment, runSession } from './session.js';
+import { exitOnError, isMain, requireDeployment, runSession, type Session } from './session.js';
 
 const REQUEST_TTL_SECONDS = 86_400n;
 
@@ -42,34 +42,34 @@ const proofInputsFor = (persona: PersonaBundle, schema: string) => {
   return { credential: toContractCredential(doc), signature: toContractSignature(doc), holderSecret: fromHex32(persona.holderSecret) };
 };
 
-exitOnError(
-  runSession('e2e', async ({ config, logger, providers }) => {
-    const { contractAddress } = await requireDeployment(config.network.networkId);
-    const contract = await joinStateProof(providers, contractAddress, emptyPrivateState());
+export const runE2E = async ({ config, logger, providers, wallet }: Session): Promise<void> => {
+  const { contractAddress } = await requireDeployment(config.network.networkId);
+  const contract = await joinStateProof(providers, contractAddress, emptyPrivateState());
 
-    const requestId = randomBytes32();
-    const now = BigInt(Math.floor(Date.now() / 1000));
-    let t = Date.now();
-    const created = await createRequest(contract, requestId, buildPolicy(DEMO_POLICY), now, now + REQUEST_TTL_SECONDS);
-    logger.info(`createRequest ${toHex(requestId)} tx ${created.txHash} in ${Math.round((Date.now() - t) / 1000)}s`);
+  const requestId = randomBytes32();
+  const now = BigInt(Math.floor(Date.now() / 1000));
+  let t = Date.now();
+  const created = await wallet.runTx('createRequest', () => createRequest(contract, requestId, buildPolicy(DEMO_POLICY), now, now + REQUEST_TTL_SECONDS));
+  logger.info(`createRequest ${toHex(requestId)} tx ${created.txHash} in ${Math.round((Date.now() - t) / 1000)}s`);
 
-    const sora = await loadPersona('sora');
-    try {
-      await submitProof(providers, contract, requestId, proofInputsFor(sora, 'employment'));
-      throw new Error('Sora (6 months) must not satisfy the policy');
-    } catch (e) {
-      if (!(e instanceof Error) || !/Policy conditions are not satisfied/.test(e.message)) throw e;
-      logger.info('Sora rejected locally as expected: policy not satisfied, nothing sent on chain');
-    }
+  const sora = await loadPersona('sora');
+  try {
+    await submitProof(providers, contract, requestId, proofInputsFor(sora, 'employment'));
+    throw new Error('Sora (6 months) must not satisfy the policy');
+  } catch (e) {
+    if (!(e instanceof Error) || !/Policy conditions are not satisfied/.test(e.message)) throw e;
+    logger.info('Sora rejected locally as expected: policy not satisfied, nothing sent on chain');
+  }
 
-    const minji = await loadPersona('minji');
-    t = Date.now();
-    const proved = await submitProof(providers, contract, requestId, proofInputsFor(minji, 'employment'));
-    logger.info(`submitProof tx ${proved.txHash} (block ${proved.blockHeight}) in ${Math.round((Date.now() - t) / 1000)}s`);
+  const minji = await loadPersona('minji');
+  t = Date.now();
+  const proved = await wallet.runTx('submitProof', () => submitProof(providers, contract, requestId, proofInputsFor(minji, 'employment')));
+  logger.info(`submitProof tx ${proved.txHash} (block ${proved.blockHeight}) in ${Math.round((Date.now() - t) / 1000)}s`);
 
-    const ledger = await readLedger(providers.publicDataProvider, contractAddress);
-    const receipt = buildReceipt(requestId, ledger.requests.lookup(requestId), ledger.results.member(requestId) ? ledger.results.lookup(requestId) : null, BigInt(Math.floor(Date.now() / 1000)));
-    logger.info(`Receipt: ${JSON.stringify({ ...receipt, policy: { conditions: receipt.policy.conditions, notDisclosed: receipt.policy.notDisclosed } })}`);
-    if (receipt.status !== 'verified') throw new Error(`Expected verified, got ${receipt.status}`);
-  }),
-);
+  const ledger = await readLedger(providers.publicDataProvider, contractAddress);
+  const receipt = buildReceipt(requestId, ledger.requests.lookup(requestId), ledger.results.member(requestId) ? ledger.results.lookup(requestId) : null, BigInt(Math.floor(Date.now() / 1000)));
+  logger.info(`Receipt: ${JSON.stringify({ ...receipt, policy: { conditions: receipt.policy.conditions, notDisclosed: receipt.policy.notDisclosed } })}`);
+  if (receipt.status !== 'verified') throw new Error(`Expected verified, got ${receipt.status}`);
+};
+
+if (isMain(import.meta.url)) exitOnError(runSession('e2e', runE2E));
