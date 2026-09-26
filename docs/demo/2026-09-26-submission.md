@@ -38,4 +38,4 @@ https://stateproof-demo.web.app (Midnight Preprod)
 
 ## 데모 영상 (선택)
 
-(녹화 후 링크 기입)
+https://github.com/AHTTOH/stateproof/blob/main/docs/demo/2026-09-26-walkthrough.mp4 (약 100초, 자막 포함. Lace 승인 단계는 빠져 있고, 그 단계를 포함한 실제 온체인 실행 기록은 README 의 Preprod 기록 표에 있다)

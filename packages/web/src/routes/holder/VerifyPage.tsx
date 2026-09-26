@@ -106,7 +106,7 @@ export const VerifyPage = () => {
       ) : (
         <div className="stack">
           <p className="small muted">
-            Using {wallet.label}’s {schema.title}. The proof is generated in this browser (a few seconds). Lace then asks
+            Using {wallet.label}’s {schema.title}. The proof is generated in this browser (about 30 seconds). Lace then asks
             you to approve the network fee.
           </p>
           <div>
