@@ -10,6 +10,7 @@
     "e2e": "tsx src/e2e-preprod.ts",
     "status": "tsx src/status.ts",
     "operator": "tsx src/operator.ts",
+    "prove": "tsx src/prove.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

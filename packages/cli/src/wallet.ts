@@ -25,6 +25,11 @@ const PROGRESS_LOG_INTERVAL_MS = 30_000;
 // After a transaction, the DUST wallet must apply the block that spent its coin before the
 // next fee proof is built; otherwise the node rejects it (Custom error 170, InvalidDustSpendProof).
 const SETTLE_TIMEOUT_MS = 300_000;
+// Custom error 170 also appears intermittently when the indexer feeding the wallet lags the
+// node, so a fresh attempt with a newer DUST tree usually passes. Other errors are not retried.
+const DUST_PROOF_REJECTED = /Custom error: 170/;
+const MAX_TX_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 30_000;
 const FEE_BLOCKS_MARGIN = 5;
 const ADDITIONAL_FEE_OVERHEAD = 1_000n;
 
@@ -127,7 +132,7 @@ export const openOperatorWallet = async (config: CliConfig, logger: Logger): Pro
     provider,
     runTx: async <T,>(label: string, tx: () => Promise<T>): Promise<T> => {
       const before = dustIndex(await Rx.firstValueFrom(facade.state()));
-      const result = await tx();
+      const result = await withDustRetry(label, tx, logger);
       await settle(facade, before, label, logger);
       await saveState();
       return result;
@@ -146,6 +151,19 @@ const isComplete = (progress: unknown): boolean =>
   typeof (progress as { isStrictlyComplete?: unknown })?.isStrictlyComplete === 'function' &&
   (progress as { isStrictlyComplete: () => boolean }).isStrictlyComplete();
 
+const withDustRetry = async <T,>(label: string, tx: () => Promise<T>, logger: Logger): Promise<T> => {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await tx();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      if (!DUST_PROOF_REJECTED.test(message) || attempt >= MAX_TX_ATTEMPTS) throw e;
+      logger.warn(`${label}: node rejected the DUST fee proof (170), attempt ${attempt}/${MAX_TX_ATTEMPTS}; retrying in ${RETRY_DELAY_MS / 1000}s`);
+      await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+    }
+  }
+};
+
 type FacadeState = Rx.ObservedValueOf<ReturnType<Facade["state"]>>;
 
 const dustIndex = (s: FacadeState): bigint => {
@@ -161,7 +179,15 @@ const settle = async (facade: Facade, before: bigint, label: string, logger: Log
   const started = Date.now();
   await Rx.firstValueFrom(
     facade.state().pipe(
-      Rx.filter((s) => allComplete(s) && dustIndex(s) > before),
+      // The spent coin must leave "pending" and the change coin must be spendable; the DUST
+      // index alone also advances on other people's events and is not proof of our tx.
+      Rx.filter(
+        (s) =>
+          allComplete(s) &&
+          dustIndex(s) > before &&
+          s.dust.pendingCoins.length === 0 &&
+          s.dust.availableCoins.length > 0,
+      ),
       Rx.timeout({ first: SETTLE_TIMEOUT_MS, with: () => Rx.throwError(() => new Error(`${label}: wallet did not sync the transaction within ${SETTLE_TIMEOUT_MS / 1000}s`)) }),
     ),
   );

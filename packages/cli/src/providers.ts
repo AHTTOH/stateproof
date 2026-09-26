@@ -70,6 +70,18 @@ export const buildProviders = (config: CliConfig, wallet: OperatorWallet, logger
     zkConfigProvider: new NodeZkConfigProvider<StateProofCircuitId>(CONTRACT_MANAGED_DIR),
     proofProvider: createWasmProofProvider(nodeKeyMaterialSource(config, logger)),
     walletProvider: wallet.provider,
-    midnightProvider: wallet.provider,
+    midnightProvider: {
+      // A rejected submission must hand its DUST coin back: without revert the wallet keeps
+      // treating the coin as spent and the balance silently shrinks (seen on Preprod 2026-09-26).
+      submitTx: async (tx) => {
+        try {
+          return await wallet.provider.submitTx(tx);
+        } catch (e) {
+          await wallet.provider.wallet.revertTransaction(tx);
+          logger.warn('Submission rejected; reverted the transaction in the wallet so its DUST coin is spendable again');
+          throw e;
+        }
+      },
+    },
   };
 };

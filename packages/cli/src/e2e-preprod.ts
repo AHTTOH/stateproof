@@ -29,14 +29,14 @@ const DEMO_POLICY: PolicyInput = {
   reveal: 'jobCategory',
 };
 
-const loadPersona = async (id: string): Promise<PersonaBundle> => {
+export const loadPersona = async (id: string): Promise<PersonaBundle> => {
   const { personas } = JSON.parse(await readFile(DEMO_BUNDLE_FILE, 'utf8')) as { personas: PersonaBundle[] };
   const persona = personas.find((p) => p.id === id);
   if (!persona) throw new Error(`Persona ${id} not found in ${DEMO_BUNDLE_FILE}`);
   return persona;
 };
 
-const proofInputsFor = (persona: PersonaBundle, schema: string) => {
+export const proofInputsFor = (persona: PersonaBundle, schema: string) => {
   const doc = persona.credentials.find((c) => c.schema === schema);
   if (!doc) throw new Error(`${persona.id} has no ${schema} credential`);
   return { credential: toContractCredential(doc), signature: toContractSignature(doc), holderSecret: fromHex32(persona.holderSecret) };
