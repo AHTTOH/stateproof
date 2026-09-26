@@ -62,6 +62,8 @@ Midnight 재단의 공용 proof server 는 요청 본문 8KB 이상을 403 으�
 | 검증 요청 생성 | [`d85c2733…8e4d2b61`](https://explorer.preprod.midnight.network/transactions/d85c27339ab97969a2facbdee8b84cc0e4c9ac3cb672acf828f96cd78e4d2b61) (웹 `/verifier`, Lace) |
 | 홀더 증명 → VERIFIED | [`a8498d4b…0a92012a`](https://explorer.preprod.midnight.network/transactions/a8498d4bbf12a5839a4d11105de0f1835fc0bbda3ef83bc3ab9a6bfa0a92012a) (웹 `/holder/verify`, 브라우저 증명 약 28초 + Lace) |
 | 영수증 | https://stateproof-demo.web.app/request/9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a |
+| 공개 슬롯 요청 생성 (직무 공개) | [`0af1b881…ed23ba74`](https://explorer.preprod.midnight.network/transactions/0af1b8816632de729d712035cbbfa55aa1d28beb1d85573eaee7f27aed23ba74) (CLI) |
+| 공개 슬롯 증명 → VERIFIED, 공개 값 Job category = Engineering | [`dcb1464a…d46ad545`](https://explorer.preprod.midnight.network/transactions/dcb1464adbf98f17aaf4981ba28e3340b659a4cd1ac0d15e2927cec5d46ad545) (CLI, Node WASM 증명). 영수증: https://stateproof-demo.web.app/request/04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f |
 
 전체 기록은 [config/deployments.json](config/deployments.json) 과 [docs/demo](docs/demo) 에 있다.
 
