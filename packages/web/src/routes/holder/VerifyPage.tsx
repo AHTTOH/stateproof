@@ -5,7 +5,7 @@ import { Op, pureCircuits, submitProof, type Request } from '@stateproof/contrac
 import { bytes32ToLabel, describePolicy, fromHex32, getSchema, schemaByIdBytes, type CredentialDocument } from '@stateproof/core';
 import { useLace } from '../../app/LaceContext';
 import { errorMessage, useAsync } from '../../app/useAsync';
-import { explorerTxUrl } from '../../app/env';
+import { explorerTxUrl, issuerInfo } from '../../app/env';
 import { Boundary } from '../../components/Boundary';
 import { StatusBadge } from '../../components/StatusBadge';
 import { fetchRequest } from '../../state/ledger';
@@ -75,11 +75,11 @@ export const VerifyPage = () => {
         A verifier asks you to prove something <StatusBadge status={receipt.status} />
       </h1>
       <p className="lede">
-        They need a {schema.title.toLowerCase()} from {receipt.policy.issuerId}. Review exactly what crosses over before
-        you prove anything.
+        They ask about your {schema.title} from {issuerInfo(receipt.policy.issuerId).name}. Review exactly what crosses
+        over before you prove anything.
       </p>
 
-      <Boundary description={receipt.policy} verifierLabel="The verifier" />
+      <Boundary description={receipt.policy} verifierLabel="The verifier" issuerName={issuerInfo(receipt.policy.issuerId).name} />
 
       {receipt.status !== 'pending' ? (
         <p className="notice">
@@ -92,7 +92,7 @@ export const VerifyPage = () => {
         </>
       ) : doc === null ? (
         <p className="notice error">
-          {wallet.label} has no {schema.title} from {receipt.policy.issuerId}. Nothing can be proven.
+          {wallet.label} has no {schema.title} from {issuerInfo(receipt.policy.issuerId).name}. Nothing can be proven.
         </p>
       ) : check && !check.ok ? (
         <div className="notice error" role="alert">

@@ -18,9 +18,11 @@ import { networkEndpoints, zkBaseUrl } from '../app/env';
 import { inMemoryPrivateStateProvider } from './in-memory-private-state-provider';
 import { createWorkerProofProvider } from './workerProving';
 
+// The provider defaults to isomorphic-ws, whose browser build has no named WebSocket
+// export; without the browser's own WebSocket the tx-confirmation subscription never opens.
 export const publicDataProvider = (): PublicDataProvider => {
   const net = networkEndpoints();
-  return indexerPublicDataProvider(net.indexer, net.indexerWS);
+  return indexerPublicDataProvider(net.indexer, net.indexerWS, globalThis.WebSocket as unknown as Parameters<typeof indexerPublicDataProvider>[2]);
 };
 
 export const walletProviders = async (api: ConnectedAPI): Promise<StateProofProviders> => {

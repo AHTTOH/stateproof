@@ -1,5 +1,6 @@
 // Public request / receipt page (PRD §17). Reads only the ledger; no wallet needed.
 import { Link, useParams } from 'react-router-dom';
+import { issuerInfo } from '../../app/env';
 import { useAsync } from '../../app/useAsync';
 import { StatusBadge } from '../../components/StatusBadge';
 import { fetchRequest } from '../../state/ledger';
@@ -36,14 +37,14 @@ export const RequestPage = () => {
         ))}
         <li>
           <span>Issuer</span>
-          <span>{receipt.policy.issuerId}</span>
+          <span>{issuerInfo(receipt.policy.issuerId).name}</span>
         </li>
         <li>
           <span>{receipt.revealed ? receipt.revealed.label : 'Revealed values'}</span>
           <span>{receipt.revealed ? receipt.revealed.value : 'None'}</span>
         </li>
         <li>
-          <span>Not disclosed</span>
+          <span>Exact values not disclosed</span>
           <span className="muted">{receipt.policy.notDisclosed.filter((l) => l !== receipt.revealed?.label).join(', ')}</span>
         </li>
         <li>

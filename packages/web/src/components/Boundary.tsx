@@ -3,10 +3,11 @@ import type { PolicyDescription } from '@stateproof/core';
 interface BoundaryProps {
   readonly description: PolicyDescription;
   readonly verifierLabel: string;
+  readonly issuerName: string;
 }
 
 // The privacy boundary made literal: what crosses to the verifier vs what stays here.
-export const Boundary = ({ description, verifierLabel }: BoundaryProps) => (
+export const Boundary = ({ description, verifierLabel, issuerName }: BoundaryProps) => (
   <div className="boundary">
     <section className="proven" aria-labelledby="boundary-proven">
       <h3 id="boundary-proven">{verifierLabel} will learn</h3>
@@ -17,7 +18,7 @@ export const Boundary = ({ description, verifierLabel }: BoundaryProps) => (
           </li>
         ))}
         <li>
-          <span>That the credential was signed by {description.issuerId}</span>
+          <span>That the credential was signed by {issuerName}</span>
         </li>
         {description.revealed !== null && (
           <li>
@@ -31,7 +32,7 @@ export const Boundary = ({ description, verifierLabel }: BoundaryProps) => (
       <ul>
         {description.notDisclosed.map((label) => (
           <li key={label}>
-            <span>Your {label.toLowerCase()}</span>
+            <span>Your exact {label.toLowerCase()}</span>
           </li>
         ))}
         <li>

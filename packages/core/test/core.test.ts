@@ -102,7 +102,7 @@ describe('policy builder', () => {
     const d = describePolicy(buildPolicy(demo));
     expect(d.conditions).toEqual(['Age at issuance at least 19 years', 'Region of residence is one of Seoul, Gyeonggi', 'Nationality is KR']);
     expect(d.revealed).toBe('Region of residence');
-    expect(d.notDisclosed).toEqual(['Date of birth', 'Age at issuance', 'Nationality']);
+    expect(d.notDisclosed).toEqual(['Date of birth', 'Age at issuance']);
   });
 
   it('rejects invalid policies', () => {

@@ -110,11 +110,13 @@ export const describePolicy = (policy: Policy): PolicyDescription => {
     ? schema.claims.find((c) => BigInt(c.slot) === policy.revealSlot.value)
     : undefined;
   if (policy.revealSlot.is_some && !revealedClaim) throw new Error('Reveal slot is not defined in the schema');
+  // An `eq` condition pins the value, so a successful proof tells the verifier exactly what it is.
+  const pinnedSlots = new Set(active.filter((c) => c.op === Op.eq).map((c) => c.claimIndex));
   return {
     schema,
     issuerId: bytes32ToLabel(policy.issuerId),
     conditions: active.map((c) => describeCondition(schema, c)),
     revealed: revealedClaim ? revealedClaim.label : null,
-    notDisclosed: schema.claims.filter((c) => c !== revealedClaim).map((c) => c.label),
+    notDisclosed: schema.claims.filter((c) => c !== revealedClaim && !pinnedSlots.has(BigInt(c.slot))).map((c) => c.label),
   };
 };
