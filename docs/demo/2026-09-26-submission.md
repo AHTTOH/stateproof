@@ -1,45 +1,65 @@
 # 제출 폼 문구 (Midnight Korea Hackathon 2026)
 
-> 작성: 2026-09-26 13:30 KST · 갱신: 2026-09-27 · 제출 마감 2026-09-28 00:00 KST (목표 09-27 21:00)
-> 프로젝트명과 한 줄 설명은 README 첫 두 줄과 글자 단위로 같아야 한다(심사 기준 §2.3). README 를 고치면 이 문서도 같이 고친다.
+> 작성: 2026-09-26 13:30 KST, 갱신: 2026-09-27 14:00 KST. 제출 마감 2026-09-28 00:00 KST.
+> 실제 제출 폼은 Tally https://tally.so/r/Np20VW (허브의 Submit 버튼). 아래 순서가 폼 항목 순서다.
+> 프로젝트명과 한 줄 설명은 README 와 글자 단위로 같아야 한다.
 
-## 프로젝트명
+## 팀/프로젝트명 (필수)
 
 StateProof
 
-## 한 줄 설명
+## 참가 형태 (필수)
 
-원본 개인정보를 넘기지 않고, 상대가 요구한 조건을 충족한다는 사실만 증명하는 Midnight 기반 ZK 크리덴셜 검증 서비스.
+개인
 
-## 공개 GitHub 저장소
+## 소속/이름 (필수, Luma 신청 정보와 같게)
+
+(Luma 등록 후 그 정보 그대로 기입. 신영환 확인 필요)
+
+## 대표자 연락처 (필수)
+
+ai.antton.ai@gmail.com (Discord: antton7282)
+
+## GitHub Repository 링크 (필수)
 
 https://github.com/AHTTOH/stateproof
 
-## 데모
+## 'midnightntwrk' 토픽 추가 여부 (필수)
 
-https://stateproof-demo.web.app (Midnight Preprod)
+확인했습니다. (2026-09-27 저장소 About Topics 에 midnightntwrk 추가 완료)
 
-## 실행 방법 / 데모 흐름
+## 프로젝트 소개 (필수)
 
-**지갑 없이 확인 (브라우저만):** https://stateproof-demo.web.app/demo (아직 답이 없는 데모 요청으로 자동 이동) 에서 Use Minji Park, Try the proof without a wallet(브라우저에서 실제 ZK 증명 생성, 제출 안 함), Use a different persona, Use Sora Kim(조건 불충족으로 증명 없이 차단) 순서로 누른다. 고용 조건과 신원 조건(19세 이상, 거주지 서울·경기) 두 종류의 데모 요청이 있다. 자세한 단계는 README 첫 절.
+원본 개인정보를 넘기지 않고, 상대가 요구한 조건을 충족한다는 사실만 증명하는 Midnight 기반 ZK 크리덴셜 검증 서비스.
 
-**Lace 로 실제 트랜잭션까지:**
+채용 담당자는 "재직 중이고 근속 12개월 이상인가"만 알면 되는데 지금은 재직증명서 원본을 통째로 받습니다. 생년월일, 입사일, 주소처럼 필요 없는 정보까지 넘어갑니다. StateProof 는 검증자가 조건을 골라 요청을 체인에 올리면 홀더가 자기 브라우저 안에서 발급자 서명 크리덴셜로 영지식 증명을 만들어 조건 충족 여부만 넘기는 흐름입니다.
 
-1. 저장소를 받아 `npm ci`, `npm test` (컨트랙트 시뮬레이터 33건 + core 17건, Compact 컴파일러 없이 동작).
-2. 데모 사이트 `/verifier` 에서 조건(예: 재직 상태 = Active, 근속 12개월 이상)을 고르고 검증 요청을 만든다. Lace 가 수수료를 내고 요청이 온체인에 기록된다.
-3. 홀더 링크 `/holder/verify/<id>` 를 열면 "검증자가 알게 되는 것 / 받지 못하는 것" 이 나뉘어 보인다. 가상 인물 Minji 의 크리덴셜을 불러와 [Verify privately] 를 누르면 브라우저 안에서 ZK 증명이 만들어지고 Lace 가 제출한다.
-4. `/request/<id>` 영수증에 VERIFIED 와 증명된 조건, 공개되지 않은 항목이 표시된다.
-5. 같은 요청을 조건 미달 인물(Sora, 근속 6개월)로 열면 증명도 트랜잭션도 만들어지지 않고 어떤 조건이 안 맞는지 보여 준다.
+- 검증자: 항목과 연산자(이상, 이하, 같음, 제외, 범위, 다음 중 하나)로 조건을 조합하고 요청을 올립니다. 값 하나를 공개해 달라고 선택적으로 요청할 수 있습니다.
+- 홀더: 크리덴셜은 브라우저에만 있습니다. 요청을 열면 항목마다 "이 브라우저 값, 봉인선, 검증자가 아는 것"이 한 줄로 보이고 증명은 브라우저 Web Worker 에서 만들어집니다. 조건을 못 채우면 같은 회로가 먼저 로컬에서 돌아 증명도 트랜잭션도 만들지 않습니다.
+- 누구나: 영수증 페이지에서 체인에 기록된 결과를 지갑 없이 확인합니다.
+- 지갑 없이 체험: https://stateproof-demo.web.app/demo 에서 홀더 박민지를 고르고 "지갑 없이 증명해 보기"를 누르면 실제 submitProof 트랜잭션의 영지식 증명이 브라우저에서 만들어집니다(제출하지 않음).
 
-실제로 이 흐름을 Preprod 에서 끝까지 실행한 기록(tx 해시)은 README 의 "Preprod 기록" 표에 있다.
+## Midnight 구현 포인트 (필수)
 
-## Midnight 사용 방식
+- Compact 0.31.1 컨트랙트 하나(registerIssuer, createRequest, submitProof).
+- 증명하는 것: submitProof 회로 안에서 발급자 Jubjub Schnorr 서명 검증, 크리덴셜 유효기간, 홀더 바인딩(비밀값 커밋), 정책의 모든 조건. 정책은 요청 생성 시점의 public 입력이고 회로 하나가 임의의 정책을 평가합니다(8개 슬롯과 6개 연산자를 모두 계산한 뒤 선택).
+- 공개하는 것: ledger 에는 요청(정책)과 결과(VERIFIED, 검증자가 요청한 값 하나)만 남습니다. 크리덴셜 8개 슬롯, 서명, 홀더 비밀값은 witness 로만 쓰이고 disclose() 는 9곳이 전부입니다.
+- 왜 프라이버시가 필요한가: 재직, 나이, 거주지 같은 조건 확인에 원본 문서를 넘기는 관행이 과잉 수집과 유출을 만듭니다. 결과는 누구나 확인할 수 있게 체인에 남기면서 원본 값은 어디에도 남기지 않는 구조는 Midnight 의 선택적 공개로 가능합니다.
+- 회로 증명은 @midnight-ntwrk/zkir-v2 WASM 으로 브라우저(Web Worker)와 Node 에서 직접 만들어 크리덴셜이 어떤 서버로도 가지 않습니다. Lace 는 DApp Connector 로 수수료(DUST)와 제출만 맡습니다.
+- Preprod 컨트랙트 4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3. 실제 tx 기록은 README 의 Preprod 기록 표.
 
-- Compact 0.31.1 컨트랙트 하나(`registerIssuer`, `createRequest`, `submitProof`). 정책(조건 최대 4개, 연산자 6종)은 요청 생성 시점의 **public 입력**이고, 크리덴셜·발급자 서명·홀더 비밀값은 **witness** 다.
-- `submitProof` 회로 안에서 Jubjub Schnorr 발급자 서명 검증, 크리덴셜 유효기간, 홀더 바인딩, 모든 조건 평가를 수행한다. 요청 만료는 `blockTimeLt` 로 체인 시간 기준으로 검사한다.
-- ledger 에는 요청(정책 공개)과 결과(VERIFIED, 검증자가 요청한 경우 공개 값 1개)만 남는다. 생년월일, 근속 개월 수, 상세 주소 같은 원본 값은 어디에도 기록되지 않는다.
-- 회로 증명은 `@midnight-ntwrk/zkir-v2` WASM 으로 브라우저(Web Worker)와 Node 에서 직접 만든다. 크리덴셜이 어떤 서버로도 전송되지 않는다. Lace 는 DApp Connector 로 수수료(DUST) 균형과 제출만 맡는다.
+## 프로젝트 참고자료 (선택, Google Slides)
 
-## 데모 영상 (선택)
+(작성 예정)
 
-https://stateproof-demo.web.app/media/walkthrough.mp4 (브라우저에서 바로 재생, 약 100초, 자막 포함. 정책 작성, 경계 화면, 브라우저 안 실제 증명 생성, 조건 미달 인물 차단, 온체인 영수증. Lace 승인 단계는 없으며 그 단계를 포함한 실제 온체인 실행 기록은 README 의 Preprod 기록 표에 있다)
+## 데모 영상 링크 (선택, 3분 이내)
+
+https://stateproof-demo.web.app/media/walkthrough.mp4
+
+## 데모 URL (선택)
+
+https://stateproof-demo.web.app
+
+## Midnight Academy 수료증 (선택, 1단계와 2단계 각 +1점)
+
+(신영환이 이수하면 파일 첨부)
