@@ -4,17 +4,17 @@
 
 **Prove the condition. Keep the data.**
 
-> 문서 기준일: 2026-09-27. 네트워크: Midnight **Preprod**. 데모: https://stateproof-demo.web.app · 화면 녹화(브라우저에서 바로 재생): https://stateproof-demo.web.app/media/walkthrough.mp4
+> 문서 기준일: 2026-09-27. 네트워크: Midnight **Preprod**. 데모: https://stateproof.web.app · 화면 녹화(브라우저에서 바로 재생): https://stateproof.web.app/media/walkthrough.mp4
 
 ## 지갑 없이 3분 안에 확인하기 (심사용)
 
 설치할 것도 지갑도 필요 없다. 브라우저 하나면 된다.
 
-1. https://stateproof-demo.web.app/demo 를 연다. 아직 답이 없는 데모 요청으로 자동 이동한다(첫 화면의 **Open a pending demo request** 와 같다).
+1. https://stateproof.web.app/demo 를 연다. 아직 답이 없는 데모 요청으로 자동 이동한다(첫 화면의 **Open a pending demo request** 와 같다).
 2. "The verifier will learn / They will NOT receive" 경계를 확인하고 **Use Minji Park (fictional)** 를 누른다.
 3. **Try the proof without a wallet** 를 누른다. 브라우저 Web Worker 가 실제 `submitProof` 트랜잭션을 만들고 ZK 증명을 생성한다(10~30초, 경과 시간이 표시된다). 임시 키를 쓰고 제출하지 않는다.
 4. **Use a different persona** → **Use Sora Kim** (근속 6개월). 같은 회로가 먼저 로컬에서 돌아 "Not met: Months employed at least 12 months" 를 보여 주고, 증명도 트랜잭션도 만들지 않는다.
-5. 실제로 체인에 기록된 결과를 지갑 없이 본다: [영수증 1](https://stateproof-demo.web.app/request/9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a) (공개 값 없음), [영수증 2](https://stateproof-demo.web.app/request/04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f) (공개 값: 직무 Engineering). tx 는 아래 "Preprod 기록" 표에서 익스플로러로 열린다.
+5. 실제로 체인에 기록된 결과를 지갑 없이 본다: [영수증 1](https://stateproof.web.app/request/9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a) (공개 값 없음), [영수증 2](https://stateproof.web.app/request/04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f) (공개 값: 직무 Engineering). tx 는 아래 "Preprod 기록" 표에서 익스플로러로 열린다.
 
 데모 요청은 [config/demo-requests.json](config/demo-requests.json) 에 있다(모두 2026-10-27 까지 유효). 고용 조건(재직 Active, 근속 12개월 이상, 직무 공개)과 신원 조건(발급 시점 나이 19세 이상, 거주지 서울 또는 경기, 거주지 공개) 두 종류다. 신원 요청에서는 Sora 가 두 조건 모두 Not met 으로 막힌다.
 
@@ -93,17 +93,17 @@ Midnight 재단의 공용 proof server 는 요청 본문 8KB 이상을 403 으�
 
 | 항목 | 값 |
 |---|---|
-| 데모 | https://stateproof-demo.web.app |
-| 화면 녹화 | https://stateproof-demo.web.app/media/walkthrough.mp4 (브라우저에서 재생. 원본 [docs/demo](docs/demo). 자막 포함. 지갑 없는 흐름만 담았다: 정책 작성, 경계 화면, 브라우저 증명, Sora 차단, 영수증. Lace 승인 단계는 없다) |
+| 데모 | https://stateproof.web.app |
+| 화면 녹화 | https://stateproof.web.app/media/walkthrough.mp4 (브라우저에서 재생. 원본 [docs/demo](docs/demo). 자막 포함. 지갑 없는 흐름만 담았다: 정책 작성, 경계 화면, 브라우저 증명, Sora 차단, 영수증. Lace 승인 단계는 없다) |
 | StateProof 컨트랙트 | [`4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3`](https://explorer.preprod.midnight.network/contracts/4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3) |
 | 배포 tx | [`9b5b3d77…729b60`](https://explorer.preprod.midnight.network/transactions/9b5b3d7728fa7baca2cd4aa9994e126e4e3e42ed09ad6143053a996f58729b60) (2026-09-26 06:22 KST, 컴파일러 0.31.1) |
 | 발급자 등록 `issuer:acme-hr` | [`bf69827e…f680549`](https://explorer.preprod.midnight.network/transactions/bf69827ee414acb764df5d86963ff6030a20532d3b9b36de08fb3471ff680549) (CLI, Node WASM 증명) |
 | 발급자 등록 `issuer:gov-id-demo` | [`df1eaf69…ddccd70e`](https://explorer.preprod.midnight.network/transactions/df1eaf6978d0b1ea9e1262cb86383fdd07cb02693a7654b4f22b00b9ddccd70e) (웹 Operator tools, 브라우저 증명 + Lace) |
 | 검증 요청 생성 | [`d85c2733…8e4d2b61`](https://explorer.preprod.midnight.network/transactions/d85c27339ab97969a2facbdee8b84cc0e4c9ac3cb672acf828f96cd78e4d2b61) (웹 `/verifier`, Lace) |
 | 홀더 증명 → VERIFIED | [`a8498d4b…0a92012a`](https://explorer.preprod.midnight.network/transactions/a8498d4bbf12a5839a4d11105de0f1835fc0bbda3ef83bc3ab9a6bfa0a92012a) (웹 `/holder/verify`, 브라우저 증명 약 28초 + Lace) |
-| 영수증 | https://stateproof-demo.web.app/request/9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a |
+| 영수증 | https://stateproof.web.app/request/9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a |
 | 공개 슬롯 요청 생성 (직무 공개) | [`0af1b881…ed23ba74`](https://explorer.preprod.midnight.network/transactions/0af1b8816632de729d712035cbbfa55aa1d28beb1d85573eaee7f27aed23ba74) (CLI) |
-| 공개 슬롯 증명 → VERIFIED, 공개 값 Job category = Engineering | [`dcb1464a…d46ad545`](https://explorer.preprod.midnight.network/transactions/dcb1464adbf98f17aaf4981ba28e3340b659a4cd1ac0d15e2927cec5d46ad545) (CLI, Node WASM 증명). 영수증: https://stateproof-demo.web.app/request/04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f |
+| 공개 슬롯 증명 → VERIFIED, 공개 값 Job category = Engineering | [`dcb1464a…d46ad545`](https://explorer.preprod.midnight.network/transactions/dcb1464adbf98f17aaf4981ba28e3340b659a4cd1ac0d15e2927cec5d46ad545) (CLI, Node WASM 증명). 영수증: https://stateproof.web.app/request/04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f |
 | 심사용 대기 요청 (고용, 직무 공개) | [`d331bc8c…6ae3b1e0`](https://explorer.preprod.midnight.network/transactions/d331bc8c107c33c3db594ff326fdd90b2097ddc55cff92ee78f061326ae3b1e0) (CLI `demo-request`, 2026-09-27 02:50 KST, 30일) |
 | 심사용 대기 요청 (신원, 거주지 공개) | [`dd616ac7…fdb3621`](https://explorer.preprod.midnight.network/transactions/dd616ac704ae0206eb355af5152d0dac5a0c14bd22612562b160298adfdb3621) (CLI `demo-request`, 2026-09-27 05:53 KST, 30일) |
 
