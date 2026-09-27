@@ -79,16 +79,6 @@ export const RequestPage = () => {
       <p className="seal-note">{t('boundary.publicNote')}</p>
       <ul className="rows">
         <li>
-          <span>{receipt.policy.revealed === null ? t('receipt.revealedValue') : receipt.policy.revealed}</span>
-          {receipt.revealed ? (
-            <strong>{receipt.revealed.value}</strong>
-          ) : (
-            <span className="muted">
-              {receipt.policy.revealed === null ? t('receipt.noneRequested') : receipt.status === 'pending' ? t('receipt.shownAfter') : t('receipt.notRevealed')}
-            </span>
-          )}
-        </li>
-        <li>
           <span>{t('receipt.issuer')}</span>
           <span>{issuer}</span>
         </li>

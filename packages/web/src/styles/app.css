@@ -1178,3 +1178,58 @@ textarea {
 .footer-links a:hover {
   color: var(--c-ink);
 }
+
+/* Proof finished, holder empty state, verifier form alignment (2026-09-27 evening). */
+.proof-done {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-5);
+  align-items: start;
+  margin: var(--s-4) 0;
+  padding: var(--s-6);
+  border-radius: var(--r-band);
+  border: 1px solid var(--c-link);
+  background: linear-gradient(135deg, rgba(0, 0, 254, 0.35), rgba(0, 0, 254, 0.05) 70%), var(--c-surface);
+}
+.proof-done-mark {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--c-ledger);
+  color: var(--c-on-accent);
+  font-size: 1.75rem;
+  font-weight: 900;
+  box-shadow: 0 0 32px rgba(0, 0, 254, 0.7);
+}
+.proof-done h2 {
+  margin: 0 0 var(--s-2);
+  font-size: var(--t-xl);
+  font-weight: 900;
+}
+.proof-done p {
+  margin: 0 0 var(--s-4);
+  color: var(--c-ink-soft);
+}
+.empty-state {
+  margin: var(--s-6) 0;
+  padding: var(--s-8) var(--s-6);
+  border: 1px dashed var(--c-control-edge);
+  border-radius: 14px;
+  color: var(--c-ink-soft);
+  text-align: center;
+}
+.policy-grid {
+  align-items: start;
+}
+.policy-grid select,
+.policy-grid input {
+  width: 100%;
+}
+.policy-grid .inline {
+  flex-wrap: nowrap;
+}
+.policy-grid > .btn {
+  align-self: end;
+}

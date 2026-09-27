@@ -22,6 +22,12 @@ import { checkLocally, matchingCredential, type LocalReason } from '../../state/
 
 const NO_FAILURES: ReadonlySet<string> = new Set();
 
+// A recorded receipt to show after a wallet-free proof, from config/demo-requests.json.
+const receiptExampleId = (): string | null => {
+  const demo = demoRequestsFor();
+  return demo === null || demo.verified.length === 0 ? null : demo.verified[demo.verified.length - 1].requestId;
+};
+
 const isDemoRequest = (requestId: string): boolean =>
   demoRequestsFor()?.pending.some((r) => r.requestId === requestId.toLowerCase()) === true;
 
@@ -49,6 +55,7 @@ export const VerifyPage = () => {
   const [txHash, setTxHash] = useState<string | null>(null);
   const [dryRun, setDryRun] = useState<DryRunResult | null>(null);
   const hasLace = useLaceDetected();
+  const receiptExample = receiptExampleId();
   const working = busy || dryBusy;
   const elapsed = useElapsed(working);
 
@@ -184,29 +191,38 @@ export const VerifyPage = () => {
         </div>
       ) : (
         <>
-          {/* Without Lace the wallet-free proof is the primary action, first in visual and tab order. */}
+          {/* Until Lace is confirmed the wallet-free proof is the primary action, first in visual and tab order. */}
           <div className="actions">
-            {hasLace === false ? (
-              <>
-                {dryButton('btn primary')}
-                {laceButton('btn quiet')}
-              </>
-            ) : (
+            {hasLace === true ? (
               <>
                 {laceButton('btn primary')}
                 {dryButton('btn quiet')}
               </>
+            ) : (
+              <>
+                {dryButton('btn primary')}
+                {laceButton('btn quiet')}
+              </>
             )}
           </div>
-          <p className="small muted">{hasLace === false ? t('verify.helpNoLace') : t('verify.helpLace')}</p>
+          <p className="small muted">{hasLace === true ? t('verify.helpLace') : t('verify.helpNoLace')}</p>
           {working && <ProofBand mode={dryBusy ? 'dry' : 'lace'} elapsed={elapsed} />}
         </>
       )}
 
       {dryRun && (
-        <p className="notice ok" role="status">
-          {t('verify.dryResult', { seconds: (dryRun.proveMs / 1000).toFixed(1), size: (dryRun.txBytes / 1024).toFixed(1) })}
-        </p>
+        <section className="proof-done" role="status">
+          <span className="proof-done-mark" aria-hidden="true">✓</span>
+          <div>
+            <h2>{t('proof.done')}</h2>
+            <p>{t('proof.doneBody', { seconds: (dryRun.proveMs / 1000).toFixed(1), size: (dryRun.txBytes / 1024).toFixed(1) })}</p>
+            {receiptExample !== null && (
+              <Link className="btn quiet" to={`/request/${receiptExample}`}>
+                {t('proof.doneReceipt')}
+              </Link>
+            )}
+          </div>
+        </section>
       )}
       {error && <ErrorNotice message={error} />}
       {txHash && (

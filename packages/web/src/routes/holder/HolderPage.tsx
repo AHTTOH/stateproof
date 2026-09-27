@@ -1,5 +1,6 @@
 // The holder's credentials in this browser. Demo personas are fictional and public by design.
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getSchema, schemaTitle } from '@stateproof/core';
 import { issuerInfo, issuerName } from '../../app/env';
 import { personaNameKey, useI18n } from '../../app/i18n';
@@ -58,6 +59,7 @@ export const HolderPage = () => {
         </div>
       </div>
 
+      {wallet === null && <p className="empty-state">{t('holder.empty')}</p>}
       {wallet !== null && (
         <>
           <ul className="rows" style={{ marginTop: 'var(--s-4)' }}>
@@ -78,6 +80,11 @@ export const HolderPage = () => {
               );
             })}
           </ul>
+          <p>
+            <Link className="btn primary" to="/start">
+              {t('holder.openRequest')}
+            </Link>
+          </p>
           <div className="field" style={{ marginTop: 'var(--s-6)' }}>
             <label htmlFor="import">{t('holder.import')}</label>
             <input id="import" type="file" accept="application/json" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
