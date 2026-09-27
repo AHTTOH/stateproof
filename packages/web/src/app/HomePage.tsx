@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { NETWORK, demoRequestsFor } from './env';
 import { useI18n } from './i18n';
+import { ScrollStory } from './ScrollStory';
 
 // The preview reads the ledger and needs the contract runtime, so it loads after first paint.
 const SealPreview = lazy(() => import('../routes/holder/SealPreview').then((m) => ({ default: m.SealPreview })));
@@ -99,9 +100,21 @@ export const HomePage = () => {
   usePrefetchHolderPage();
   return (
     <>
+      <section className="hero">
+        <h1>{t('home.lede')}</h1>
+        <p>{t('home.hero.sub')}</p>
+        <div className="actions">
+          <Link className="btn primary" to="/demo">
+            {t('home.try.open')}
+          </Link>
+          <a className="btn quiet" href="#results-title">
+            {t('home.hero.receipt')}
+          </a>
+        </div>
+      </section>
+      <ScrollStory />
       <div className="home">
         <div>
-          <h1 className="display">{t('home.lede')}</h1>
           <DemoRequests />
         </div>
         <aside className="preview" aria-label={t('seal.lineHead')}>

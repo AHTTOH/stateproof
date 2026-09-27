@@ -1,35 +1,39 @@
-/* StateProof design tokens: "봉인선" (2026-09-27, docs/decisions/2026-09-27-design-direction.md).
+/* 2026-09-27 afternoon: black + electric blue, per 신영환's references (midnight.network, Midnight Expert, ZK Judge).
+   StateProof design tokens: "봉인선" (2026-09-27, docs/decisions/2026-09-27-design-direction.md).
    Colour carries meaning only: midnight = stays in this browser, cobalt = crosses to the verifier
    and the public ledger, yellow = the one value a request asks to see, red = a condition not met. */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  --c-ground: #ffffff;
-  --c-hatch: #eef0f4;
-  --c-hover: #f4f5f8;
-  --c-surface: #ffffff;
-  --c-ink: #131a2b;
-  --c-ink-soft: #475169;
-  --c-muted: #5c667d;
-  --c-rule: #d6dce6;
-  --c-control-edge: #8791a6;
+  --c-ground: #000000;
+  --c-hatch: #16171e;
+  --c-hover: #15161c;
+  --c-surface: #0b0b10;
+  --c-ink: #ffffff;
+  --c-ink-soft: #c3c6d1;
+  --c-muted: #9297a8;
+  --c-rule: #25262e;
+  --c-control-edge: #4b4e5c;
+  --c-on-accent: #ffffff;
+  --c-link: #8b98ff;
 
-  --c-ledger: #1f4bc4;
-  --c-ledger-deep: #173a9c;
-  --c-ledger-wash: #e7edfc;
+  --c-ledger: #0000fe;
+  --c-ledger-deep: #0000c4;
+  --c-ledger-wash: rgba(0, 0, 254, 0.24);
+  --c-ledger-text: #aab4ff;
 
-  --c-sealed: #161d3b;
-  --c-sealed-raised: #202a52;
-  --c-sealed-ink: #c9cfea;
-  --c-sealed-hatch: rgba(201, 207, 234, 0.14);
+  --c-sealed: #0000fe;
+  --c-sealed-raised: #0000c8;
+  --c-sealed-ink: #cdd2ff;
+  --c-sealed-hatch: rgba(255, 255, 255, 0.14);
 
-  --c-mark: #ffd84d;
-  --c-mark-ink: #5c4500;
+  --c-mark: #ffe14d;
+  --c-mark-ink: #3d2f00;
 
-  --c-fail: #b42318;
-  --c-fail-wash: #fce9e7;
-  --c-pending: #8a5a00;
-  --c-pending-wash: #fbf1dc;
+  --c-fail: #ff5a4e;
+  --c-fail-wash: rgba(255, 90, 78, 0.14);
+  --c-pending: #ffb547;
+  --c-pending-wash: rgba(255, 181, 71, 0.14);
 
   --f-sans: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
   --f-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
@@ -39,7 +43,8 @@
   --t-base: 1rem;
   --t-lg: 1.1875rem;
   --t-xl: clamp(1.5rem, 1.15rem + 1.4vw, 2rem);
-  --t-display: clamp(1.5rem, 1.15rem + 1.3vw, 2.125rem);
+  --t-display: clamp(2.5rem, 1.2rem + 5.2vw, 5.5rem);
+  --t-hero: clamp(3rem, 1rem + 8vw, 8.5rem);
   --t-numeral: clamp(3.5rem, 2.4rem + 4.6vw, 6rem);
 
   --s-1: 0.25rem;
