@@ -114,15 +114,15 @@
       {
         "requestId": "9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a",
         "title": {
-          "ko": "고용 조건 검증 완료, 공개 값 없음 (Lace)",
-          "en": "Employment, verified through Lace, no value revealed"
+          "ko": "고용 조건 검증 완료, 공개 값 없음",
+          "en": "Employment, verified, no value revealed"
         }
       },
       {
         "requestId": "04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f",
         "title": {
-          "ko": "고용 조건 검증 완료, 직무 공개 (CLI)",
-          "en": "Employment, verified from the CLI, job category revealed"
+          "ko": "고용 조건 검증 완료, 직무 공개",
+          "en": "Employment, verified, job category revealed"
         }
       }
     ]

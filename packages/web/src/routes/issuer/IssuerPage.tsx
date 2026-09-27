@@ -26,8 +26,12 @@ const STATE_CLASS: Readonly<Record<RegistryState, string>> = {
   mismatch: 'invalid',
 };
 
+// Deploy and registration tools are for the operator only: shown with ?operator in the URL.
+const OPERATOR_FLAG = 'operator';
+
 export const IssuerPage = () => {
   const { t, locale } = useI18n();
+  const operator = new URLSearchParams(window.location.search).has(OPERATOR_FLAG);
   const deployed = contractAddress() !== null;
   const ledger = useAsync(() => (deployed ? fetchLedger() : Promise.resolve(null)), [deployed]);
   // A failed ledger read is "could not check", never "not registered".
@@ -55,13 +59,14 @@ export const IssuerPage = () => {
               <div>
                 <div className="row-title">{issuerName(i, locale)}</div>
                 <div className="small">{t('issuer.issues', { schemas: i.schemas.map((s) => schemaTitle(getSchema(s), locale)).join(', ') })}</div>
-                <div className="hash muted">{i.id}</div>
               </div>
               <span className={`status ${STATE_CLASS[state]}`}>{t(STATE_LABEL[state])}</span>
             </li>
           );
         })}
       </ul>
+      {operator && (
+        <>
       <h2 className="section-title">{t('issuer.issueTitle')}</h2>
       <p className="small">{t('issuer.issueBody')}</p>
       <pre className="hash">
@@ -70,6 +75,8 @@ npm run issue -w @stateproof/issuer -- personas
 npm run register-issuer -w @stateproof/cli`}
       </pre>
       <OperatorPanel />
+        </>
+      )}
     </>
   );
 };

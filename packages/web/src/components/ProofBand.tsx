@@ -2,9 +2,9 @@
 // and where the work happens.
 import { useI18n } from '../app/i18n';
 
-// Ruler length; proofs usually take 10 to 30 seconds (12 to 15 measured on a laptop).
-const RULER_SECONDS = 30;
-const RULER_MARKS = [0, 10, 20, 30] as const;
+// Ruler length; proofs take 12 to 45 seconds depending on the machine (measured 2026-09-27).
+const RULER_SECONDS = 60;
+const RULER_MARKS = [0, 20, 40, 60] as const;
 const RING_LENGTH = 2 * Math.PI * 52;
 
 interface ProofBandProps {

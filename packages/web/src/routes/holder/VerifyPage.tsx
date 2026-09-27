@@ -125,8 +125,8 @@ export const VerifyPage = () => {
     r.kind === 'condition' ? t('verify.notMetItem', { condition: r.text }) : r.kind === 'expired' ? t('verify.reasonExpired') : t('verify.reasonIssuedAfter');
 
   const laceButton = (className: string) => (
-    <button type="button" className={className} aria-disabled={working} onClick={prove}>
-      {busy ? t('verify.laceBusy') : t('verify.lace')}
+    <button type="button" className={className} aria-disabled={working} disabled={hasLace === false} onClick={prove}>
+      {hasLace === false ? t('verify.laceMissing') : busy ? t('verify.laceBusy') : t('verify.lace')}
     </button>
   );
   const dryButton = (className: string) => (
@@ -167,7 +167,7 @@ export const VerifyPage = () => {
           {isDemoRequest(requestId) && (
             <>
               {' '}
-              <Link to="/demo">{t('verify.anotherDemo')}</Link>
+              <Link to="/start">{t('verify.anotherDemo')}</Link>
             </>
           )}
         </p>

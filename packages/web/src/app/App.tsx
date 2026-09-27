@@ -45,6 +45,7 @@ export const App = () => (
             <Route index element={<HomePage />} />
             <Route path="verifier" element={page(<VerifierPage />)} />
             <Route path="request/:requestId" element={page(<RequestPage />)} />
+            <Route path="start" element={page(<DemoPage />)} />
             <Route path="demo" element={page(<DemoPage />)} />
             <Route path="holder" element={page(<HolderPage />)} />
             <Route path="holder/verify/:requestId" element={page(<VerifyPage />)} />

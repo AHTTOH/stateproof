@@ -1,6 +1,12 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
 @import './tokens.css';
 
+/* Decorative art bleeds past the column; it must never create a horizontal scroll. */
+html,
+body {
+  overflow-x: clip;
+}
+
 /* Layout and components for the "봉인선" direction (2026-09-27). */
 
 *,
@@ -812,7 +818,7 @@ textarea {
 .hero::before {
   content: '';
   position: absolute;
-  inset: 0 -30vw 0 35%;
+  inset: 0 0 0 35%;
   z-index: -1;
   background: radial-gradient(circle, var(--c-ledger) 1.3px, transparent 1.8px) 0 0 / 9px 9px;
   -webkit-mask-image: radial-gradient(ellipse 60% 70% at 70% 45%, #000 20%, transparent 70%);

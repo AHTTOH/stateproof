@@ -44,7 +44,7 @@ export const Layout = () => {
         </ErrorBoundary>
       </main>
       <footer className="footer">
-        <span className="footer-brand">StateProof</span>
+        <span className="footer-brand">{t('footer.copyright')}</span>
         <nav className="footer-links" aria-label={t('footer.links')}>
           <a href="https://github.com/AHTTOH/stateproof">GitHub</a>
           {address !== null && <a href={explorerContractUrl(address)}>{t('footer.contract')}</a>}

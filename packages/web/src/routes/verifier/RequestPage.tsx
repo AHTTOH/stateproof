@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { RequestStatus } from '@stateproof/core';
 import { bytes32ToLabel } from '@stateproof/core';
-import { issuerInfo, issuerName } from '../../app/env';
+import { explorerContractUrl, issuerInfo, issuerName, requireContractAddress } from '../../app/env';
 import { useI18n } from '../../app/i18n';
 import type { MessageKey } from '../../app/messages';
 import { useAsync } from '../../app/useAsync';
@@ -29,12 +29,17 @@ const HEADING: Readonly<Record<RequestStatus, MessageKey>> = {
 
 const NO_FAILURES: ReadonlySet<string> = new Set();
 
-// Dates follow the page language (index.html lang), not the OS locale, so the UI reads in one language.
-const TIME_FORMAT: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'long' };
+// Compact "2026-09-26 14:32 GMT+9" in the viewer's time zone.
+const TIME_PARTS: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'short' };
+
+const compactTime = (value: Date): string => {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', TIME_PARTS).formatToParts(value).map((p) => [p.type, p.value]));
+  return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute} ${parts.timeZoneName}`;
+};
 
 const Time = ({ value }: { readonly value: Date }) => (
   <time dateTime={value.toISOString()} title={value.toISOString()}>
-    {value.toLocaleString(document.documentElement.lang, TIME_FORMAT)}
+    {compactTime(value)}
   </time>
 );
 
@@ -94,6 +99,10 @@ export const RequestPage = () => {
         <li>
           <span>{t('receipt.expires')}</span>
           <Time value={receipt.expiresAt} />
+        </li>
+        <li>
+          <span>{t('receipt.ledger')}</span>
+          <a href={explorerContractUrl(requireContractAddress())}>{t('receipt.ledgerLink')}</a>
         </li>
         <li>
           <span>{t('receipt.requestId')}</span>

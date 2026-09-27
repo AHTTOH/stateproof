@@ -25,7 +25,7 @@ const DemoRequests = () => {
     <section aria-labelledby="demo-title">
       <div className="demo-head">
         <h2 id="demo-title">{t('home.demoTitle')}</h2>
-        <Link className="btn primary" to="/demo">
+        <Link className="btn primary" to="/start">
           {t('home.try.open')}
         </Link>
       </div>
@@ -45,7 +45,7 @@ const DemoRequests = () => {
                 ))}
               </ul>
               <span className="small muted">{r.reveals === null ? t('home.try.asksNone') : t('home.try.asks', { value: r.reveals[locale] })}</span>
-              <Link className="btn primary" to={`/holder/verify/${r.requestId}`}>
+              <Link className="btn quiet" to={`/holder/verify/${r.requestId}`}>
                 {t('verify.dry')}
               </Link>
             </li>
@@ -108,7 +108,7 @@ export const HomePage = () => {
         <h1>{t('home.lede')}</h1>
         <p>{t('home.hero.sub')}</p>
         <div className="actions">
-          <Link className="btn primary" to="/demo">
+          <Link className="btn primary" to="/start">
             {t('home.try.open')}
           </Link>
           <a className="btn quiet" href="#results-title">
