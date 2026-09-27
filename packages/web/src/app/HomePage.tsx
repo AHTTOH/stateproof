@@ -51,11 +51,6 @@ const DemoRequests = () => {
             </li>
           ))}
       </ul>
-      <ol className="steps">
-        <li>{t('home.try.step1')}</li>
-        <li>{t('home.try.step2')}</li>
-        <li>{t('home.try.step3')}</li>
-      </ol>
     </section>
   );
 };

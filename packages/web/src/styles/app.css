@@ -1148,3 +1148,27 @@ textarea {
     justify-self: center;
   }
 }
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+.footer-brand {
+  font-weight: 900;
+  font-size: var(--t-base);
+  color: var(--c-ink);
+}
+.footer-links {
+  display: flex;
+  gap: var(--s-5);
+}
+.footer-links a {
+  color: var(--c-ink-soft);
+  text-decoration: none;
+}
+.footer-links a:hover {
+  color: var(--c-ink);
+}

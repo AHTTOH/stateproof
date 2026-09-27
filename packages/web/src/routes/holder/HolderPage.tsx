@@ -57,7 +57,6 @@ export const HolderPage = () => {
           ))}
         </div>
       </div>
-      <p className="small muted">{t('holder.personaNote')}</p>
 
       {wallet !== null && (
         <>

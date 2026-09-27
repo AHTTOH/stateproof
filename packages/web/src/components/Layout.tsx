@@ -44,18 +44,12 @@ export const Layout = () => {
         </ErrorBoundary>
       </main>
       <footer className="footer">
-        <p>{t('footer.proving')}</p>
-        <p>
-          {t('footer.contract')}{' '}
-          {address === null ? (
-            <span className="hash">{t('footer.notDeployed', { network: NETWORK })}</span>
-          ) : (
-            <a className="hash" href={explorerContractUrl(address)}>
-              {address}
-            </a>
-          )}
-          . {t('footer.testData')}
-        </p>
+        <span className="footer-brand">StateProof</span>
+        <nav className="footer-links" aria-label={t('footer.links')}>
+          <a href="https://github.com/AHTTOH/stateproof">GitHub</a>
+          {address !== null && <a href={explorerContractUrl(address)}>{t('footer.contract')}</a>}
+          <a href="https://midnight.network/">Midnight</a>
+        </nav>
       </footer>
     </div>
   );
