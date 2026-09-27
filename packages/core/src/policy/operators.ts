@@ -1,5 +1,5 @@
 import { Op } from '@stateproof/contract';
-import type { ClaimType } from '../schemas/index.js';
+import type { ClaimDefinition, ClaimType } from '../schemas/index.js';
 
 export type OperatorName = 'gte' | 'lte' | 'eq' | 'neq' | 'between' | 'inSet';
 
@@ -33,5 +33,5 @@ export const operatorByOp = (op: Op): OperatorDefinition => {
   return def;
 };
 
-export const operatorsForClaimType = (type: ClaimType): readonly OperatorDefinition[] =>
-  OPERATORS.filter((o) => o.claimTypes.includes(type));
+// In the order the schema lists them; the first one is the default in the policy builder.
+export const operatorsForClaim = (claim: ClaimDefinition): readonly OperatorDefinition[] => claim.operators.map(operatorByName);

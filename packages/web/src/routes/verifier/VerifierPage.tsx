@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { createRequest } from '@stateproof/contract';
 import { buildPolicy, describePolicy, randomBytes32, toHex, type PolicyInput } from '@stateproof/core';
 import { useLace } from '../../app/LaceContext';
-import { contractAddress, explorerTxUrl, NETWORK } from '../../app/env';
+import { contractAddress, explorerTxUrl, issuerInfo, NETWORK } from '../../app/env';
+import { Boundary } from '../../components/Boundary';
+import { Field } from '../../components/Field';
 import { errorMessage, useAsync } from '../../app/useAsync';
 import { StatusBadge } from '../../components/StatusBadge';
 import { fetchRequest } from '../../state/ledger';
@@ -101,34 +103,29 @@ export const VerifierPage = () => {
 
       <PolicyBuilder value={policyInput} onChange={setPolicyInput} />
 
-      <h2 className="section-title">The holder will prove</h2>
       {preview.error && <p className="notice error">{preview.error}</p>}
       {description && (
-        <ul className="rows">
-          {description.conditions.map((c) => (
-            <li key={c}>
-              <span>{c}</span>
-            </li>
-          ))}
-          <li>
-            <span className="muted">
-              {description.revealed ? `Revealed to you: ${description.revealed}` : 'No value is revealed, only the yes/no result.'}
-            </span>
-          </li>
-        </ul>
+        <Boundary
+          description={description}
+          issuerName={issuerInfo(policyInput.issuerId).name}
+          learnHeading="You will learn"
+          sealedHeading="You will NOT receive"
+          revealedValue={null}
+        />
       )}
 
       <div className="inline" style={{ marginTop: 'var(--s-6)' }}>
-        <div className="field">
-          <label>Request valid for</label>
-          <select value={ttl} onChange={(e) => setTtl(Number(e.target.value))}>
-            {TTL_OPTIONS.map((o) => (
-              <option key={o.seconds} value={o.seconds}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Field label="Request valid for">
+          {(id) => (
+            <select id={id} value={ttl} onChange={(e) => setTtl(Number(e.target.value))}>
+              {TTL_OPTIONS.map((o) => (
+                <option key={o.seconds} value={o.seconds}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </Field>
         <button type="button" className="btn" disabled={!preview.policy || busy} onClick={create}>
           {busy ? 'Creating request in Lace' : 'Create verification request'}
         </button>
@@ -145,7 +142,10 @@ export const VerifierPage = () => {
 
       <h2 className="section-title">Your requests</h2>
       {requests.length === 0 ? (
-        <p className="muted">Requests you create from this browser appear here.</p>
+        <p className="muted">
+          Requests you create from this browser appear here. No wallet? The <Link to="/">start page</Link> lists pending demo
+          requests you can prove without one.
+        </p>
       ) : (
         <ul className="rows">
           {requests.map((r) => (

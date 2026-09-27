@@ -1,15 +1,19 @@
 /* StateProof design tokens (2026-09-25).
-   Palette: cool mist ground, one semantic green for "proven", one indigo for "stays private". */
+   Palette: cool mist ground, one semantic green for "proven", one indigo for "stays private".
+   2026-09-27: proven green darkened to 5.2:1 on its wash, control edge token for 3:1 input borders. */
 :root {
+  color-scheme: light;
   --c-ground: #e9edea;
   --c-paper: #fbfcfa;
   --c-ink: #17211d;
   --c-ink-soft: #3a4641;
   --c-muted: #5a6660;
   --c-rule: #c9d1cc;
-  --c-proven: #0e7a5a;
+  --c-control-edge: #8a958f;
+  --c-proven: #0b6e51;
   --c-proven-wash: #dcefe6;
   --c-sealed: #3b3a8f;
+  --c-sealed-deep: #25246b;
   --c-sealed-wash: #e4e3f4;
   --c-alert: #a4262c;
   --c-alert-wash: #f6e1e1;

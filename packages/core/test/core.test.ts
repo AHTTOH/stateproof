@@ -111,19 +111,39 @@ describe('policy builder', () => {
         ...demo,
         conditions: [
           { claim: 'region', op: 'inSet', values: ['Seoul'] },
-          { claim: 'ageYears', op: 'between', value: 31, value2: 31 },
+          { claim: 'birthDate', op: 'between', value: '1995-03-14', value2: '1995-03-14' },
         ],
         reveal: null,
       }),
     );
-    expect(d.notDisclosed).toEqual(['Date of birth', 'Nationality']);
+    expect(d.notDisclosed).toEqual(['Age at issuance', 'Nationality']);
+  });
+
+  it('treats conditions that together leave one value as disclosing it', () => {
+    const employment = { schema: 'employment', issuerId: 'issuer:acme-hr', reveal: null } as const;
+    const notDisclosed = (conditions: PolicyInput['conditions']) => describePolicy(buildPolicy({ ...employment, conditions })).notDisclosed;
+    const startDay = { claim: 'employmentStartDate', op: 'gte', value: '2024-07-01' } as const;
+    expect(notDisclosed([startDay, { claim: 'employmentStartDate', op: 'lte', value: '2024-07-01' }])).not.toContain('Employment start date');
+    expect(notDisclosed([startDay, { claim: 'employmentStartDate', op: 'lte', value: '2024-07-02' }, { claim: 'employmentStartDate', op: 'neq', value: '2024-07-02' }])).not.toContain('Employment start date');
+    expect(notDisclosed([startDay, { claim: 'employmentStartDate', op: 'lte', value: '2024-07-02' }])).toContain('Employment start date');
+    expect(notDisclosed([{ claim: 'employmentStatus', op: 'neq', value: 'Active' }, { claim: 'employmentStatus', op: 'neq', value: 'Leave' }])).not.toContain('Employment status');
+    expect(notDisclosed([{ claim: 'employmentStatus', op: 'neq', value: 'Active' }])).toContain('Employment status');
+    expect(notDisclosed([{ claim: 'jobCategory', op: 'inSet', values: ['Design', 'Sales'] }, { claim: 'jobCategory', op: 'neq', value: 'Sales' }])).not.toContain('Job category');
+  });
+
+  it('allows only "at least" on values recorded at issuance', () => {
+    for (const op of ['lte', 'eq', 'neq'] as const) {
+      expect(() => buildPolicy({ ...demo, conditions: [{ claim: 'ageYears', op, value: 24 }] })).toThrow(/not allowed for Age at issuance/);
+    }
+    expect(() => buildPolicy({ ...demo, conditions: [{ claim: 'ageYears', op: 'between', value: 19, value2: 24 }] })).toThrow(/not allowed/);
+    expect(() => buildPolicy({ schema: 'employment', issuerId: 'issuer:acme-hr', reveal: null, conditions: [{ claim: 'employmentMonths', op: 'lte', value: 6 }] })).toThrow(/not allowed for Months employed/);
   });
 
   it('rejects invalid policies', () => {
     expect(() => buildPolicy({ ...demo, conditions: [] })).toThrow(/at least one/);
     expect(() => buildPolicy({ ...demo, conditions: Array(MAX_CONDITIONS + 1).fill(demo.conditions[0]) })).toThrow(/At most/);
-    expect(() => buildPolicy({ ...demo, conditions: [{ claim: 'region', op: 'gte', value: 'Seoul' }] })).toThrow(/does not apply/);
-    expect(() => buildPolicy({ ...demo, conditions: [{ claim: 'ageYears', op: 'between', value: 30, value2: 20 }] })).toThrow(/lower bound/);
+    expect(() => buildPolicy({ ...demo, conditions: [{ claim: 'region', op: 'gte', value: 'Seoul' }] })).toThrow(/not allowed/);
+    expect(() => buildPolicy({ ...demo, conditions: [{ claim: 'birthDate', op: 'between', value: '2000-01-02', value2: '2000-01-01' }] })).toThrow(/lower bound/);
     expect(() => buildPolicy({ ...demo, conditions: [{ claim: 'ageYears', op: 'gte' }] })).toThrow(/value is required/);
     expect(() => buildPolicy({ ...demo, reveal: 'salary' })).toThrow(/no claim salary/);
   });

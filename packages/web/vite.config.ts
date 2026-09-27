@@ -10,6 +10,8 @@ const WEB_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(WEB_DIR, '..', '..');
 const MANAGED_DIR = path.join(REPO_ROOT, 'packages', 'contract', 'src', 'managed', 'stateproof');
 const ZK_ROUTE = 'zk';
+const DEMO_DIR = path.join(REPO_ROOT, 'docs', 'demo');
+const VIDEO_ROUTE = 'media/walkthrough.mp4';
 
 const rootEnv = path.join(REPO_ROOT, '.env');
 if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
@@ -88,6 +90,18 @@ const zkAssets = (): Plugin => {
   };
 };
 
+// Publishes the latest dated walkthrough (docs/demo/YYYY-MM-DD-walkthrough.mp4) at /media so it
+// plays in the browser; GitHub serves repository videos as downloads.
+const demoVideo = (): Plugin => ({
+  name: 'stateproof-demo-video',
+  generateBundle() {
+    const videos = readdirSync(DEMO_DIR).filter((f) => /^\d{4}-\d{2}-\d{2}-walkthrough\.mp4$/.test(f)).sort();
+    const latest = videos.at(-1);
+    if (latest === undefined) throw new Error(`No dated walkthrough video in ${DEMO_DIR}`);
+    this.emitFile({ type: 'asset', fileName: VIDEO_ROUTE, source: readFileSync(path.join(DEMO_DIR, latest)) });
+  },
+});
+
 export default defineConfig({
   cacheDir: './.vite',
   define: {
@@ -98,7 +112,7 @@ export default defineConfig({
     target: 'esnext',
     commonjsOptions: { transformMixedEsModules: true, extensions: ['.js', '.cjs'], ignoreDynamicRequires: true },
   },
-  plugins: [react(), wasm(), zkAssets()],
+  plugins: [react(), wasm(), zkAssets(), demoVideo()],
   worker: { format: 'es', plugins: () => [wasm()] },
   optimizeDeps: {
     include: ['@midnight-ntwrk/compact-runtime'],

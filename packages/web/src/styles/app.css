@@ -115,6 +115,9 @@ a {
   font-size: var(--t-xs);
   word-break: break-all;
 }
+pre.hash {
+  white-space: pre-wrap;
+}
 
 /* Controls */
 .btn {
@@ -128,21 +131,25 @@ a {
   cursor: pointer;
   transition: transform var(--d-fast) var(--ease-out), background var(--d-fast) var(--ease-out);
 }
-.btn:hover:not(:disabled) {
+.btn:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--c-ink-soft);
 }
-.btn:active:not(:disabled) {
+.btn:active:not(:disabled):not([aria-disabled='true']) {
   transform: translateY(1px);
 }
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
+/* Busy, not unavailable: keeps focus and full contrast while a proof runs. */
+.btn[aria-disabled='true'] {
+  cursor: progress;
+}
 .btn.quiet {
   background: transparent;
   color: var(--c-ink);
 }
-.btn.quiet:hover:not(:disabled) {
+.btn.quiet:hover:not(:disabled):not([aria-disabled='true']) {
   background: var(--c-paper);
 }
 .btn.prove {
@@ -151,12 +158,29 @@ a {
   font-size: var(--t-base);
   padding: var(--s-4) var(--s-6);
 }
+.btn.prove:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--c-sealed-deep);
+  border-color: var(--c-sealed-deep);
+}
+.progress {
+  margin: 0;
+  min-height: 1.55em;
+  color: var(--c-ink-soft);
+}
 
 .field {
   display: grid;
   gap: var(--s-1);
 }
-.field label {
+fieldset.field {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.field label,
+.field legend {
+  padding: 0;
   font-size: var(--t-xs);
   color: var(--c-muted);
   font-weight: 500;
@@ -169,7 +193,7 @@ textarea {
   font: var(--t-sm) var(--f-sans);
   color: var(--c-ink);
   background: var(--c-paper);
-  border: 1px solid var(--c-rule);
+  border: 1px solid var(--c-control-edge);
   border-radius: var(--r-control);
   padding: var(--s-2) var(--s-3);
   min-width: 0;
@@ -262,11 +286,15 @@ textarea:focus {
   background:
     repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 9px),
     var(--c-sealed);
-  border-top: 4px solid #25246b;
+  border-top: 4px solid var(--c-sealed-deep);
 }
-.boundary h3 {
+.boundary h2 {
   margin: 0 0 var(--s-4);
-  font-size: var(--t-base);
+  font-size: var(--t-lg);
+  line-height: 1.25;
+}
+.boundary .proven > p {
+  margin: var(--s-4) 0 0;
 }
 .boundary ul {
   list-style: none;
@@ -284,6 +312,11 @@ textarea:focus {
   content: '✓';
   color: var(--c-proven);
   font-weight: 700;
+}
+/* A revealed value is data, not a yes/no fact: its own marker in the pending colour. */
+.boundary .proven li.revealed::before {
+  content: '◆';
+  color: var(--c-pending);
 }
 .boundary .sealed li::before {
   content: '⊘';
@@ -363,7 +396,76 @@ textarea:focus {
   color: var(--c-muted);
 }
 
+/* Home: the wallet-free walkthrough is the first thing to do. */
+.try {
+  margin: var(--s-8) 0 0;
+  padding: var(--s-6);
+  background: var(--c-paper);
+  border-radius: var(--r-panel);
+  border-top: 4px solid var(--c-sealed);
+}
+.try h2 {
+  margin: 0 0 var(--s-3);
+  font-size: var(--t-lg);
+}
+.try-steps {
+  margin: 0 0 var(--s-4);
+  padding-left: var(--s-6);
+  display: grid;
+  gap: var(--s-1);
+}
+.try-links {
+  list-style: none;
+  margin: 0 0 var(--s-4);
+  padding: 0;
+  display: grid;
+  gap: var(--s-2);
+}
+.try-links a {
+  display: grid;
+  gap: 2px;
+  padding: var(--s-3) var(--s-4);
+  background: var(--c-sealed-wash);
+  border-left: 3px solid var(--c-sealed);
+  border-radius: 0 var(--r-control) var(--r-control) 0;
+  text-decoration: none;
+  transition: background var(--d-fast) var(--ease-out);
+}
+.try-links a:hover strong {
+  text-decoration: underline;
+}
+.try-links a:hover {
+  background: var(--c-paper);
+}
+.try > p {
+  margin: 0 0 var(--s-4);
+}
+.try > p:last-child {
+  margin: 0;
+}
+a.btn {
+  display: inline-block;
+  text-decoration: none;
+}
+
 @media (max-width: 720px) {
+  .masthead {
+    justify-content: space-between;
+    gap: var(--s-2) var(--s-4);
+  }
+  .nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .nav a {
+    padding: var(--s-2) var(--s-3);
+  }
+  .rows > li > .status {
+    justify-self: start;
+  }
+  .try {
+    padding: var(--s-4);
+  }
   .boundary,
   .roles {
     grid-template-columns: 1fr;

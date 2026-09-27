@@ -2,13 +2,35 @@
 import { getSchema, labelToBytes32 } from '@stateproof/core';
 import { ISSUERS, NETWORK, contractAddress } from '../../app/env';
 import { useAsync } from '../../app/useAsync';
+import { ErrorNotice } from '../../components/ErrorNotice';
 import { fetchLedger } from '../../state/ledger';
 import { OperatorPanel } from './OperatorPanel';
+
+type RegistryState = 'checking' | 'unknown' | 'registered' | 'missing' | 'mismatch';
+
+const STATE_LABEL: Record<RegistryState, string> = {
+  checking: 'Checking',
+  unknown: 'Could not check',
+  registered: 'Registered on chain',
+  missing: 'Not registered',
+  mismatch: 'Key mismatch',
+};
+
+const STATE_CLASS: Record<RegistryState, string> = {
+  checking: 'pending',
+  unknown: 'pending',
+  registered: 'verified',
+  missing: 'invalid',
+  mismatch: 'invalid',
+};
 
 export const IssuerPage = () => {
   const deployed = contractAddress() !== null;
   const ledger = useAsync(() => (deployed ? fetchLedger() : Promise.resolve(null)), [deployed]);
-  const onChain = (id: string, pk: { x: string; y: string } | null): 'registered' | 'missing' | 'mismatch' => {
+  // A failed ledger read is "could not check", never "not registered".
+  const onChain = (id: string, pk: { x: string; y: string } | null): RegistryState => {
+    if (ledger.loading) return 'checking';
+    if (ledger.error) return 'unknown';
     if (!ledger.data || pk === null) return 'missing';
     const key = labelToBytes32(id);
     if (!ledger.data.issuers.member(key)) return 'missing';
@@ -25,7 +47,7 @@ export const IssuerPage = () => {
         circuit.
       </p>
       {!deployed && <p className="notice">StateProof is not deployed on {NETWORK} yet. Use the operator tools below.</p>}
-      {ledger.error && <p className="notice error" role="alert">{ledger.error}</p>}
+      {ledger.error && <ErrorNotice message={ledger.error} />}
       <ul className="rows">
         {ISSUERS.map((i) => {
           const state = onChain(i.id, i.publicKey);
@@ -36,9 +58,7 @@ export const IssuerPage = () => {
                 <div className="small">Issues {i.schemas.map((s) => getSchema(s).title).join(', ')}</div>
                 <div className="hash muted">{i.id}</div>
               </div>
-              <span className={`status ${state === 'registered' ? 'verified' : 'invalid'}`}>
-                {ledger.loading ? 'Checking' : state === 'registered' ? 'Registered on chain' : state === 'mismatch' ? 'Key mismatch' : 'Not registered'}
-              </span>
+              <span className={`status ${STATE_CLASS[state]}`}>{STATE_LABEL[state]}</span>
             </li>
           );
         })}

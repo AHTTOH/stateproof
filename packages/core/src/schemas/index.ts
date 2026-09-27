@@ -2,6 +2,7 @@
 // and enum codes; the policy builder, encoder and UI all read from here.
 import { CLAIM_SLOTS } from '../constants.js';
 import { labelToBytes32 } from '../encoding/bytes.js';
+import { OPERATORS, type OperatorName } from '../policy/operators.js';
 import employment from './employment.json' with { type: 'json' };
 import identity from './identity.json' with { type: 'json' };
 
@@ -13,6 +14,9 @@ export interface ClaimDefinition {
   readonly label: string;
   readonly type: ClaimType;
   readonly unit?: string;
+  // Operators a verifier may use on this claim. Values recorded at issuance that only grow
+  // afterwards (age, months employed) allow "at least" only, which stays true over time.
+  readonly operators: readonly OperatorName[];
   readonly codes?: Readonly<Record<string, number>>;
 }
 
@@ -36,6 +40,14 @@ export const validateSchema = (raw: CredentialSchema): CredentialSchema => {
     if (slots.has(claim.slot)) throw new Error(`${raw.id}: slot ${claim.slot} used twice`);
     if (keys.has(claim.key)) throw new Error(`${raw.id}: key ${claim.key} used twice`);
     if (!CLAIM_TYPES.includes(claim.type)) throw new Error(`${raw.id}.${claim.key}: unknown type ${claim.type}`);
+    if (!Array.isArray(claim.operators) || claim.operators.length === 0) {
+      throw new Error(`${raw.id}.${claim.key}: operators list is required`);
+    }
+    for (const name of claim.operators) {
+      const def = OPERATORS.find((o) => o.name === name);
+      if (!def) throw new Error(`${raw.id}.${claim.key}: unknown operator ${name}`);
+      if (!def.claimTypes.includes(claim.type)) throw new Error(`${raw.id}.${claim.key}: operator ${name} does not apply to ${claim.type}`);
+    }
     if (claim.type === 'enum' && (!claim.codes || Object.keys(claim.codes).length === 0)) {
       throw new Error(`${raw.id}.${claim.key}: enum claim needs codes`);
     }

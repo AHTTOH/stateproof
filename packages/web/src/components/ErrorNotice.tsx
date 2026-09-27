@@ -9,7 +9,7 @@ export const ErrorNotice = ({ message }: { readonly message: string }) => {
       {detail !== summary && (
         <details className="small">
           <summary>Technical details</summary>
-          <pre className="hash" style={{ whiteSpace: 'pre-wrap' }}>
+          <pre className="hash">
             {detail}
           </pre>
         </details>

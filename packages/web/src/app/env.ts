@@ -2,6 +2,7 @@
 import networks from '../../../../config/networks.json';
 import deployments from '../../../../config/deployments.json';
 import issuers from '../../../../config/issuers.json';
+import demoRequests from '../../../../config/demo-requests.json';
 
 declare const __STATEPROOF_NETWORK__: string;
 declare const __STATEPROOF_ZK_ROUTE__: string;
@@ -48,6 +49,26 @@ export const issuerInfo = (id: string): IssuerInfo => {
   if (!entry) throw new Error(`Issuer ${id} is not in config/issuers.json`);
   return entry;
 };
+
+export interface DemoRequest {
+  readonly requestId: string;
+  readonly title: string;
+}
+
+export interface PendingDemoRequest extends DemoRequest {
+  // Label of the one value the request asks to see, or null when it asks for none.
+  readonly reveals: string | null;
+}
+
+export interface DemoRequests {
+  readonly pending: readonly PendingDemoRequest[];
+  readonly verified: readonly DemoRequest[];
+}
+
+// Requests created for reviewers (config/demo-requests.json). null means none on this
+// network; the home page then shows that state instead of links.
+export const demoRequestsFor = (): DemoRequests | null =>
+  (demoRequests as Record<string, DemoRequests | undefined>)[NETWORK] ?? null;
 
 export const zkBaseUrl = (): string => new URL(`${import.meta.env.BASE_URL}${__STATEPROOF_ZK_ROUTE__}/`, window.location.origin).toString();
 

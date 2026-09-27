@@ -2,37 +2,45 @@ import type { PolicyDescription } from '@stateproof/core';
 
 interface BoundaryProps {
   readonly description: PolicyDescription;
-  readonly verifierLabel: string;
   readonly issuerName: string;
+  readonly learnHeading: string;
+  readonly sealedHeading: string;
+  // The revealed value once a proof is on chain; null before that or when nothing is revealed.
+  readonly revealedValue: string | null;
 }
 
-// The privacy boundary made literal: what crosses to the verifier vs what stays here.
-export const Boundary = ({ description, verifierLabel, issuerName }: BoundaryProps) => (
+// The privacy boundary made literal: what crosses to the verifier vs what stays with the holder.
+export const Boundary = ({ description, issuerName, learnHeading, sealedHeading, revealedValue }: BoundaryProps) => (
   <div className="boundary">
     <section className="proven" aria-labelledby="boundary-proven">
-      <h3 id="boundary-proven">{verifierLabel} will learn</h3>
+      <h2 id="boundary-proven">{learnHeading}</h2>
       <ul>
         {description.conditions.map((c) => (
           <li key={c}>
-            <span>That {c.charAt(0).toLowerCase() + c.slice(1)}</span>
+            <span>{c}</span>
           </li>
         ))}
         <li>
-          <span>That the credential was signed by {issuerName}</span>
+          <span>Signed by {issuerName}</span>
         </li>
         {description.revealed !== null && (
-          <li>
-            <span>Your {description.revealed.toLowerCase()} (the one value this request asks to see)</span>
+          <li className="revealed">
+            <span>
+              {revealedValue === null
+                ? `The ${description.revealed.toLowerCase()} itself, the one value this request asks to see`
+                : `${description.revealed}: ${revealedValue}`}
+            </span>
           </li>
         )}
       </ul>
+      <p className="small muted">The result and any revealed value are written to the public Midnight ledger.</p>
     </section>
     <section className="sealed" aria-labelledby="boundary-sealed">
-      <h3 id="boundary-sealed">They will NOT receive</h3>
+      <h2 id="boundary-sealed">{sealedHeading}</h2>
       <ul>
         {description.notDisclosed.map((label) => (
           <li key={label}>
-            <span>Your exact {label.toLowerCase()}</span>
+            <span>The exact {label.toLowerCase()}</span>
           </li>
         ))}
         <li>

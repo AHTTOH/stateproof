@@ -11,11 +11,21 @@ CONTRACT_DIR="$ROOT/packages/contract"
 SOURCE="src/stateproof.compact"
 OUT="src/managed/stateproof"
 
-if ! command -v compact >/dev/null 2>&1; then
+COMPACT_BIN="$(command -v compact || true)"
+if [ -z "$COMPACT_BIN" ]; then
   echo "compact CLI not found. Install: https://docs.midnight.network/getting-started/installation" >&2
   echo "Then run: compact update $REQUIRED_COMPILER" >&2
   exit 1
 fi
+# On Windows, Git Bash finds C:\Windows\System32\compact.exe (NTFS compression), not Midnight's CLI.
+# The Compact compiler ships for Linux and macOS; on Windows run this script inside WSL.
+case "$(printf '%s' "$COMPACT_BIN" | tr '[:upper:]' '[:lower:]')" in
+  */windows/system32/*)
+    echo "Found $COMPACT_BIN, which is the Windows file compression tool, not the Midnight Compact CLI." >&2
+    echo "The Compact compiler runs on Linux and macOS. On Windows, run scripts/compile.sh inside WSL." >&2
+    exit 1
+    ;;
+esac
 
 ACTUAL_COMPILER="$(compact compile --version)"
 if [ "$ACTUAL_COMPILER" != "$REQUIRED_COMPILER" ]; then

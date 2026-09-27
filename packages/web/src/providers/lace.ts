@@ -16,16 +16,20 @@ const findWallet = (): InitialAPI | null => {
   return match ?? null;
 };
 
-const waitForWallet = async (): Promise<InitialAPI> => {
+// Resolves once a compatible Lace is injected, or false after the discovery window.
+export const detectLace = async (): Promise<boolean> => {
   const deadline = Date.now() + DISCOVERY_TIMEOUT_MS;
-  for (;;) {
-    const wallet = findWallet();
-    if (wallet) return wallet;
-    if (Date.now() > deadline) {
-      throw new Error('Midnight Lace was not found. Install the Lace extension and enable Midnight, then reload.');
-    }
+  while (findWallet() === null) {
+    if (Date.now() > deadline) return false;
     await new Promise((r) => setTimeout(r, DISCOVERY_POLL_MS));
   }
+  return true;
+};
+
+const waitForWallet = async (): Promise<InitialAPI> => {
+  const wallet = (await detectLace()) ? findWallet() : null;
+  if (wallet === null) throw new Error('Midnight Lace was not found. Install the Lace extension and enable Midnight, then reload.');
+  return wallet;
 };
 
 export const connectLace = async (networkId: string): Promise<ConnectedAPI> => {

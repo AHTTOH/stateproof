@@ -8,27 +8,53 @@
       "key": "birthDate",
       "slot": 0,
       "label": "Date of birth",
-      "type": "date"
+      "type": "date",
+      "operators": [
+        "gte",
+        "lte",
+        "eq",
+        "neq",
+        "between"
+      ]
     },
     {
       "key": "ageYears",
       "slot": 1,
       "label": "Age at issuance",
       "type": "integer",
-      "unit": "years"
+      "unit": "years",
+      "operators": [
+        "gte"
+      ]
     },
     {
       "key": "nationality",
       "slot": 2,
       "label": "Nationality",
       "type": "enum",
-      "codes": { "KR": 410, "US": 840, "JP": 392, "CN": 156, "VN": 704 }
+      "operators": [
+        "eq",
+        "neq",
+        "inSet"
+      ],
+      "codes": {
+        "KR": 410,
+        "US": 840,
+        "JP": 392,
+        "CN": 156,
+        "VN": 704
+      }
     },
     {
       "key": "region",
       "slot": 3,
       "label": "Region of residence",
       "type": "enum",
+      "operators": [
+        "eq",
+        "neq",
+        "inSet"
+      ],
       "codes": {
         "Seoul": 11,
         "Busan": 26,

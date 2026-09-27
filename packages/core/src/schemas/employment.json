@@ -9,27 +9,57 @@
       "slot": 0,
       "label": "Employment status",
       "type": "enum",
-      "codes": { "Active": 1, "Leave": 2, "Terminated": 3 }
+      "operators": [
+        "eq",
+        "neq",
+        "inSet"
+      ],
+      "codes": {
+        "Active": 1,
+        "Leave": 2,
+        "Terminated": 3
+      }
     },
     {
       "key": "jobCategory",
       "slot": 1,
       "label": "Job category",
       "type": "enum",
-      "codes": { "Engineering": 1, "Design": 2, "Sales": 3, "Operations": 4, "Research": 5 }
+      "operators": [
+        "eq",
+        "neq",
+        "inSet"
+      ],
+      "codes": {
+        "Engineering": 1,
+        "Design": 2,
+        "Sales": 3,
+        "Operations": 4,
+        "Research": 5
+      }
     },
     {
       "key": "employmentStartDate",
       "slot": 2,
       "label": "Employment start date",
-      "type": "date"
+      "type": "date",
+      "operators": [
+        "gte",
+        "lte",
+        "eq",
+        "neq",
+        "between"
+      ]
     },
     {
       "key": "employmentMonths",
       "slot": 3,
       "label": "Months employed",
       "type": "integer",
-      "unit": "months"
+      "unit": "months",
+      "operators": [
+        "gte"
+      ]
     }
   ]
 }

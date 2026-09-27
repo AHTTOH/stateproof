@@ -13,8 +13,17 @@ interface Rule {
 
 const RULES: readonly Rule[] = [
   {
+    match: /^Invalid request id in link/,
+    summary: 'This link does not contain a valid request id. A request id is 64 hexadecimal characters; check that the whole link was copied.',
+  },
+  {
+    match: /does not exist on this contract/,
+    summary: 'This request is not on the current StateProof contract. The link may be mistyped or come from an older deployment.',
+  },
+  {
     match: /Lace was not found/i,
-    summary: 'Midnight Lace was not found. Install the Lace extension, turn on the Midnight account, then reload this page.',
+    summary:
+      'Midnight Lace was not found. Install the Lace extension, turn on the Midnight account, then reload this page. On a holder request page you can still generate the proof without a wallet.',
   },
   {
     match: /Custom error: 170/,
@@ -42,6 +51,11 @@ const RULES: readonly Rule[] = [
   {
     match: /Lace is not connected|wallet is locked|is locked/i,
     summary: 'Lace is locked or disconnected. Unlock Lace and try again.',
+  },
+  // Generic network failure last, so the specific proof server and Lace rules win.
+  {
+    match: /Failed to fetch|NetworkError|Load failed/i,
+    summary: 'Could not reach the Midnight network service. Check your connection and reload the page.',
   },
 ];
 
