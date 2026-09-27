@@ -27,7 +27,7 @@ const ko = {
   'status.expired': '만료',
 
   'home.title': '조건은 증명하고, 데이터는 지킨다.',
-  'home.lede': '원본 개인정보를 넘기지 않고, 상대가 요구한 조건을 충족한다는 사실만 증명하는 Midnight 기반 ZK 크리덴셜 검증 서비스.',
+  'home.lede': '조건만 증명하고 개인정보는 넘기지 않습니다.',
   'home.try.title': '지갑 없이 해 보기',
   'home.try.open': '대기 중인 데모 요청 열기',
   'home.try.step1': '대기 중인 요청 열기',
@@ -252,7 +252,7 @@ const en: Readonly<Record<MessageKey, string>> = {
   'status.expired': 'Expired',
 
   'home.title': 'Prove the condition. Keep the data.',
-  'home.lede': 'Prove to a verifier that you meet their conditions, without handing over the personal data behind them. ZK credential verification on Midnight.',
+  'home.lede': 'Prove the condition. Keep the data.',
   'home.try.title': 'Try it now, no wallet needed',
   'home.try.open': 'Open a pending demo request',
   'home.try.step1': 'Open a pending request',
