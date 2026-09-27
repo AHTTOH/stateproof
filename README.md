@@ -10,15 +10,15 @@
 
 설치할 것도 지갑도 필요 없다. 브라우저 하나면 된다.
 
-1. https://stateproof.web.app/demo 를 연다. 아직 답이 없는 데모 요청으로 자동 이동한다(첫 화면의 **Open a pending demo request** 와 같다).
-2. "The verifier will learn / They will NOT receive" 경계를 확인하고 **Use Minji Park (fictional)** 를 누른다.
-3. **Try the proof without a wallet** 를 누른다. 브라우저 Web Worker 가 실제 `submitProof` 트랜잭션을 만들고 ZK 증명을 생성한다(10~30초, 경과 시간이 표시된다). 임시 키를 쓰고 제출하지 않는다.
-4. **Use a different persona** → **Use Sora Kim** (근속 6개월). 같은 회로가 먼저 로컬에서 돌아 "Not met: Months employed at least 12 months" 를 보여 주고, 증명도 트랜잭션도 만들지 않는다.
+1. https://stateproof.web.app/demo 를 연다. 아직 답이 없는 요청으로 자동 이동한다(첫 화면의 **바로 증명해 보기** 와 같다). 화면은 한국어가 기본이고 오른쪽 위 KO/EN 으로 영어로 바꿀 수 있다.
+2. 홀더에서 **박민지** 를 누른다. 봉인선 표에 항목마다 "이 브라우저 값, 선을 넘는 것(조건만 통과, 값 통과, 봉인), 검증자가 아는 것"이 한 줄로 나온다.
+3. **지갑 없이 증명해 보기** 를 누른다. 브라우저 Web Worker 가 실제 `submitProof` 트랜잭션을 만들고 ZK 증명을 생성한다(10~30초, 경과 초가 표시된다). 임시 키를 쓰고 제출하지 않는다.
+4. 홀더를 **김소라** (근속 6개월)로 바꾼다. 같은 회로가 먼저 로컬에서 돌아 근속 줄이 "불충족"으로 바뀌고 "충족하지 못함: 근속 기간 12개월 이상"을 보여 주며, 증명도 트랜잭션도 만들지 않는다.
 5. 실제로 체인에 기록된 결과를 지갑 없이 본다: [영수증 1](https://stateproof.web.app/request/9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a) (공개 값 없음), [영수증 2](https://stateproof.web.app/request/04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f) (공개 값: 직무 Engineering). tx 는 아래 "Preprod 기록" 표에서 익스플로러로 열린다.
 
-데모 요청은 [config/demo-requests.json](config/demo-requests.json) 에 있다(모두 2026-10-27 까지 유효). 고용 조건(재직 Active, 근속 12개월 이상, 직무 공개)과 신원 조건(발급 시점 나이 19세 이상, 거주지 서울 또는 경기, 거주지 공개) 두 종류다. 신원 요청에서는 Sora 가 두 조건 모두 Not met 으로 막힌다.
+열린 요청 목록은 [config/demo-requests.json](config/demo-requests.json) 에 있다(모두 2026-10-27 까지 유효). 고용 조건(재직 Active, 근속 12개월 이상, 직무 공개)과 신원 조건(발급 시점 나이 19세 이상, 거주지 서울 또는 경기, 거주지 공개) 두 종류다. 신원 요청에서는 김소라가 두 조건 모두 불충족으로 막힌다.
 
-요청 하나에는 결과가 한 번만 기록된다. 누군가 Lace 로 데모 요청에 실제 증명을 제출하면 그 요청은 Verified 가 되고, `/demo` 는 다음 대기 요청으로 보낸다. **Lace 로 실제 tx 를 내 보려면 `/verifier` 에서 새 요청을 만들어 써 주세요.**
+요청 하나에는 결과가 한 번만 기록된다. 누군가 Lace 로 이 요청에 실제 증명을 제출하면 그 요청은 Verified 가 되고, `/demo` 는 다음 대기 요청으로 보낸다. **Lace 로 실제 tx 를 내 보려면 `/verifier` 에서 새 요청을 만들어 써 주세요.**
 
 ## English summary
 
