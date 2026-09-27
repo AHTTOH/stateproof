@@ -4,7 +4,9 @@
 :root {
   color-scheme: light;
 
-  --c-ground: #eef1f5;
+  --c-ground: #ffffff;
+  --c-hatch: #eef0f4;
+  --c-hover: #f4f5f8;
   --c-surface: #ffffff;
   --c-ink: #131a2b;
   --c-ink-soft: #475169;

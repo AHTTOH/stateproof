@@ -220,7 +220,7 @@ pre.hash {
   border-color: var(--c-control-edge);
 }
 .btn.quiet:hover:not(:disabled):not([aria-disabled='true']) {
-  background: var(--c-ground);
+  background: var(--c-hover);
 }
 .btn.small {
   padding: var(--s-2) var(--s-4);
@@ -370,6 +370,7 @@ textarea {
 /* Signature element: the seal line table */
 .seal {
   width: 100%;
+  border: 1px solid var(--c-rule);
   border-collapse: collapse;
   table-layout: fixed;
   background: var(--c-surface);
@@ -479,7 +480,7 @@ textarea {
   color: var(--c-ink-soft);
   font-size: var(--t-sm);
   padding: 1px var(--s-2);
-  background: repeating-linear-gradient(135deg, var(--c-ground) 0 6px, var(--c-surface) 6px 10px);
+  background: repeating-linear-gradient(135deg, var(--c-hatch) 0 6px, var(--c-surface) 6px 10px);
   border: 1px dashed var(--c-control-edge);
 }
 .seal-note {
