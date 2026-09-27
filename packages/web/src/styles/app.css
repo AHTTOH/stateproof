@@ -843,7 +843,8 @@ textarea {
 .story {
   --p: 0;
   position: relative;
-  height: 340vh;
+  /* Tall on purpose: each of the four scenes gets about two screens of scrolling. */
+  height: 900vh;
   border-top: 1px solid var(--c-rule);
 }
 .story-stage {
@@ -986,7 +987,7 @@ textarea {
 
 @media (max-width: 900px) {
   .story {
-    height: 300vh;
+    height: 800vh;
   }
   .story-stage {
     grid-template-columns: 1fr;
