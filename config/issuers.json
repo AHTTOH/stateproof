@@ -3,10 +3,10 @@
   "issuers": [
     {
       "id": "issuer:acme-hr",
-      "name": "ACME Corp HR (demo)",
+      "name": "ACME Corp HR",
       "i18n": {
         "ko": {
-          "name": "ACME Corp 인사팀 (데모)"
+          "name": "ACME Corp 인사팀"
         }
       },
       "schemas": [
@@ -20,10 +20,10 @@
     },
     {
       "id": "issuer:gov-id-demo",
-      "name": "Demo Identity Authority",
+      "name": "Identity Authority",
       "i18n": {
         "ko": {
-          "name": "데모 신원 발급기관"
+          "name": "신원 발급기관"
         }
       },
       "schemas": [
