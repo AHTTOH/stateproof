@@ -28,6 +28,30 @@
           "en": "Region of residence"
         },
         "createdAt": "2026-09-27T05:53:00+09:00"
+      },
+      {
+        "requestId": "bc1e3080a82b0974e3a5f4d5501b3f7b507218fe2a43294b74447a2a6dc701e0",
+        "title": {
+          "ko": "고용: 재직 중, 근속 12개월 이상",
+          "en": "Employment: status Active and at least 12 months employed"
+        },
+        "reveals": {
+          "ko": "직무",
+          "en": "Job category"
+        },
+        "createdAt": "2026-09-27T11:57:00+09:00"
+      },
+      {
+        "requestId": "3a5c2432996907c3a4a4ad913f7d315eb2cb4ceb5f3479f87cad875087081c97",
+        "title": {
+          "ko": "신원: 발급 시점 19세 이상, 서울 또는 경기 거주",
+          "en": "Identity: 19 or older at issuance, living in Seoul or Gyeonggi"
+        },
+        "reveals": {
+          "ko": "거주지",
+          "en": "Region of residence"
+        },
+        "createdAt": "2026-09-27T14:59:00+09:00"
       }
     ],
     "verified": [
