@@ -94,7 +94,7 @@ Midnight 재단의 공용 proof server 는 요청 본문 8KB 이상을 403 으�
 | 항목 | 값 |
 |---|---|
 | 데모 | https://stateproof.web.app |
-| 화면 녹화 | https://stateproof.web.app/media/walkthrough.mp4 (브라우저에서 재생. 원본 [docs/demo](docs/demo). 자막 포함. 지갑 없는 흐름만 담았다: 정책 작성, 경계 화면, 브라우저 증명, Sora 차단, 영수증. Lace 승인 단계는 없다) |
+| 화면 녹화 | https://stateproof.web.app/media/walkthrough.mp4 (브라우저에서 재생. 원본 [docs/demo](docs/demo). 자막 포함. 한국어 화면, 약 110초. 스크롤 연출, 박민지로 브라우저 증명, 김소라 불충족 차단, 체인 영수증, 확인 요청 만들기. Lace 승인 단계는 없다) |
 | StateProof 컨트랙트 | [`4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3`](https://explorer.preprod.midnight.network/contracts/4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3) |
 | 배포 tx | [`9b5b3d77…729b60`](https://explorer.preprod.midnight.network/transactions/9b5b3d7728fa7baca2cd4aa9994e126e4e3e42ed09ad6143053a996f58729b60) (2026-09-26 06:22 KST, 컴파일러 0.31.1) |
 | 발급자 등록 `issuer:acme-hr` | [`bf69827e…f680549`](https://explorer.preprod.midnight.network/transactions/bf69827ee414acb764df5d86963ff6030a20532d3b9b36de08fb3471ff680549) (CLI, Node WASM 증명) |

@@ -55,6 +55,10 @@ export const VerifyPage = () => {
   const [txHash, setTxHash] = useState<string | null>(null);
   const [dryRun, setDryRun] = useState<DryRunResult | null>(null);
   const hasLace = useLaceDetected();
+  // Bring the result into view; on phones it appears below the fold.
+  useEffect(() => {
+    if (dryRun !== null) document.querySelector('.proof-done')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, [dryRun]);
   const receiptExample = receiptExampleId();
   const working = busy || dryBusy;
   const elapsed = useElapsed(working);
@@ -154,7 +158,7 @@ export const VerifyPage = () => {
         <div className="segmented" role="group" aria-label={t('verify.holder')}>
           {DEMO_PERSONAS.map((p) => (
             <button key={p.id} type="button" aria-pressed={wallet?.personaId === p.id} disabled={working} onClick={() => pickPersona(p.id)}>
-              {t(personaNameKey(p.id, 'short'))}
+              {t(personaNameKey(p.id))}
             </button>
           ))}
         </div>
@@ -165,6 +169,7 @@ export const VerifyPage = () => {
         issuerName={issuer}
         holderHeading={holderName === null ? t('seal.holderHeadEmpty') : t('seal.holderHead', { holder: holderName })}
         verifierHeading={t('boundary.holder.learn')}
+        dimmed={check !== null && !check.ok}
       />
       <p className="seal-note">{t('boundary.publicNote')}</p>
 

@@ -65,18 +65,20 @@ const RequestRow = ({ stored }: { readonly stored: StoredRequest }) => {
   );
 };
 
-type Preview = { readonly policy: Policy; readonly error: null } | { readonly policy: null; readonly error: string };
+// An empty value while composing is a hint, not an error.
+type Preview = { readonly policy: Policy; readonly error: null; readonly hint: null } | { readonly policy: null; readonly error: string | null; readonly hint: string | null };
 
 const composePreview = (input: PolicyInput, locale: Locale, t: (key: MessageKey, vars?: Record<string, string | number>) => string): Preview => {
   try {
-    return { policy: buildPolicy(input), error: null };
+    return { policy: buildPolicy(input), error: null, hint: null };
   } catch (e) {
-    if (!(e instanceof PolicyInputError)) return { policy: null, error: errorMessage(e) };
+    if (!(e instanceof PolicyInputError)) return { policy: null, error: errorMessage(e), hint: null };
     const vars = {
       ...(e.claimKey === null ? {} : { claim: claimLabel(getClaim(getSchema(input.schema), e.claimKey), locale) }),
       ...(e.limit === null ? {} : { max: e.limit }),
     };
-    return { policy: null, error: t(`policy.error.${e.code}` as MessageKey, vars) };
+    const text = t(`policy.error.${e.code}` as MessageKey, vars);
+    return e.code === 'valueRequired' || e.code === 'setEmpty' ? { policy: null, error: null, hint: text } : { policy: null, error: text, hint: null };
   }
 };
 
@@ -130,6 +132,7 @@ export const VerifierPage = () => {
       <PolicyBuilder value={policyInput} onChange={setPolicyInput} />
 
       {preview.error !== null && <p className="notice error">{preview.error}</p>}
+      {preview.hint !== null && <p className="muted">{preview.hint}</p>}
       {preview.policy && (
         <SealTable rows={rows} issuerName={issuerName(issuerInfo(policyInput.issuerId), locale)} holderHeading={null} verifierHeading={t('boundary.verifier.learn')} />
       )}

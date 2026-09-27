@@ -53,7 +53,7 @@ export const HolderPage = () => {
         <div className="segmented" role="group" aria-label={t('verify.holder')}>
           {DEMO_PERSONAS.map((p) => (
             <button key={p.id} type="button" aria-pressed={wallet?.personaId === p.id} onClick={() => pick(p.id)}>
-              {t(personaNameKey(p.id, 'short'))}
+              {t(personaNameKey(p.id))}
             </button>
           ))}
         </div>

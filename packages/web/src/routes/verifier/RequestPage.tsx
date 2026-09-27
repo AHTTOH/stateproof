@@ -77,7 +77,7 @@ export const RequestPage = () => {
       </section>
       <SealTable rows={rows} issuerName={issuer} holderHeading={null} verifierHeading={t(HEADING[receipt.status])} />
       <p className="seal-note">{t('boundary.publicNote')}</p>
-      <ul className="rows">
+      <ul className="rows link-rows">
         <li>
           <span>{t('receipt.issuer')}</span>
           <span>{issuer}</span>

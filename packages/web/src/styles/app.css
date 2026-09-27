@@ -112,7 +112,8 @@ a {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--c-ledger);
+  background: var(--c-link);
+  box-shadow: 0 0 8px var(--c-link);
 }
 .lang {
   display: inline-flex;
@@ -975,8 +976,9 @@ textarea {
   border: 1px solid var(--c-link);
   border-radius: 999px;
   color: var(--c-ink);
-  opacity: clamp(0, (var(--p) - 0.66) * 10, 1);
-  transform: translateX(calc((1 - clamp(0, (var(--p) - 0.66) * 10, 1)) * -80px));
+  /* Scene 2 shows the question faintly; scene 3 confirms it. */
+  opacity: calc(clamp(0, (var(--p) - 0.28) * 10, 1) * 0.4 + clamp(0, (var(--p) - 0.66) * 10, 1) * 0.6);
+  transform: translateX(calc((1 - clamp(0, (var(--p) - 0.66) * 10, 1)) * -24px));
 }
 .story-stamp {
   margin-top: var(--s-4);
@@ -1232,4 +1234,24 @@ textarea {
 }
 .policy-grid > .btn {
   align-self: end;
+}
+
+/* Final QA fixes (2026-09-27 night). */
+.chip {
+  white-space: nowrap;
+  flex: none;
+}
+.nav a {
+  white-space: nowrap;
+}
+.story-steps h2 {
+  text-wrap: balance;
+}
+.is-dimmed tr:not(.is-failed) .seal-verifier {
+  opacity: 0.35;
+}
+@media (max-width: 720px) {
+  .nav a {
+    padding-inline: var(--s-2);
+  }
 }

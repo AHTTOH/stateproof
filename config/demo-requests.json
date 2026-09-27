@@ -8,7 +8,7 @@
       {
         "requestId": "08da5a24a5528086cd5ca5079e641c2dae79238dbb27eb0bbfeaad5a5f40d91e",
         "title": {
-          "ko": "고용: 재직 중, 근속 12개월 이상",
+          "ko": "재직 중, 근속 12개월 이상",
           "en": "Employment: status Active and at least 12 months employed"
         },
         "reveals": {
@@ -17,7 +17,7 @@
         },
         "createdAt": "2026-09-27T02:50:00+09:00",
         "label": {
-          "ko": "고용 요청",
+          "ko": "재직 확인 요청",
           "en": "Employment"
         },
         "conditions": {
@@ -43,7 +43,7 @@
         },
         "createdAt": "2026-09-27T05:53:00+09:00",
         "label": {
-          "ko": "신원 요청",
+          "ko": "신원 확인 요청",
           "en": "Identity"
         },
         "conditions": {
@@ -60,7 +60,7 @@
       {
         "requestId": "bc1e3080a82b0974e3a5f4d5501b3f7b507218fe2a43294b74447a2a6dc701e0",
         "title": {
-          "ko": "고용: 재직 중, 근속 12개월 이상",
+          "ko": "재직 중, 근속 12개월 이상",
           "en": "Employment: status Active and at least 12 months employed"
         },
         "reveals": {
@@ -69,7 +69,7 @@
         },
         "createdAt": "2026-09-27T11:57:00+09:00",
         "label": {
-          "ko": "고용 요청",
+          "ko": "재직 확인 요청",
           "en": "Employment"
         },
         "conditions": {
@@ -95,7 +95,7 @@
         },
         "createdAt": "2026-09-27T14:59:00+09:00",
         "label": {
-          "ko": "신원 요청",
+          "ko": "신원 확인 요청",
           "en": "Identity"
         },
         "conditions": {
@@ -114,14 +114,14 @@
       {
         "requestId": "9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a",
         "title": {
-          "ko": "고용 조건 검증 완료, 공개 값 없음",
+          "ko": "재직 조건 검증 완료, 공개 값 없음",
           "en": "Employment, verified, no value revealed"
         }
       },
       {
         "requestId": "04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f",
         "title": {
-          "ko": "고용 조건 검증 완료, 직무 공개",
+          "ko": "재직 조건 검증 완료, 직무 공개",
           "en": "Employment, verified, job category revealed"
         }
       }

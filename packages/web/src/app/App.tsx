@@ -29,9 +29,14 @@ const NotFound = () => {
   return (
     <>
       <h1 className="page-title">{t('notFound.title')}</h1>
-      <p>
-        <Link to="/">{t('common.toStart')}</Link>
-      </p>
+      <div className="actions">
+        <Link className="btn primary" to="/">
+          {t('common.toStart')}
+        </Link>
+        <Link className="btn quiet" to="/start">
+          {t('home.try.open')}
+        </Link>
+      </div>
     </>
   );
 };

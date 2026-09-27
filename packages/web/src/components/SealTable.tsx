@@ -17,9 +17,11 @@ interface SealTableProps {
   readonly verifierHeading: string;
   // Heading of the holder column; null hides the column (verifier and receipt views).
   readonly holderHeading: string | null;
+  // The holder does not meet the request: what the verifier would learn is shown faded.
+  readonly dimmed?: boolean;
 }
 
-export const SealTable = ({ rows, issuerName, verifierHeading, holderHeading }: SealTableProps) => {
+export const SealTable = ({ rows, issuerName, verifierHeading, holderHeading, dimmed = false }: SealTableProps) => {
   const { t } = useI18n();
   const signature: SealRow = {
     key: '__signature',
@@ -33,7 +35,7 @@ export const SealTable = ({ rows, issuerName, verifierHeading, holderHeading }: 
     return row.state === 'revealed' ? t('seal.revealPending') : t('seal.sealedValue');
   };
   return (
-    <table className="seal">
+    <table className={dimmed ? 'seal is-dimmed' : 'seal'}>
       <thead>
         <tr>
           {holderHeading !== null && <th className="seal-holder-head">{holderHeading}</th>}
