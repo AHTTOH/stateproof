@@ -102,6 +102,14 @@ const demoVideo = (): Plugin => ({
   },
 });
 
+// Social preview image at a stable URL (index.html og:image points here).
+const ogImage = (): Plugin => ({
+  name: 'stateproof-og-image',
+  generateBundle() {
+    this.emitFile({ type: 'asset', fileName: 'og.jpg', source: readFileSync(path.join(WEB_DIR, 'src', 'assets', 'og.jpg')) });
+  },
+});
+
 export default defineConfig({
   cacheDir: './.vite',
   define: {
@@ -112,7 +120,7 @@ export default defineConfig({
     target: 'esnext',
     commonjsOptions: { transformMixedEsModules: true, extensions: ['.js', '.cjs'], ignoreDynamicRequires: true },
   },
-  plugins: [react(), wasm(), zkAssets(), demoVideo()],
+  plugins: [react(), wasm(), zkAssets(), demoVideo(), ogImage()],
   worker: { format: 'es', plugins: () => [wasm()] },
   optimizeDeps: {
     include: ['@midnight-ntwrk/compact-runtime'],
