@@ -518,7 +518,6 @@ textarea {
   letter-spacing: 0;
 }
 .proof-band-stage {
-  font-family: var(--f-mono);
   margin: 0 0 var(--s-3);
   color: var(--c-sealed-ink);
   font-size: var(--t-sm);
@@ -526,7 +525,7 @@ textarea {
 .ruler {
   position: relative;
   height: 8px;
-  background: var(--c-sealed-raised);
+  background: #1c1d26;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -1004,5 +1003,147 @@ textarea {
     height: 3px;
     transform-origin: left;
     transform: scaleX(clamp(0.08, (var(--p) - 0.4) * 5, 1));
+  }
+}
+
+/* From mockups I, J, K (2026-09-27): hero shield art, request cards, receipt medal, proof ring. */
+.hero-art {
+  position: absolute;
+  z-index: -1;
+  right: -8%;
+  top: 50%;
+  width: min(62%, 820px);
+  height: auto;
+  transform: translateY(-50%);
+  -webkit-mask-image: radial-gradient(ellipse 55% 60% at 55% 50%, #000 45%, transparent 75%);
+  mask-image: radial-gradient(ellipse 55% 60% at 55% 50%, #000 45%, transparent 75%);
+  pointer-events: none;
+}
+.hero h1 {
+  background: linear-gradient(180deg, #ffffff 30%, #9aa6ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.request-cards {
+  list-style: none;
+  margin: var(--s-4) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--s-4);
+}
+.request-cards > li {
+  display: grid;
+  gap: var(--s-3);
+  align-content: start;
+  padding: var(--s-5);
+  border: 1px solid var(--c-rule);
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(0, 0, 254, 0.22), rgba(0, 0, 254, 0.02) 60%), var(--c-surface);
+  transition: border-color var(--d-fast) var(--ease-out), transform var(--d-fast) var(--ease-out);
+}
+.request-cards > li:hover {
+  border-color: var(--c-link);
+  transform: translateY(-2px);
+}
+.request-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-3);
+}
+.request-card-head strong {
+  font-size: var(--t-lg);
+  font-weight: 900;
+}
+.checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-1);
+}
+.checks li::before {
+  content: '✓';
+  color: var(--c-link);
+  font-weight: 900;
+  margin-right: var(--s-2);
+}
+.request-cards .btn {
+  justify-self: start;
+  margin-top: var(--s-2);
+}
+.status-band {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  overflow: hidden;
+}
+.status-band-art {
+  width: clamp(8rem, 18vw, 15rem);
+  height: auto;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+}
+.status-band-reveal {
+  margin-top: var(--s-4) !important;
+  font-size: var(--t-display);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+.status-band-reveal span {
+  font-size: var(--t-lg);
+  font-weight: 700;
+  opacity: 0.8;
+  letter-spacing: 0;
+}
+.proof-ring {
+  position: relative;
+  width: 8.5rem;
+  height: 8.5rem;
+  display: grid;
+  place-items: center;
+}
+.proof-ring svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+.proof-ring-track,
+.proof-ring-fill {
+  fill: none;
+  stroke-width: 8;
+}
+.proof-ring-track {
+  stroke: var(--c-rule);
+}
+.proof-ring-fill {
+  stroke: var(--c-link);
+  stroke-linecap: round;
+  stroke-dasharray: 326.73;
+  transition: stroke-dashoffset 900ms linear;
+  filter: drop-shadow(0 0 6px rgba(139, 152, 255, 0.7));
+}
+.proof-ring .proof-band-count {
+  font-size: 2.75rem;
+}
+.proof-band {
+  align-items: center;
+}
+@media (max-width: 720px) {
+  .hero-art {
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    width: 100%;
+    margin: calc(-1 * var(--s-8)) 0 var(--s-4);
+  }
+  .status-band {
+    grid-template-columns: 1fr;
+  }
+  .status-band-art {
+    justify-self: center;
   }
 }

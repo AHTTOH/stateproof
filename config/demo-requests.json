@@ -15,7 +15,21 @@
           "ko": "직무",
           "en": "Job category"
         },
-        "createdAt": "2026-09-27T02:50:00+09:00"
+        "createdAt": "2026-09-27T02:50:00+09:00",
+        "label": {
+          "ko": "고용 요청",
+          "en": "Employment"
+        },
+        "conditions": {
+          "ko": [
+            "재직 상태 재직 중",
+            "근속 12개월 이상"
+          ],
+          "en": [
+            "Employment status Active",
+            "At least 12 months employed"
+          ]
+        }
       },
       {
         "requestId": "5d21cc83a45e9552ad1b447cd0c6677654cb9c692d4e33ee381cdb28260c6073",
@@ -27,7 +41,21 @@
           "ko": "거주지",
           "en": "Region of residence"
         },
-        "createdAt": "2026-09-27T05:53:00+09:00"
+        "createdAt": "2026-09-27T05:53:00+09:00",
+        "label": {
+          "ko": "신원 요청",
+          "en": "Identity"
+        },
+        "conditions": {
+          "ko": [
+            "발급 시점 나이 19세 이상",
+            "거주지 서울 또는 경기"
+          ],
+          "en": [
+            "19 or older at issuance",
+            "Lives in Seoul or Gyeonggi"
+          ]
+        }
       },
       {
         "requestId": "bc1e3080a82b0974e3a5f4d5501b3f7b507218fe2a43294b74447a2a6dc701e0",
@@ -39,7 +67,21 @@
           "ko": "직무",
           "en": "Job category"
         },
-        "createdAt": "2026-09-27T11:57:00+09:00"
+        "createdAt": "2026-09-27T11:57:00+09:00",
+        "label": {
+          "ko": "고용 요청",
+          "en": "Employment"
+        },
+        "conditions": {
+          "ko": [
+            "재직 상태 재직 중",
+            "근속 12개월 이상"
+          ],
+          "en": [
+            "Employment status Active",
+            "At least 12 months employed"
+          ]
+        }
       },
       {
         "requestId": "3a5c2432996907c3a4a4ad913f7d315eb2cb4ceb5f3479f87cad875087081c97",
@@ -51,7 +93,21 @@
           "ko": "거주지",
           "en": "Region of residence"
         },
-        "createdAt": "2026-09-27T14:59:00+09:00"
+        "createdAt": "2026-09-27T14:59:00+09:00",
+        "label": {
+          "ko": "신원 요청",
+          "en": "Identity"
+        },
+        "conditions": {
+          "ko": [
+            "발급 시점 나이 19세 이상",
+            "거주지 서울 또는 경기"
+          ],
+          "en": [
+            "19 or older at issuance",
+            "Lives in Seoul or Gyeonggi"
+          ]
+        }
       }
     ],
     "verified": [

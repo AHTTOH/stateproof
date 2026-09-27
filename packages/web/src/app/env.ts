@@ -72,6 +72,8 @@ export interface DemoRequest {
 }
 
 export interface PendingDemoRequest extends DemoRequest {
+  readonly label: LocalizedText;
+  readonly conditions: Readonly<Record<Locale, readonly string[]>>;
   // Label of the one value the request asks to see, or null when it asks for none.
   readonly reveals: LocalizedText | null;
 }

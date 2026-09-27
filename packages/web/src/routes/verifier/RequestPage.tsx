@@ -13,6 +13,7 @@ import { buildSealRows } from '../../components/sealRows';
 import { STATUS_LABEL } from '../../components/StatusBadge';
 import { fetchRequest, receiptOf } from '../../state/ledger';
 import { holderLink } from './VerifierPage';
+import sealMedal from '../../assets/seal-medal.webp';
 
 const LEDE: Readonly<Record<RequestStatus, MessageKey>> = {
   verified: 'receipt.lede.verified',
@@ -57,9 +58,17 @@ export const RequestPage = () => {
   return (
     <>
       <section className={`status-band ${receipt.status}`}>
-        <span className="kicker">{t('receipt.title')}</span>
-        <h1>{t(STATUS_LABEL[receipt.status])}</h1>
-        <p>{t(LEDE[receipt.status])}</p>
+        <div>
+          <span className="kicker">{t('receipt.title')}</span>
+          <h1>{t(STATUS_LABEL[receipt.status])}</h1>
+          <p>{t(LEDE[receipt.status])}</p>
+          {receipt.revealed && (
+            <p className="status-band-reveal">
+              <span>{receipt.revealed.label}</span> {receipt.revealed.value}
+            </p>
+          )}
+        </div>
+        {receipt.status === 'verified' && <img className="status-band-art" src={sealMedal} alt="" width={1024} height={1024} />}
       </section>
       <SealTable rows={rows} issuerName={issuer} holderHeading={null} verifierHeading={t(HEADING[receipt.status])} />
       <p className="seal-note">{t('boundary.publicNote')}</p>

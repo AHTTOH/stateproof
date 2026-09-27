@@ -5,6 +5,7 @@ import { useI18n } from '../app/i18n';
 // Ruler length; proofs usually take 10 to 30 seconds (12 to 15 measured on a laptop).
 const RULER_SECONDS = 30;
 const RULER_MARKS = [0, 10, 20, 30] as const;
+const RING_LENGTH = 2 * Math.PI * 52;
 
 interface ProofBandProps {
   readonly mode: 'dry' | 'lace';
@@ -16,9 +17,15 @@ export const ProofBand = ({ mode, elapsed }: ProofBandProps) => {
   const fill = Math.min(elapsed / RULER_SECONDS, 1) * 100;
   return (
     <section className="proof-band" aria-live="polite" role="status">
-      <div className="proof-band-count" aria-hidden="true">
-        {elapsed}
-        <small>{t('proof.secondsUnit')}</small>
+      <div className="proof-ring" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" className="proof-ring-track" />
+          <circle cx="60" cy="60" r="52" className="proof-ring-fill" style={{ strokeDashoffset: RING_LENGTH * (1 - fill / 100) }} />
+        </svg>
+        <div className="proof-band-count">
+          {elapsed}
+          <small>{t('proof.secondsUnit')}</small>
+        </div>
       </div>
       <div>
         <p className="proof-band-stage">{mode === 'dry' ? t('verify.progressDry') : t('verify.progressLace')}</p>

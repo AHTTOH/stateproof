@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { NETWORK, demoRequestsFor } from './env';
 import { useI18n } from './i18n';
 import { ScrollStory } from './ScrollStory';
+import heroShield from '../assets/hero-shield.webp';
 
 // The preview reads the ledger and needs the contract runtime, so it loads after first paint.
 const SealPreview = lazy(() => import('../routes/holder/SealPreview').then((m) => ({ default: m.SealPreview })));
@@ -28,20 +29,27 @@ const DemoRequests = () => {
           {t('home.try.open')}
         </Link>
       </div>
-      <ul className="demo-list">
-        {demo.pending.map((r) => (
-          <li key={r.requestId}>
-            <div>
-              <strong>{r.title[locale]}</strong>
-              <span className="small muted">
-                {r.reveals === null ? t('home.try.asksNone') : t('home.try.asks', { value: r.reveals[locale] })}
-              </span>
-            </div>
-            <Link className="btn quiet small" to={`/holder/verify/${r.requestId}`}>
-              {t('verify.dry')}
-            </Link>
-          </li>
-        ))}
+      {/* One card per kind of request; spare copies of the same request stay reachable through /demo. */}
+      <ul className="request-cards">
+        {demo.pending
+          .filter((r, i, all) => all.findIndex((o) => o.title.ko === r.title.ko) === i)
+          .map((r) => (
+            <li key={r.requestId}>
+              <div className="request-card-head">
+                <strong>{r.label[locale]}</strong>
+                <span className="status pending">{t('status.pending')}</span>
+              </div>
+              <ul className="checks">
+                {r.conditions[locale].map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+              <span className="small muted">{r.reveals === null ? t('home.try.asksNone') : t('home.try.asks', { value: r.reveals[locale] })}</span>
+              <Link className="btn primary" to={`/holder/verify/${r.requestId}`}>
+                {t('verify.dry')}
+              </Link>
+            </li>
+          ))}
       </ul>
       <ol className="steps">
         <li>{t('home.try.step1')}</li>
@@ -101,6 +109,7 @@ export const HomePage = () => {
   return (
     <>
       <section className="hero">
+        <img className="hero-art" src={heroShield} alt="" width={1536} height={1024} />
         <h1>{t('home.lede')}</h1>
         <p>{t('home.hero.sub')}</p>
         <div className="actions">
