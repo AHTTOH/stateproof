@@ -1,6 +1,10 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { NETWORK, demoRequestsFor } from './env';
+import { useI18n } from './i18n';
+
+// The preview reads the ledger and needs the contract runtime, so it loads after first paint.
+const SealPreview = lazy(() => import('../routes/holder/SealPreview').then((m) => ({ default: m.SealPreview })));
 
 // The holder page pulls in the ledger and prover WASM; fetch it while the visitor reads.
 const PREFETCH_DELAY_MS = 1500;
@@ -11,76 +15,102 @@ const usePrefetchHolderPage = () => {
   }, []);
 };
 
-const TryIt = () => {
+const DemoRequests = () => {
+  const { t, locale } = useI18n();
   const demo = demoRequestsFor();
-  if (demo === null) return <p className="notice">No demo requests are configured for {NETWORK}.</p>;
+  if (demo === null) return <p className="notice">{t('home.noDemo', { network: NETWORK })}</p>;
   return (
-    <section className="try" aria-labelledby="try-title">
-      <h2 id="try-title">Try it now, no wallet needed</h2>
-      <p>
-        <Link className="btn prove" to="/demo">
-          Open a pending demo request
+    <section aria-labelledby="demo-title">
+      <div className="demo-head">
+        <h2 id="demo-title">{t('home.demoTitle')}</h2>
+        <Link className="btn primary" to="/demo">
+          {t('home.try.open')}
         </Link>
-      </p>
-      <ol className="try-steps">
-        <li>Open a pending request (the button above picks one that is still open, or choose below).</li>
-        <li>
-          Load the fictional holder <strong>Minji</strong>.
-        </li>
-        <li>
-          Press <strong>Try the proof without a wallet</strong>. Your browser generates a real zero-knowledge proof for
-          that request (usually 10 to 30 seconds). Nothing is signed or submitted.
-        </li>
-      </ol>
-      <ul className="try-links">
+      </div>
+      <ul className="demo-list">
         {demo.pending.map((r) => (
           <li key={r.requestId}>
-            <Link to={`/holder/verify/${r.requestId}`}>
-              <strong>{r.title}</strong>
-              <span className="small muted">{r.reveals === null ? 'Asks to see no value' : `Asks to see one value: ${r.reveals}`}</span>
+            <div>
+              <strong>{r.title[locale]}</strong>
+              <span className="small muted">
+                {r.reveals === null ? t('home.try.asksNone') : t('home.try.asks', { value: r.reveals[locale] })}
+              </span>
+            </div>
+            <Link className="btn quiet small" to={`/holder/verify/${r.requestId}`}>
+              {t('verify.dry')}
             </Link>
           </li>
         ))}
       </ul>
-      <p className="small">
-        Results already written on Preprod:{' '}
-        {demo.verified.map((r, i) => (
-          <span key={r.requestId}>
-            {i > 0 && '; '}
-            <Link to={`/request/${r.requestId}`}>{r.title}</Link>
-          </span>
-        ))}
-        .
-      </p>
+      <ol className="steps">
+        <li>{t('home.try.step1')}</li>
+        <li>{t('home.try.step2')}</li>
+        <li>{t('home.try.step3')}</li>
+      </ol>
     </section>
   );
 };
 
+const LowerLinks = () => {
+  const { t, locale } = useI18n();
+  const demo = demoRequestsFor();
+  return (
+    <div className="lower">
+      <section aria-labelledby="results-title">
+        <h2 className="section-title" id="results-title">
+          {t('home.try.results')}
+        </h2>
+        {demo !== null && (
+          <ul className="rows">
+            {demo.verified.map((r) => (
+              <li key={r.requestId}>
+                <Link to={`/request/${r.requestId}`}>{r.title[locale]}</Link>
+                <span className="status verified">{t('status.verified')}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      <nav aria-labelledby="roles-title">
+        <h2 className="section-title" id="roles-title">
+          {t('home.roles')}
+        </h2>
+        <ul className="rows link-rows">
+          <li>
+            <Link to="/verifier">{t('nav.verifier')}</Link>
+            <span className="small muted">{t('home.role.verifier')}</span>
+          </li>
+          <li>
+            <Link to="/holder">{t('nav.holder')}</Link>
+            <span className="small muted">{t('home.role.holder')}</span>
+          </li>
+          <li>
+            <Link to="/issuer">{t('nav.issuer')}</Link>
+            <span className="small muted">{t('home.role.issuer')}</span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
+};
+
 export const HomePage = () => {
+  const { t } = useI18n();
   usePrefetchHolderPage();
   return (
     <>
-      <h1 className="hero-title">Prove the condition. Keep the data.</h1>
-      <p className="lede">
-        StateProof lets a verifier ask “is this person employed for at least a year?” or “are they an adult living in Seoul
-        or Gyeonggi?” and get a yes, checked by zero-knowledge proof on Midnight, without receiving the birth date,
-        employment record or home address behind it.
-      </p>
-      <TryIt />
-      <nav className="roles" aria-label="Start as">
-        <Link to="/verifier">
-          <strong>Verifier</strong>
-          <span className="muted">Compose conditions, send a link, read a receipt.</span>
-        </Link>
-        <Link to="/holder">
-          <strong>Holder</strong>
-          <span className="muted">Keep credentials in your browser and prove only what is asked.</span>
-        </Link>
-        <Link to="/issuer">
-          <strong>Issuer</strong>
-          <span className="muted">Sign credentials. Registered keys are trusted by the contract.</span>
-        </Link>
-      </nav>
+      <div className="home">
+        <div>
+          <h1 className="display">{t('home.lede')}</h1>
+          <DemoRequests />
+        </div>
+        <aside className="preview" aria-label={t('seal.lineHead')}>
+          <Suspense fallback={<div className="preview-skeleton" aria-hidden="true" />}>
+            <SealPreview />
+          </Suspense>
+        </aside>
+      </div>
+      <LowerLinks />
     </>
   );
 };

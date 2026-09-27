@@ -2,6 +2,11 @@
   "id": "identity",
   "version": 1,
   "title": "Identity Credential",
+  "i18n": {
+    "ko": {
+      "title": "신원 크리덴셜"
+    }
+  },
   "label": "stateproof:identity:v1",
   "claims": [
     {
@@ -15,7 +20,12 @@
         "eq",
         "neq",
         "between"
-      ]
+      ],
+      "i18n": {
+        "ko": {
+          "label": "생년월일"
+        }
+      }
     },
     {
       "key": "ageYears",
@@ -25,7 +35,13 @@
       "unit": "years",
       "operators": [
         "gte"
-      ]
+      ],
+      "i18n": {
+        "ko": {
+          "label": "발급 시점 나이",
+          "unit": "세"
+        }
+      }
     },
     {
       "key": "nationality",
@@ -37,6 +53,18 @@
         "neq",
         "inSet"
       ],
+      "i18n": {
+        "ko": {
+          "label": "국적",
+          "values": {
+            "KR": "대한민국",
+            "US": "미국",
+            "JP": "일본",
+            "CN": "중국",
+            "VN": "베트남"
+          }
+        }
+      },
       "codes": {
         "KR": 410,
         "US": 840,
@@ -55,6 +83,30 @@
         "neq",
         "inSet"
       ],
+      "i18n": {
+        "ko": {
+          "label": "거주지",
+          "values": {
+            "Seoul": "서울",
+            "Busan": "부산",
+            "Daegu": "대구",
+            "Incheon": "인천",
+            "Gwangju": "광주",
+            "Daejeon": "대전",
+            "Ulsan": "울산",
+            "Sejong": "세종",
+            "Gyeonggi": "경기",
+            "Chungbuk": "충북",
+            "Chungnam": "충남",
+            "Jeonnam": "전남",
+            "Gyeongbuk": "경북",
+            "Gyeongnam": "경남",
+            "Jeju": "제주",
+            "Gangwon": "강원",
+            "Jeonbuk": "전북"
+          }
+        }
+      },
       "codes": {
         "Seoul": 11,
         "Busan": 26,

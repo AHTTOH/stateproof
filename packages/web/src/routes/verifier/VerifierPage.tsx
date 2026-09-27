@@ -1,23 +1,38 @@
+// Verifier composes a policy, previews the seal line from its side, and publishes the request.
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { createRequest } from '@stateproof/contract';
-import { buildPolicy, describePolicy, randomBytes32, toHex, type PolicyInput } from '@stateproof/core';
+import { createRequest, type Policy } from '@stateproof/contract';
+import {
+  PolicyInputError,
+  buildPolicy,
+  claimLabel,
+  describePolicy,
+  getClaim,
+  getSchema,
+  randomBytes32,
+  toHex,
+  type Locale,
+  type PolicyInput,
+} from '@stateproof/core';
+import { contractAddress, explorerTxUrl, issuerInfo, issuerName, NETWORK } from '../../app/env';
+import { useI18n } from '../../app/i18n';
+import type { MessageKey } from '../../app/messages';
 import { useLace } from '../../app/LaceContext';
-import { contractAddress, explorerTxUrl, issuerInfo, NETWORK } from '../../app/env';
-import { Boundary } from '../../components/Boundary';
-import { Field } from '../../components/Field';
 import { errorMessage, useAsync } from '../../app/useAsync';
+import { ErrorNotice } from '../../components/ErrorNotice';
+import { Field } from '../../components/Field';
+import { SealTable } from '../../components/SealTable';
+import { buildSealRows } from '../../components/sealRows';
 import { StatusBadge } from '../../components/StatusBadge';
-import { fetchRequest } from '../../state/ledger';
+import { fetchRequest, receiptOf } from '../../state/ledger';
 import { loadRequests, rememberRequest, type StoredRequest } from '../../state/verifierRequests';
 import { PolicyBuilder } from './PolicyBuilder';
-import { ErrorNotice } from '../../components/ErrorNotice';
 
-const TTL_OPTIONS = [
-  { label: '1 hour', seconds: 3_600 },
-  { label: '1 day', seconds: 86_400 },
-  { label: '7 days', seconds: 604_800 },
-] as const;
+const TTL_OPTIONS: readonly { readonly label: MessageKey; readonly seconds: number }[] = [
+  { label: 'verifier.ttl.hour', seconds: 3_600 },
+  { label: 'verifier.ttl.day', seconds: 86_400 },
+  { label: 'verifier.ttl.week', seconds: 604_800 },
+];
 
 const STARTER_POLICY: PolicyInput = {
   schema: 'employment',
@@ -29,9 +44,12 @@ const STARTER_POLICY: PolicyInput = {
   reveal: null,
 };
 
+const NO_FAILURES: ReadonlySet<string> = new Set();
+
 export const holderLink = (requestId: string): string => new URL(`/holder/verify/${requestId}`, window.location.origin).toString();
 
-const RequestRow = ({ stored }: { stored: StoredRequest }) => {
+const RequestRow = ({ stored }: { readonly stored: StoredRequest }) => {
+  const { t, locale } = useI18n();
   const view = useAsync(() => fetchRequest(stored.requestId), [stored.requestId]);
   return (
     <li>
@@ -40,14 +58,30 @@ const RequestRow = ({ stored }: { stored: StoredRequest }) => {
           <Link to={`/request/${stored.requestId}`}>{stored.label}</Link>
         </div>
         <div className="hash muted">{stored.requestId}</div>
-        {view.error && <div className="small" role="alert">{view.error}</div>}
+        {view.error && <ErrorNotice message={view.error} />}
       </div>
-      {view.data ? <StatusBadge status={view.data.receipt.status} /> : <span className="muted small">{view.loading ? 'Reading ledger' : ''}</span>}
+      {view.data ? <StatusBadge status={receiptOf(view.data, locale).status} /> : view.loading && <span className="muted small">{t('verifier.readingLedger')}</span>}
     </li>
   );
 };
 
+type Preview = { readonly policy: Policy; readonly error: null } | { readonly policy: null; readonly error: string };
+
+const composePreview = (input: PolicyInput, locale: Locale, t: (key: MessageKey, vars?: Record<string, string | number>) => string): Preview => {
+  try {
+    return { policy: buildPolicy(input), error: null };
+  } catch (e) {
+    if (!(e instanceof PolicyInputError)) return { policy: null, error: errorMessage(e) };
+    const vars = {
+      ...(e.claimKey === null ? {} : { claim: claimLabel(getClaim(getSchema(input.schema), e.claimKey), locale) }),
+      ...(e.limit === null ? {} : { max: e.limit }),
+    };
+    return { policy: null, error: t(`policy.error.${e.code}` as MessageKey, vars) };
+  }
+};
+
 export const VerifierPage = () => {
+  const { t, locale } = useI18n();
   const lace = useLace();
   const [policyInput, setPolicyInput] = useState<PolicyInput>(STARTER_POLICY);
   const [ttl, setTtl] = useState<number>(TTL_OPTIONS[1].seconds);
@@ -56,17 +90,14 @@ export const VerifierPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<StoredRequest | null>(null);
 
-  const preview = useMemo(() => {
-    try {
-      return { policy: buildPolicy(policyInput), error: null };
-    } catch (e) {
-      return { policy: null, error: errorMessage(e) };
-    }
-  }, [policyInput]);
-  const description = preview.policy ? describePolicy(preview.policy) : null;
+  const preview = useMemo(() => composePreview(policyInput, locale, t), [policyInput, locale, t]);
+  const rows = useMemo(
+    () => (preview.policy ? buildSealRows({ policy: preview.policy, locale, subject: null, failing: NO_FAILURES, revealedValue: null }) : []),
+    [preview.policy, locale],
+  );
 
   const create = async () => {
-    if (!preview.policy || !description) return;
+    if (!preview.policy || busy) return;
     setBusy(true);
     setError(null);
     try {
@@ -76,7 +107,7 @@ export const VerifierPage = () => {
       const receipt = await createRequest(session.contract, requestId, preview.policy, now, now + BigInt(ttl));
       const stored: StoredRequest = {
         requestId: toHex(requestId),
-        label: description.conditions.join(' and '),
+        label: describePolicy(preview.policy, locale).conditions.join(', '),
         createdAt: new Date().toISOString(),
         txHash: receipt.txHash,
       };
@@ -89,62 +120,50 @@ export const VerifierPage = () => {
     }
   };
 
-  if (contractAddress() === null) {
-    return <p className="notice error">StateProof is not deployed on {NETWORK} yet.</p>;
-  }
+  if (contractAddress() === null) return <p className="notice error">{t('verifier.notDeployed', { network: NETWORK })}</p>;
 
   return (
     <>
-      <h1 className="page-title">Ask for a fact, not a file</h1>
-      <p className="lede">
-        Compose the conditions you need. The holder proves them against a signed credential without sending you the
-        credential. The policy is written on chain, so the holder sees exactly what you asked for.
-      </p>
+      <h1 className="page-title">{t('verifier.title')}</h1>
+      <p className="lede">{t('verifier.lede')}</p>
 
       <PolicyBuilder value={policyInput} onChange={setPolicyInput} />
 
-      {preview.error && <p className="notice error">{preview.error}</p>}
-      {description && (
-        <Boundary
-          description={description}
-          issuerName={issuerInfo(policyInput.issuerId).name}
-          learnHeading="You will learn"
-          sealedHeading="You will NOT receive"
-          revealedValue={null}
-        />
+      {preview.error !== null && <p className="notice error">{preview.error}</p>}
+      {preview.policy && (
+        <SealTable rows={rows} issuerName={issuerName(issuerInfo(policyInput.issuerId), locale)} holderHeading={null} verifierHeading={t('boundary.verifier.learn')} />
       )}
 
-      <div className="inline" style={{ marginTop: 'var(--s-6)' }}>
-        <Field label="Request valid for">
+      <div className="actions">
+        <Field label={t('verifier.ttl')}>
           {(id) => (
             <select id={id} value={ttl} onChange={(e) => setTtl(Number(e.target.value))}>
               {TTL_OPTIONS.map((o) => (
                 <option key={o.seconds} value={o.seconds}>
-                  {o.label}
+                  {t(o.label)}
                 </option>
               ))}
             </select>
           )}
         </Field>
-        <button type="button" className="btn" disabled={!preview.policy || busy} onClick={create}>
-          {busy ? 'Creating request in Lace' : 'Create verification request'}
+        <button type="button" className="btn primary" disabled={!preview.policy} aria-disabled={busy} onClick={create}>
+          {busy ? t('verifier.creating') : t('verifier.create')}
         </button>
       </div>
       {error && <ErrorNotice message={error} />}
       {created && (
-        <div className="notice ok">
-          Request created (<a href={explorerTxUrl(created.txHash)}>transaction</a>). Send this link to the holder:
+        <div className="notice ok" role="status">
+          {t('verifier.created')} <a href={explorerTxUrl(created.txHash)}>{t('common.transaction')}</a>
           <div className="hash" style={{ marginTop: 'var(--s-2)' }}>
             <a href={holderLink(created.requestId)}>{holderLink(created.requestId)}</a>
           </div>
         </div>
       )}
 
-      <h2 className="section-title">Your requests</h2>
+      <h2 className="section-title">{t('verifier.yours')}</h2>
       {requests.length === 0 ? (
         <p className="muted">
-          Requests you create from this browser appear here. No wallet? The <Link to="/">start page</Link> lists pending demo
-          requests you can prove without one.
+          {t('verifier.empty')} <Link to="/">{t('verifier.emptyDemo')}</Link>
         </p>
       ) : (
         <ul className="rows">

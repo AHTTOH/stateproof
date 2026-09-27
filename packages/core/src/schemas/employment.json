@@ -2,6 +2,11 @@
   "id": "employment",
   "version": 1,
   "title": "Employment Credential",
+  "i18n": {
+    "ko": {
+      "title": "재직 크리덴셜"
+    }
+  },
   "label": "stateproof:employment:v1",
   "claims": [
     {
@@ -14,6 +19,16 @@
         "neq",
         "inSet"
       ],
+      "i18n": {
+        "ko": {
+          "label": "재직 상태",
+          "values": {
+            "Active": "재직 중",
+            "Leave": "휴직",
+            "Terminated": "퇴사"
+          }
+        }
+      },
       "codes": {
         "Active": 1,
         "Leave": 2,
@@ -30,6 +45,18 @@
         "neq",
         "inSet"
       ],
+      "i18n": {
+        "ko": {
+          "label": "직무",
+          "values": {
+            "Engineering": "엔지니어링",
+            "Design": "디자인",
+            "Sales": "영업",
+            "Operations": "운영",
+            "Research": "연구"
+          }
+        }
+      },
       "codes": {
         "Engineering": 1,
         "Design": 2,
@@ -49,7 +76,12 @@
         "eq",
         "neq",
         "between"
-      ]
+      ],
+      "i18n": {
+        "ko": {
+          "label": "입사일"
+        }
+      }
     },
     {
       "key": "employmentMonths",
@@ -59,7 +91,13 @@
       "unit": "months",
       "operators": [
         "gte"
-      ]
+      ],
+      "i18n": {
+        "ko": {
+          "label": "근속 기간",
+          "unit": "개월"
+        }
+      }
     }
   ]
 }

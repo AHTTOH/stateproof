@@ -2,15 +2,21 @@
 import {
   MAX_CONDITIONS,
   SCHEMAS,
+  claimLabel,
+  claimUnit,
+  claimValueText,
   getClaim,
   getSchema,
+  operatorLabel,
   operatorsForClaim,
+  schemaTitle,
   type ClaimDefinition,
   type ConditionInput,
   type OperatorName,
   type PolicyInput,
 } from '@stateproof/core';
-import { ISSUERS } from '../../app/env';
+import { ISSUERS, issuerName } from '../../app/env';
+import { useI18n } from '../../app/i18n';
 import { Field } from '../../components/Field';
 
 interface PolicyBuilderProps {
@@ -23,6 +29,11 @@ const defaultCondition = (claim: ClaimDefinition): ConditionInput => {
   return { claim: claim.key, op };
 };
 
+const enumCodes = (claim: ClaimDefinition): readonly string[] => {
+  if (!claim.codes) throw new Error(`${claim.key} is not an enum claim`);
+  return Object.keys(claim.codes);
+};
+
 interface ValueInputProps {
   readonly claim: ClaimDefinition;
   readonly value: string;
@@ -32,13 +43,14 @@ interface ValueInputProps {
 }
 
 const ValueInput = ({ claim, value, onChange, id, label }: ValueInputProps) => {
+  const { t, locale } = useI18n();
   if (claim.type === 'enum') {
     return (
       <select id={id} aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
-        <option value="">Choose…</option>
-        {Object.keys(claim.codes ?? {}).map((k) => (
+        <option value="">{t('policy.choose')}</option>
+        {enumCodes(claim).map((k) => (
           <option key={k} value={k}>
-            {k}
+            {claimValueText(claim, k, locale)}
           </option>
         ))}
       </select>
@@ -56,31 +68,44 @@ const ValueInput = ({ claim, value, onChange, id, label }: ValueInputProps) => {
   );
 };
 
-const ConditionRow = ({ schemaId, condition, onChange, onRemove }: { schemaId: string; condition: ConditionInput; onChange(c: ConditionInput): void; onRemove(): void }) => {
+interface ConditionRowProps {
+  readonly schemaId: string;
+  readonly condition: ConditionInput;
+  onChange(c: ConditionInput): void;
+  onRemove(): void;
+}
+
+const ConditionRow = ({ schemaId, condition, onChange, onRemove }: ConditionRowProps) => {
+  const { t, locale } = useI18n();
   const schema = getSchema(schemaId);
   const claim = getClaim(schema, condition.claim);
-  const ops = operatorsForClaim(claim);
-  const valueLabel = `Value${claim.unit ? ` (${claim.unit})` : ''}`;
+  const label = claimLabel(claim, locale);
+  const unit = claimUnit(claim, locale);
+  const valueLabel = unit === undefined ? t('policy.value') : t('policy.valueUnit', { unit });
   const selectedSet = new Set((condition.values ?? []).map(String));
+  const toggle = (code: string, checked: boolean) => {
+    const next = checked ? [...selectedSet, code] : [...selectedSet].filter((c) => c !== code);
+    onChange({ ...condition, values: next });
+  };
   return (
     <div className="policy-grid">
-      <Field label="Claim">
+      <Field label={t('policy.claim')}>
         {(id) => (
           <select id={id} value={condition.claim} onChange={(e) => onChange(defaultCondition(getClaim(schema, e.target.value)))}>
             {schema.claims.map((c) => (
               <option key={c.key} value={c.key}>
-                {c.label}
+                {claimLabel(c, locale)}
               </option>
             ))}
           </select>
         )}
       </Field>
-      <Field label="Condition">
+      <Field label={t('policy.condition')}>
         {(id) => (
           <select id={id} value={condition.op} onChange={(e) => onChange({ claim: condition.claim, op: e.target.value as OperatorName })}>
-            {ops.map((o) => (
+            {operatorsForClaim(claim).map((o) => (
               <option key={o.name} value={o.name}>
-                {o.label}
+                {operatorLabel(o, locale)}
               </option>
             ))}
           </select>
@@ -90,19 +115,10 @@ const ConditionRow = ({ schemaId, condition, onChange, onRemove }: { schemaId: s
         <fieldset className="field">
           <legend>{valueLabel}</legend>
           <div className="chips">
-            {Object.keys(claim.codes ?? {}).map((k) => (
+            {enumCodes(claim).map((k) => (
               <label key={k} className="chip">
-                <input
-                  type="checkbox"
-                  checked={selectedSet.has(k)}
-                  onChange={(e) => {
-                    const next = new Set(selectedSet);
-                    if (e.target.checked) next.add(k);
-                    else next.delete(k);
-                    onChange({ ...condition, values: [...next] });
-                  }}
-                />
-                {k}
+                <input type="checkbox" checked={selectedSet.has(k)} onChange={(e) => toggle(k, e.target.checked)} />
+                {claimValueText(claim, k, locale)}
               </label>
             ))}
           </div>
@@ -115,7 +131,7 @@ const ConditionRow = ({ schemaId, condition, onChange, onRemove }: { schemaId: s
               {condition.op === 'between' && (
                 <ValueInput
                   claim={claim}
-                  label={`${claim.label} upper value`}
+                  label={t('policy.upperValue', { label })}
                   value={String(condition.value2 ?? '')}
                   onChange={(v) => onChange({ ...condition, value2: v })}
                 />
@@ -124,46 +140,44 @@ const ConditionRow = ({ schemaId, condition, onChange, onRemove }: { schemaId: s
           )}
         </Field>
       )}
-      <button type="button" className="btn quiet" onClick={onRemove} aria-label={`Remove condition on ${claim.label}`}>
-        Remove
+      <button type="button" className="btn quiet small" onClick={onRemove} aria-label={t('policy.removeAria', { label })}>
+        {t('policy.remove')}
       </button>
     </div>
   );
 };
 
 export const PolicyBuilder = ({ value, onChange }: PolicyBuilderProps) => {
+  const { t, locale } = useI18n();
   const schema = getSchema(value.schema);
   const issuers = ISSUERS.filter((i) => i.schemas.includes(schema.id));
   const setConditions = (conditions: readonly ConditionInput[]) => onChange({ ...value, conditions });
+  const switchSchema = (schemaId: string) => {
+    const next = getSchema(schemaId);
+    const issuer = ISSUERS.find((i) => i.schemas.includes(next.id));
+    if (!issuer) throw new Error(`No issuer in config/issuers.json issues ${next.id}`);
+    onChange({ schema: next.id, issuerId: issuer.id, conditions: [defaultCondition(next.claims[0])], reveal: null });
+  };
   return (
     <div className="stack">
       <div className="inline">
-        <Field label="Credential type">
+        <Field label={t('policy.credentialType')}>
           {(id) => (
-            <select
-              id={id}
-              value={value.schema}
-              onChange={(e) => {
-                const next = getSchema(e.target.value);
-                const issuer = ISSUERS.find((i) => i.schemas.includes(next.id));
-                if (!issuer) throw new Error(`No issuer in config/issuers.json issues ${next.id}`);
-                onChange({ schema: next.id, issuerId: issuer.id, conditions: [defaultCondition(next.claims[0])], reveal: null });
-              }}
-            >
+            <select id={id} value={value.schema} onChange={(e) => switchSchema(e.target.value)}>
               {SCHEMAS.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.title}
+                  {schemaTitle(s, locale)}
                 </option>
               ))}
             </select>
           )}
         </Field>
-        <Field label="Trusted issuer">
+        <Field label={t('policy.trustedIssuer')}>
           {(id) => (
             <select id={id} value={value.issuerId} onChange={(e) => onChange({ ...value, issuerId: e.target.value })}>
               {issuers.map((i) => (
                 <option key={i.id} value={i.id}>
-                  {i.name}
+                  {issuerName(i, locale)}
                 </option>
               ))}
             </select>
@@ -190,20 +204,18 @@ export const PolicyBuilder = ({ value, onChange }: PolicyBuilderProps) => {
           disabled={value.conditions.length >= MAX_CONDITIONS}
           onClick={() => setConditions([...value.conditions, defaultCondition(schema.claims[0])])}
         >
-          Add condition
+          {t('policy.add')}
         </button>
-        <span className="muted small">
-          All conditions must hold (AND). Up to {MAX_CONDITIONS}.
-        </span>
+        <span className="muted small">{t('policy.andNote', { max: MAX_CONDITIONS })}</span>
       </div>
 
-      <Field label="Also reveal one value (optional)">
+      <Field label={t('policy.reveal')}>
         {(id) => (
           <select id={id} value={value.reveal ?? ''} onChange={(e) => onChange({ ...value, reveal: e.target.value === '' ? null : e.target.value })}>
-            <option value="">Reveal nothing</option>
+            <option value="">{t('policy.revealNone')}</option>
             {schema.claims.map((c) => (
               <option key={c.key} value={c.key}>
-                {c.label}
+                {claimLabel(c, locale)}
               </option>
             ))}
           </select>

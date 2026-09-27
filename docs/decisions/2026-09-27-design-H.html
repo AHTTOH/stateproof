@@ -1,0 +1,659 @@
+<!doctype html>
+<!--
+  StateProof 디자인 실험, 변형 H
+  작성: 2026-09-27
+
+  [변형과 변수]
+  - 변형 이름: H
+  - source: pbakaus/impeccable, 고정 리비전 9d715cc4f5564a990ca8345abfdd5df6dc9b41c8 (SKILL v4.4.0, npx CLI 4.1.0 로 concept-seed, detect 실행)
+  - 바꾼 변수 하나: 스타일 source (impeccable 워크플로만 스타일 근거로 사용). 콘텐츠, 카피, 정보구조는 공통 브리프 그대로.
+
+  [impeccable 워크플로 기록]
+  0. Setup: 런처(scripts/impeccable context)는 프로젝트에 설치돼 있지 않아 "Context loading did not run" 처리.
+     브리프를 근거로 scratchpad/imp-run/PRODUCT.md 를 작성(추론 사실로 표기)한 뒤 npx impeccable 로 진행.
+  1. craft (= new-work, 새 시각 세계): mode Operate(업무 도구 + 심사 데모). 코드 선행(code-led), 이미지 생성 없음.
+     - 메커니즘: 서명된 크리덴셜 위에서 조건 충족 여부만 증명하고, 판정과 요청 값 하나만 공개 원장에 기록된다.
+     - 카테고리 기본값(배제): 네온 보라 글로우 다크 web3 대시보드 / 그 반대인 흰 SaaS + 파랑 액센트.
+     - 자체 후보 7개(공명 순): 1 정부24 발급 증명서(주민번호 뒷자리 마스킹) 2 창봉투(창으로만 보이는 주소)
+       3 블록 익스플로러 4 출입국 자동심사대 5 신속항원 검사 키트(C/T 줄) 6 지하철 개찰구 7 통장 정리(통장 인자 행)
+     - concept-seed (key f7729769, operate): ASSIGNED INDEX 7 → "통장" 세계로 확정. 공개 원장 = 통장에 인자되는 행.
+     - 도전자 판정: 다크 개발자 콘솔 = competitive(심사자 친숙도 축만 우세), 나머지 declined.
+       RAISE from 1비트 데스크톱: 상태를 색만이 아니라 패턴으로 표시(넘어가지 않는 값 = 사선 해칭 슬롯).
+       RAISE from 캐릭터 카탈로그: 인물마다 고정 가구(이름판, 가상 인물 표기, 같은 순서의 값 행).
+       RAISE from 알파벳 스톰: 대담함은 서체 한 곳, 증명 경과 초를 도트 숫자로 크게.
+       RAISE from 암실: 진행은 실제로 아는 값(경과 초)만 표시, 가짜 퍼센트 없음.
+       RAISE from 인더스트리얼 인용 문법: 모든 구역을 문자 그대로의 이름으로 라벨링.
+  2. critique: 구현 후 이중 서브에이전트(A 디자인 리뷰, B detector) 실행. 결과는 아래 [critique 결과]에.
+  3. 개선 명령 1회: critique 결과가 지목한 명령을 적용. 아래 [개선 명령]에.
+  (new-work 의 finish reviewer, documenter, DESIGN.md 는 목업 실험 범위 밖이라 생략.)
+
+  [브리프 우선으로 impeccable 과 다르게 처리한 것]
+  - new-work 는 direction contract 를 HTML 주석에 넣지 말라 하지만, 브리프가 맨 위 주석 기록을 요구해 브리프를 따름.
+  - init/new-work 는 사용자 질문 라운드를 요구하지만 무인 서브에이전트라 브리프를 답으로 사용.
+  - 기준 시각, 요청 만료, 요청 id 값은 브리프에 없어 지어내지 않고 "체인 값" 빈 슬롯으로 표시.
+
+  [1 pass 토큰 계획]
+  Color (Restrained + 커버 영역만 Committed)
+    --cover  #173F33 통장 표지 초록: 상단 띠, 주 버튼
+    --page   #EDF2EA 속지 연청자색 바탕 (보안 인쇄 물결무늬 #D3E0D3)
+    --ink    #1C2644 도트 프린터 청흑 잉크: 본문, 인자 값
+    --ink-2  #45506B 보조 글자 (바탕 대비 7.0:1)
+    --rule   #AFC3B3 행 괘선
+    --stamp  #B8321F 인주 주홍: 검증 완료 직인에만
+  Type: Pretendard Variable(라벨, 제목, 본문 전부) + DotGothic16(인자된 숫자, 해시, 초 전용)
+  Layout: 펼친 통장. 첫 화면은 표지 띠 + 원장 표(대기 요청, 체인 기록) + 역할 색인. 증명 화면은 좌우 두 쪽 사이 접힘선이
+          곧 공개 경계. 영수증은 인자된 한 쪽 + 직인. 좌측 정렬.
+          ┌ 표지 띠: StateProof, 설명 ───────── Preprod, KO/EN ┐
+          │ 대기 중인 데모 요청 [표, 행마다 증명 버튼]          │
+          │ 체인 기록 [행]        역할 [색인 탭]               │
+  Principles: 증명 화면의 접힘선 = 공개 경계. 인자 행 = 공개 원장 기록. 해칭 = 넘어가지 않음.
+
+  [2 pass 에서 바꾼 것]
+  - 표지 금박 워드마크 → 제거. 금박은 '고급' 기본값이라 표지 초록 위 속지색 글자로.
+  - 도트 서체를 라벨에도 쓰려던 계획 → 인자 값(숫자, 해시, 초)에만. 라벨의 모노 서체는 템플릿 크롬 기본값.
+  - 증명 진행 막대 → 제거. 실제 진행률을 모르므로 경과 초 + 움직이는 인자 헤드(비결정 진행)로.
+  - 역할 입구 카드 3장 → 통장 색인 탭 한 줄. 같은 모양 카드 그리드는 기본값.
+  - 행 번호(01, 02) → 넣지 않음. 순서 정보가 없는 행.
+
+  [다이얼, 스타일 값]
+  mode Operate, 색 전략 Restrained(표지 띠만 Committed), 밝은 면(심사자가 실내 조명 아래 노트북으로 봄),
+  radius 위계: 속지 14px, 버튼 6px, 칩 999px. 그림자 0 12px 32px 초록 틴트. 모션은 인자 헤드 한 곳.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StateProof 통장 목업</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css">
+<style>
+  :root {
+    --cover: #173F33;
+    --cover-2: #22574A;
+    --cover-ink: #EAF1E7;
+    --cover-ink-2: #B9CFC2;
+    --desk: #D6DFD5;
+    --page: #EDF2EA;
+    --page-2: #E3EBE0;
+    --wave: #D3E0D3;
+    --rule: #AFC3B3;
+    --rule-strong: #7F998A;
+    --ink: #1C2644;
+    --ink-2: #45506B;
+    --stamp: #B8321F;
+    --focus: #1B4FD1;
+    --hatch: rgba(28, 38, 68, .42);
+
+    --font-ui: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --font-print: "Galmuri14", "Pretendard Variable", monospace;
+
+    /* 타입 역할 (typeset 후): 메타 13, 라벨 14, 본문 16, 소제목 18, 섹션 24, 화면 제목 32, 인자 14/28/70 */
+    --fs-meta: .8125rem;
+    --fs-label: .875rem;
+    --fs-body: 1rem;
+    --fs-sub: 1.125rem;
+    --fs-section: 1.5rem;
+    --fs-display: 2rem;
+    --fs-print: .875rem;
+    --fs-print-lg: 1.75rem;
+    --fs-timer: 4.375rem;
+    --fs-xs: var(--fs-meta);
+    --fs-sm: var(--fs-label);
+    --fs-md: var(--fs-body);
+    --fs-lg: var(--fs-sub);
+    --fs-xl: var(--fs-display);
+
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 24px;
+    --sp-6: 32px;
+    --sp-7: 48px;
+    --sp-8: 72px;
+
+    --r-page: 14px;
+    --r-control: 6px;
+    --r-pill: 999px;
+    --shadow-page: 0 12px 32px rgba(23, 63, 51, .16), 0 2px 4px rgba(23, 63, 51, .10);
+    --ease-out: cubic-bezier(.16, 1, .3, 1);
+    --wave-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='24' viewBox='0 0 160 24'%3E%3Cpath d='M0 12 C20 2 40 2 60 12 S100 22 120 12 S150 4 160 12' fill='none' stroke='%23D3E0D3' stroke-width='1'/%3E%3Cpath d='M0 18 C20 8 40 8 60 18 S100 28 120 18 S150 10 160 18' fill='none' stroke='%23D8E4D8' stroke-width='.8'/%3E%3C/svg%3E");
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--desk);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: var(--fs-md);
+    line-height: 1.55;
+    font-feature-settings: "tnum";
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  ::selection { background: var(--cover); color: var(--cover-ink); }
+  a { color: var(--ink); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { color: var(--cover-2); text-decoration-thickness: 2px; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .print { font-family: var(--font-print); font-weight: 400; font-size: var(--fs-print); letter-spacing: 0; line-height: 1.6; color: var(--ink); }
+
+  /* 목업 캡션 (제품 화면 밖) */
+  .board { max-width: 1200px; margin: 0 auto; padding: var(--sp-7) var(--sp-5) var(--sp-8); }
+  .shot + .shot { margin-top: var(--sp-8); }
+  .caption {
+    margin: 0 0 var(--sp-3);
+    font-size: var(--fs-xs);
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+
+  /* 통장 속지 */
+  .book {
+    background: var(--page) var(--wave-bg) repeat;
+    border-radius: var(--r-page);
+    box-shadow: var(--shadow-page);
+    overflow: hidden;
+  }
+
+  /* 표지 띠 */
+  .cover {
+    background: var(--cover);
+    color: var(--cover-ink);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3) var(--sp-5);
+    padding: var(--sp-4) var(--sp-6);
+  }
+  .brand { display: flex; align-items: baseline; gap: var(--sp-3); flex-wrap: wrap; min-width: 0; }
+  .wordmark { font-weight: 800; font-size: 1.375rem; letter-spacing: -.02em; color: var(--cover-ink); text-decoration: none; }
+  .crumb { color: var(--cover-ink-2); font-size: var(--fs-sm); }
+  .crumb a { color: var(--cover-ink); }
+  .cover-tools { display: flex; align-items: center; gap: var(--sp-3); }
+  .net {
+    display: inline-flex; align-items: center; gap: var(--sp-2);
+    border: 1px solid var(--cover-ink-2);
+    border-radius: var(--r-pill);
+    padding: 2px var(--sp-3);
+    font-size: var(--fs-xs);
+    color: var(--cover-ink);
+  }
+  .net::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #8FD3A8; }
+  .lang { display: inline-flex; border: 1px solid var(--cover-ink-2); border-radius: var(--r-control); overflow: hidden; }
+  .lang button {
+    font: inherit; font-size: var(--fs-xs); font-weight: 700;
+    background: transparent; color: var(--cover-ink-2);
+    border: 0; padding: 4px 10px; cursor: pointer; min-height: 32px;
+  }
+  .lang button[aria-pressed="true"] { background: var(--cover-ink); color: var(--cover); }
+  .lang button:hover:not([aria-pressed="true"]) { color: var(--cover-ink); }
+  .lang button:focus-visible { outline-color: var(--cover-ink); outline-offset: -3px; }
+
+  .desc {
+    flex: 0 0 100%;
+    margin: 0;
+    padding-right: max(0px, calc(100% - 44rem));
+    color: var(--cover-ink);
+    font-size: var(--fs-md);
+    line-height: 1.6;
+  }
+
+  .sheet { padding: var(--sp-6) var(--sp-6) var(--sp-7); }
+  .sheet h2 {
+    margin: 0 0 var(--sp-4);
+    font-size: var(--fs-section);
+    font-weight: 750;
+    letter-spacing: -.01em;
+  }
+  .block + .block { margin-top: var(--sp-7); }
+
+  /* 원장 표 */
+  .ledger { width: 100%; border-collapse: collapse; }
+  .ledger th {
+    text-align: left;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--ink-2);
+    padding: var(--sp-2) var(--sp-3);
+    border-bottom: 2px solid var(--rule-strong);
+    white-space: nowrap;
+  }
+  .ledger td {
+    padding: var(--sp-4) var(--sp-3);
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    font-size: var(--fs-body);
+  }
+  .ledger td:first-child, .ledger th:first-child { padding-left: 0; }
+  .ledger td:last-child, .ledger th:last-child { padding-right: 0; text-align: right; }
+  .req-name { font-size: var(--fs-sub); font-weight: 700; }
+  .ledger .cond { max-width: 34ch; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+    font: inherit; font-weight: 700; font-size: var(--fs-sm);
+    min-height: 44px; padding: 0 var(--sp-4);
+    border-radius: var(--r-control);
+    border: 1.5px solid var(--cover);
+    cursor: pointer; text-decoration: none; white-space: nowrap;
+    transition: background-color .18s var(--ease-out), color .18s var(--ease-out), transform .12s var(--ease-out);
+  }
+  .btn-primary { background: var(--cover); color: var(--cover-ink); }
+  .btn-primary:hover { background: var(--cover-2); color: var(--cover-ink); }
+  .btn-secondary { background: transparent; color: var(--cover); }
+  .btn-secondary:hover { background: var(--page-2); color: var(--cover); }
+  .btn:active { transform: translateY(1px); }
+  .btn[disabled] { cursor: not-allowed; border-color: var(--rule-strong); color: var(--ink-2); background: transparent; }
+
+  /* 체인 기록 행 */
+  .records { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--rule-strong); }
+  .records li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--sp-1) var(--sp-4);
+    align-items: baseline;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--fs-body);
+  }
+  .records .rec-main { font-family: var(--font-print); font-size: var(--fs-print); color: var(--ink); }
+  .records .rec-meta { color: var(--ink-2); grid-column: 1; }
+  .records a { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-weight: 700; display: inline-flex; align-items: center; min-height: 44px; }
+  .records .rec-meta { font-size: var(--fs-label); }
+
+  .split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--sp-7); margin-top: var(--sp-7); }
+
+  /* 역할 색인 */
+  .index { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 2px solid var(--rule-strong); }
+  .index li { border-bottom: 1px solid var(--rule); }
+  .index a {
+    display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: var(--sp-3);
+    padding: var(--sp-3) 0; text-decoration: none; font-size: var(--fs-body);
+  }
+  .index a:hover .role { text-decoration: underline; text-underline-offset: 3px; }
+  .index .role {
+    font-weight: 700; color: var(--cover);
+  }
+  .index .role-line { color: var(--ink-2); }
+
+  .contract {
+    margin-top: var(--sp-7); padding-top: var(--sp-4); border-top: 1px dashed var(--rule-strong);
+    display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-3); font-size: var(--fs-xs); color: var(--ink-2);
+  }
+  .hash { color: var(--ink); word-break: break-all; }
+
+  /* 증명 화면 */
+  .holder-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: var(--sp-4); padding-bottom: var(--sp-5); border-bottom: 2px solid var(--rule-strong);
+  }
+  .holder-id { display: flex; align-items: baseline; gap: var(--sp-3); flex-wrap: wrap; }
+  .holder-label { font-size: var(--fs-sm); color: var(--ink-2); font-weight: 600; }
+  .holder-name { font-size: var(--fs-display); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
+  .tag {
+    font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2);
+    border: 1px solid var(--rule-strong); border-radius: var(--r-pill); padding: 1px 10px;
+  }
+  .persona { display: flex; align-items: center; gap: var(--sp-3); border: 0; margin: 0; padding: 0; }
+  .persona legend { float: left; font-size: var(--fs-sm); font-weight: 600; color: var(--ink-2); margin-right: var(--sp-3); }
+  .seg { display: inline-flex; border: 1.5px solid var(--cover); border-radius: var(--r-control); overflow: hidden; }
+  .seg label { position: relative; }
+  .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .seg span {
+    display: inline-flex; align-items: center; min-height: 40px; padding: 0 var(--sp-4);
+    font-size: var(--fs-sm); font-weight: 700; color: var(--cover);
+  }
+  .seg input:checked + span { background: var(--cover); color: var(--cover-ink); }
+  .seg input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: -3px; }
+  .seg label:hover input:not(:checked):not(:disabled) + span { background: var(--page-2); }
+  .persona:has(input:disabled) .seg { opacity: .55; border-color: var(--rule-strong); }
+  .persona:has(input:disabled) .seg input { cursor: not-allowed; }
+
+  .spread {
+    position: relative;
+    display: grid; grid-template-columns: 1fr 1fr;
+    margin-top: var(--sp-6);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-control);
+    background: var(--page);
+  }
+  .spread::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 28px; transform: translateX(-50%);
+    background: linear-gradient(90deg, transparent, rgba(23, 63, 51, .10) 45%, rgba(23, 63, 51, .18) 50%, rgba(23, 63, 51, .10) 55%, transparent);
+    pointer-events: none;
+  }
+  .leaf { padding: var(--sp-5) var(--sp-6); }
+  .leaf h3 { margin: 0 0 var(--sp-3); font-size: var(--fs-sub); font-weight: 700; }
+  .leaf dl { margin: 0; }
+  .row {
+    display: grid; grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr); gap: var(--sp-3);
+    padding: var(--sp-3) 0; border-bottom: 1px solid var(--rule); font-size: var(--fs-body); align-items: baseline;
+  }
+  .row:last-child { border-bottom: 0; }
+  .row dt { color: var(--ink-2); font-size: var(--fs-label); font-weight: 500; }
+  .row dd { margin: 0; font-weight: 600; min-width: 0; }
+  .row dd .note { display: block; font-family: var(--font-ui); font-weight: 500; color: var(--ink-2); font-size: var(--fs-meta); }
+  .row dd.print { font-weight: 400; }
+  .keep dd { font-weight: 500; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-3); align-items: baseline; }
+  .keep .stays { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-meta); font-weight: 600; color: var(--ink-2); }
+  .keep .stays::before { content: ""; width: 22px; height: 10px; border: 1px solid var(--rule-strong); border-radius: 2px; background: repeating-linear-gradient(135deg, var(--hatch) 0 1.5px, transparent 1.5px 5px); }
+
+  .ledger-line {
+    margin-top: var(--sp-3);
+    font-size: var(--fs-xs); color: var(--ink-2);
+  }
+  .ledger-line b { color: var(--ink); font-weight: 600; }
+
+  /* 인자 중 슬롯 */
+  .printer {
+    margin-top: var(--sp-6);
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-5); align-items: end;
+    padding: var(--sp-5) var(--sp-6);
+    background: var(--page-2);
+    border-radius: var(--r-control);
+    border-top: 2px solid var(--cover);
+  }
+  .printing-label { font-size: var(--fs-sub); font-weight: 700; margin: 0 0 var(--sp-2); }
+  .timer { display: flex; align-items: baseline; gap: var(--sp-2); line-height: 1; margin: 0; }
+  .timer .num { font-family: var(--font-print); font-size: var(--fs-timer); letter-spacing: 0; color: var(--ink); }
+  .timer .unit { font-family: var(--font-print); font-size: var(--fs-print-lg); }
+  .track {
+    position: relative; height: 14px; margin-top: var(--sp-4); max-width: 520px;
+    background-image: radial-gradient(circle, var(--rule-strong) 1.4px, transparent 1.6px);
+    background-size: 9px 14px; background-position: 0 50%; background-repeat: repeat-x;
+  }
+  .head {
+    position: absolute; top: -3px; left: 0; width: 26px; height: 20px;
+    border-radius: 3px; background: var(--ink);
+    box-shadow: 0 2px 4px rgba(28, 38, 68, .3);
+    animation: sweep 2.4s steps(24) infinite alternate;
+  }
+  @keyframes sweep { from { transform: translateX(0); } to { transform: translateX(calc(min(520px, 100%) - 26px)); } }
+  .printer-meta { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-5); margin-top: var(--sp-3); font-size: var(--fs-xs); color: var(--ink-2); }
+  .printer-meta b { color: var(--ink); font-weight: 600; }
+  .actions { display: flex; flex-direction: column; gap: var(--sp-2); align-items: stretch; min-width: 15rem; }
+  .btn-busy { background: var(--cover); color: var(--cover-ink); cursor: progress; }
+  .btn-busy::before {
+    content: ""; width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid rgba(234, 241, 231, .35); border-top-color: var(--cover-ink);
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* 영수증 */
+  .receipt-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--sp-5); flex-wrap: wrap; }
+  .receipt-head h2 { font-size: var(--fs-display); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; margin: 0; }
+  .status { margin-top: var(--sp-2); font-size: var(--fs-md); font-weight: 700; color: var(--stamp); }
+  .seal {
+    flex: none; width: 112px; height: 112px; border-radius: 50%;
+    border: 3px double var(--stamp); color: var(--stamp);
+    display: grid; place-items: center; text-align: center;
+    transform: rotate(-9deg);
+    font-family: var(--font-print); font-weight: 400; font-size: var(--fs-print); line-height: 1.4;
+    background: radial-gradient(circle, rgba(184, 50, 31, .06), transparent 70%);
+  }
+  .seal small { display: block; font-size: var(--fs-print); margin-top: 2px; }
+  .receipt { margin-top: var(--sp-6); border-top: 2px solid var(--rule-strong); }
+  .receipt .row { grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); padding: var(--sp-4) 0; font-size: var(--fs-body); }
+  .receipt .row:last-child { border-bottom: 1px solid var(--rule); }
+  .withheld { display: flex; flex-direction: column; gap: var(--sp-2); font-weight: 500; color: var(--ink-2); }
+  .withheld span { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
+  .hatch {
+    display: inline-block; width: 7.5rem; height: 1.1em; border-radius: 2px;
+    background: repeating-linear-gradient(135deg, var(--hatch) 0 1.5px, transparent 1.5px 6px);
+    border: 1px solid var(--rule-strong);
+  }
+  .slot {
+    display: inline-block; padding: 1px var(--sp-3);
+    border: 1.5px dashed var(--rule-strong); border-radius: 4px;
+    color: var(--ink-2); font-weight: 500; font-size: var(--fs-sm);
+  }
+
+  @media (max-width: 860px) {
+    .split { grid-template-columns: 1fr; gap: var(--sp-7); }
+    .printer { grid-template-columns: 1fr; align-items: stretch; }
+    .actions { min-width: 0; }
+  }
+
+  @media (max-width: 720px) {
+    .board { padding: var(--sp-5) var(--sp-4) var(--sp-7); }
+    .cover { padding: var(--sp-4); }
+    .sheet { padding: var(--sp-5) var(--sp-4) var(--sp-6); }
+    .ledger thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .ledger, .ledger tbody, .ledger tr, .ledger td { display: block; width: 100%; }
+    .ledger tr { border-top: 2px solid var(--rule-strong); padding: var(--sp-3) 0 var(--sp-4); }
+    .ledger td { border: 0; padding: var(--sp-1) 0; }
+    .ledger td:last-child { text-align: left; padding-top: var(--sp-3); }
+    .ledger td[data-label]::before { content: attr(data-label); display: block; font-size: var(--fs-xs); color: var(--ink-2); font-weight: 600; }
+    .ledger .btn { width: 100%; }
+    .spread { grid-template-columns: 1fr; }
+    .spread::after { display: none; }
+    .leaf + .leaf {
+      border-top: 1px solid var(--rule-strong);
+      background: linear-gradient(180deg, rgba(23, 63, 51, .12), transparent 18px);
+    }
+    .leaf { padding: var(--sp-4); }
+    .row, .receipt .row { grid-template-columns: 1fr; gap: 2px; }
+    .printer { padding: var(--sp-4); }
+    .timer .num { font-size: 3.5rem; }
+    .lang button { min-width: 44px; min-height: 44px; }
+    .seg span { min-height: 44px; }
+    .receipt-head h2 { font-size: 1.625rem; }
+    .persona { flex-wrap: wrap; }
+    .seal { width: 96px; height: 96px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .head { animation: none; transform: translateX(120px); }
+    .btn-busy::before { animation: none; border-top-color: rgba(234, 241, 231, .35); }
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+<main class="board">
+
+  <!-- 화면 1: 첫 화면 -->
+  <section class="shot" aria-labelledby="cap-home">
+    <p class="caption" id="cap-home">첫 화면</p>
+    <div class="book">
+      <header class="cover">
+        <div class="brand">
+          <a class="wordmark" href="#">StateProof</a>
+        </div>
+        <div class="cover-tools">
+          <span class="net">Midnight Preprod</span>
+          <div class="lang" role="group" aria-label="언어">
+            <button type="button" aria-pressed="true">KO</button>
+            <button type="button" aria-pressed="false">EN</button>
+          </div>
+        </div>
+        <p class="desc">원본 개인정보를 넘기지 않고 상대가 요구한 조건을 충족한다는 사실만 증명하는 Midnight 기반 ZK 크리덴셜 검증 서비스.</p>
+      </header>
+
+      <div class="sheet">
+        <section class="block" aria-labelledby="h-pending">
+          <h2 id="h-pending">대기 중인 데모 요청</h2>
+          <table class="ledger">
+            <thead>
+              <tr><th scope="col">요청</th><th scope="col">조건</th><th scope="col">공개 요청 값</th><th scope="col">발급자</th><th scope="col"><span class="sr-only">증명</span></th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-name">고용</span></td>
+                <td class="cond" data-label="조건">재직 상태가 재직 중, 근속 12개월 이상</td>
+                <td data-label="공개 요청 값">직무</td>
+                <td data-label="발급자">ACME Corp 인사팀 (데모)</td>
+                <td><a class="btn btn-primary" href="#s-proof">지갑 없이 증명해 보기</a></td>
+              </tr>
+              <tr>
+                <td><span class="req-name">신원</span></td>
+                <td class="cond" data-label="조건">발급 시점 나이 19세 이상, 거주지 서울 또는 경기</td>
+                <td data-label="공개 요청 값">거주지</td>
+                <td data-label="발급자">데모 신원 발급기관</td>
+                <td><a class="btn btn-primary" href="#">지갑 없이 증명해 보기</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div class="split">
+          <section aria-labelledby="h-records">
+            <h2 id="h-records">체인 기록</h2>
+            <ul class="records">
+              <li>
+                <span class="rec-main">고용 조건 검증 완료, 공개 값 없음</span>
+                <span class="rec-meta">제출 Lace</span>
+                <a href="#">영수증 보기</a>
+              </li>
+              <li>
+                <span class="rec-main">고용 조건 검증 완료, 공개 값 직무 Engineering</span>
+                <span class="rec-meta">제출 CLI</span>
+                <a href="#s-receipt">영수증 보기</a>
+              </li>
+            </ul>
+          </section>
+
+          <nav aria-labelledby="h-roles">
+            <h2 id="h-roles">역할</h2>
+            <ul class="index">
+              <li><a href="#"><span class="role">검증자</span><span class="role-line">조건을 골라 요청 등록</span></a></li>
+              <li><a href="#s-proof"><span class="role">홀더</span><span class="role-line">브라우저에 크리덴셜을 두고 증명</span></a></li>
+              <li><a href="#"><span class="role">발급자</span><span class="role-line">크리덴셜 서명, 공개키 체인 등록</span></a></li>
+            </ul>
+          </nav>
+        </div>
+
+        <p class="contract"><span>컨트랙트</span><span class="hash print">4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 화면 2: 홀더 증명 화면 (증명 중 7초) -->
+  <section class="shot" id="s-proof" aria-labelledby="cap-proof">
+    <p class="caption" id="cap-proof">홀더 증명 화면, 증명 중 7초</p>
+    <div class="book">
+      <header class="cover">
+        <div class="brand">
+          <a class="wordmark" href="#">StateProof</a>
+          <span class="crumb"><a href="#">대기 중인 데모 요청</a> / 고용</span>
+        </div>
+        <div class="cover-tools">
+          <span class="net">Midnight Preprod</span>
+          <div class="lang" role="group" aria-label="언어">
+            <button type="button" aria-pressed="true">KO</button>
+            <button type="button" aria-pressed="false">EN</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="sheet">
+        <div class="holder-bar">
+          <div class="holder-id">
+            <span class="holder-label">홀더</span>
+            <span class="holder-name">박민지</span>
+            <span class="tag">가상 인물</span>
+          </div>
+          <fieldset class="persona">
+            <legend>인물 바꾸기</legend>
+            <div class="seg">
+              <label><input type="radio" name="persona" checked disabled><span>박민지</span></label>
+              <label><input type="radio" name="persona" disabled><span>김소라</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="spread" role="group" aria-label="공개 경계">
+          <section class="leaf" aria-labelledby="h-learn">
+            <h3 id="h-learn">검증자가 알게 되는 것</h3>
+            <dl>
+              <div class="row"><dt>재직 상태</dt><dd class="print">재직 중</dd></div>
+              <div class="row"><dt>근속</dt><dd class="print">12개월 이상</dd></div>
+              <div class="row"><dt>서명</dt><dd class="print">ACME Corp 인사팀 (데모)</dd></div>
+              <div class="row"><dt>직무</dt><dd class="print">Engineering<span class="note">요청한 공개 값</span></dd></div>
+            </dl>
+          </section>
+          <section class="leaf" aria-labelledby="h-keep">
+            <h3 id="h-keep">넘어가지 않는 것</h3>
+            <dl>
+              <div class="row keep"><dt>정확한 입사일</dt><dd>2024-07-01<span class="stays">브라우저에만</span></dd></div>
+              <div class="row keep"><dt>정확한 근속 개월 수</dt><dd>26개월<span class="stays">브라우저에만</span></dd></div>
+              <div class="row keep"><dt>크리덴셜 원본과 서명</dt><dd>원본 보관<span class="stays">브라우저에만</span></dd></div>
+            </dl>
+          </section>
+        </div>
+        <p class="ledger-line">결과와 공개 값 기록 위치: <b>Midnight 공개 원장</b></p>
+
+        <div class="printer" aria-live="polite">
+          <div>
+            <p class="printing-label">영지식 증명 생성 중</p>
+            <p class="timer"><span class="num">7</span><span class="unit">초</span></p>
+            <div class="track" aria-hidden="true"><span class="head"></span></div>
+            <div class="printer-meta"><span>예상 <b>10~30초</b></span><span>제출 <b>안 함</b></span></div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-busy" type="button" aria-disabled="true">증명 생성 중</button>
+            <button class="btn btn-secondary" type="button" disabled>Lace로 제출</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 화면 3: 영수증 -->
+  <section class="shot" id="s-receipt" aria-labelledby="cap-receipt">
+    <p class="caption" id="cap-receipt">영수증 화면</p>
+    <div class="book">
+      <header class="cover">
+        <div class="brand">
+          <a class="wordmark" href="#">StateProof</a>
+          <span class="crumb"><a href="#">체인 기록</a> / 영수증</span>
+        </div>
+        <div class="cover-tools">
+          <span class="net">Midnight Preprod</span>
+          <div class="lang" role="group" aria-label="언어">
+            <button type="button" aria-pressed="true">KO</button>
+            <button type="button" aria-pressed="false">EN</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="sheet">
+        <div class="receipt-head">
+          <div>
+            <h2>고용 요청 영수증</h2>
+          </div>
+          <div class="seal" aria-hidden="true"><span>검증 완료<small>Preprod</small></span></div>
+        </div>
+
+        <dl class="receipt">
+          <div class="row"><dt>상태</dt><dd class="print">검증 완료</dd></div>
+          <div class="row"><dt>증명된 조건</dt><dd class="print">재직 상태가 재직 중, 근속 12개월 이상</dd></div>
+          <div class="row"><dt>공개된 값</dt><dd class="print">직무 Engineering</dd></div>
+          <div class="row">
+            <dt>넘어가지 않은 값</dt>
+            <dd class="withheld">
+              <span>정확한 입사일 <i class="hatch" role="img" aria-label="전달되지 않음"></i></span>
+              <span>정확한 근속 개월 수 <i class="hatch" role="img" aria-label="전달되지 않음"></i></span>
+              <span>크리덴셜 원본과 서명 <i class="hatch" role="img" aria-label="전달되지 않음"></i></span>
+            </dd>
+          </div>
+          <div class="row"><dt>발급자</dt><dd class="print">ACME Corp 인사팀 (데모)</dd></div>
+          <div class="row"><dt>제출</dt><dd class="print">CLI</dd></div>
+          <div class="row"><dt>기준 시각</dt><dd><span class="slot">체인 값</span></dd></div>
+          <div class="row"><dt>요청 만료</dt><dd><span class="slot">체인 값</span></dd></div>
+          <div class="row"><dt>요청 id</dt><dd><span class="slot">체인 값</span></dd></div>
+        </dl>
+
+        <p class="contract"><span>컨트랙트</span><span class="hash print">4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3</span></p>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

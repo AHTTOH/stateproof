@@ -1,5 +1,11 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { PageError } from './PageError';
+import { useI18n } from '../app/i18n';
+
+const Crash = ({ message }: { readonly message: string }) => {
+  const { t } = useI18n();
+  return <PageError title={t('crash.title')} message={message} />;
+};
 
 interface ErrorBoundaryProps {
   readonly children: ReactNode;
@@ -23,13 +29,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render(): ReactNode {
     if (this.state.error === null) return this.props.children;
-    return (
-      <div className="notice error" role="alert">
-        <strong>This page could not be displayed.</strong> {this.state.error.message}
-        <p className="small">
-          <Link to="/">Back to the start</Link>
-        </p>
-      </div>
-    );
+    return <Crash message={this.state.error.message} />;
   }
 }

@@ -4,6 +4,11 @@
     {
       "id": "issuer:acme-hr",
       "name": "ACME Corp HR (demo)",
+      "i18n": {
+        "ko": {
+          "name": "ACME Corp 인사팀 (데모)"
+        }
+      },
       "schemas": [
         "employment"
       ],
@@ -16,6 +21,11 @@
     {
       "id": "issuer:gov-id-demo",
       "name": "Demo Identity Authority",
+      "i18n": {
+        "ko": {
+          "name": "데모 신원 발급기관"
+        }
+      },
       "schemas": [
         "identity"
       ],

@@ -1,10 +1,11 @@
-// Human-level policy input -> contract Policy struct, and back to readable text.
+// Human-level policy input -> contract Policy struct. Reading it back is in describe.ts.
 import { Op, type Condition, type Policy } from '@stateproof/contract';
-import { MAX_CLAIM_VALUE, MAX_CONDITIONS, SET_SIZE } from '../constants.js';
-import { bytes32ToLabel, labelToBytes32 } from '../encoding/bytes.js';
-import { decodeClaimValue, encodeClaimValue, type ClaimInput } from '../encoding/claims.js';
-import { getClaim, getSchema, schemaByIdBytes, schemaIdBytes, type ClaimDefinition, type CredentialSchema } from '../schemas/index.js';
-import { operatorByName, operatorByOp, operatorsForClaim, type OperatorName } from './operators.js';
+import { MAX_CONDITIONS, SET_SIZE } from '../constants.js';
+import { labelToBytes32 } from '../encoding/bytes.js';
+import { encodeClaimValue, type ClaimInput } from '../encoding/claims.js';
+import { getClaim, getSchema, schemaIdBytes, type ClaimDefinition, type CredentialSchema } from '../schemas/index.js';
+import { PolicyInputError } from './input-error.js';
+import { operatorByName, operatorsForClaim, type OperatorName } from './operators.js';
 
 export interface ConditionInput {
   readonly claim: string;
@@ -31,8 +32,16 @@ const ignoredCondition = (): Condition => ({
 
 const required = (input: ConditionInput, field: 'value' | 'value2'): ClaimInput => {
   const v = input[field];
-  if (v === undefined || v === '') throw new Error(`${input.claim} ${input.op}: ${field} is required`);
+  if (v === undefined || v === '') throw new PolicyInputError('valueRequired', `${input.claim} ${input.op}: ${field} is required`, input.claim, null);
   return v;
+};
+
+const encode = (claim: ClaimDefinition, input: ClaimInput): bigint => {
+  try {
+    return encodeClaimValue(claim, input);
+  } catch (e) {
+    throw new PolicyInputError('invalidValue', e instanceof Error ? e.message : String(e), claim.key, null);
+  }
 };
 
 const buildCondition = (schema: CredentialSchema, input: ConditionInput): Condition => {
@@ -40,22 +49,22 @@ const buildCondition = (schema: CredentialSchema, input: ConditionInput): Condit
   const def = operatorByName(input.op);
   if (!claim.operators.includes(def.name)) {
     const allowed = operatorsForClaim(claim).map((o) => `"${o.label}"`).join(', ');
-    throw new Error(`Operator "${def.label}" is not allowed for ${claim.label}. Allowed: ${allowed}`);
+    throw new PolicyInputError('operatorNotAllowed', `Operator "${def.label}" is not allowed for ${claim.label}. Allowed: ${allowed}`, claim.key, null);
   }
   const base = { ...ignoredCondition(), claimIndex: BigInt(claim.slot), op: def.op };
   switch (def.arity) {
     case 'one':
-      return { ...base, value: encodeClaimValue(claim, required(input, 'value')) };
+      return { ...base, value: encode(claim, required(input, 'value')) };
     case 'two': {
-      const low = encodeClaimValue(claim, required(input, 'value'));
-      const high = encodeClaimValue(claim, required(input, 'value2'));
-      if (low > high) throw new Error(`${claim.label}: lower bound is above upper bound`);
+      const low = encode(claim, required(input, 'value'));
+      const high = encode(claim, required(input, 'value2'));
+      if (low > high) throw new PolicyInputError('boundsReversed', `${claim.label}: lower bound is above upper bound`, claim.key, null);
       return { ...base, value: low, value2: high };
     }
     case 'set': {
-      const values = (input.values ?? []).map((v) => encodeClaimValue(claim, v));
-      if (values.length === 0) throw new Error(`${claim.label}: choose at least one value`);
-      if (values.length > SET_SIZE) throw new Error(`${claim.label}: at most ${SET_SIZE} values`);
+      const values = (input.values ?? []).map((v) => encode(claim, v));
+      if (values.length === 0) throw new PolicyInputError('setEmpty', `${claim.label}: choose at least one value`, claim.key, null);
+      if (values.length > SET_SIZE) throw new PolicyInputError('setTooLarge', `${claim.label}: at most ${SET_SIZE} values`, claim.key, SET_SIZE);
       // Padding repeats a real member, so it can never add a new match.
       return { ...base, set: [...values, ...Array<bigint>(SET_SIZE - values.length).fill(values[0])] };
     }
@@ -64,8 +73,10 @@ const buildCondition = (schema: CredentialSchema, input: ConditionInput): Condit
 
 export const buildPolicy = (input: PolicyInput): Policy => {
   const schema = getSchema(input.schema);
-  if (input.conditions.length === 0) throw new Error('A policy needs at least one condition');
-  if (input.conditions.length > MAX_CONDITIONS) throw new Error(`At most ${MAX_CONDITIONS} conditions`);
+  if (input.conditions.length === 0) throw new PolicyInputError('noConditions', 'A policy needs at least one condition', null, null);
+  if (input.conditions.length > MAX_CONDITIONS) {
+    throw new PolicyInputError('tooManyConditions', `At most ${MAX_CONDITIONS} conditions`, null, MAX_CONDITIONS);
+  }
   const conditions = input.conditions.map((c) => buildCondition(schema, c));
   const revealSlot =
     input.reveal === null
@@ -76,95 +87,5 @@ export const buildPolicy = (input: PolicyInput): Policy => {
     issuerId: labelToBytes32(input.issuerId),
     conditions: [...conditions, ...Array.from({ length: MAX_CONDITIONS - conditions.length }, ignoredCondition)],
     revealSlot,
-  };
-};
-
-export interface PolicyDescription {
-  readonly schema: CredentialSchema;
-  readonly issuerId: string;
-  readonly conditions: readonly string[];
-  readonly revealed: string | null;
-  readonly notDisclosed: readonly string[];
-}
-
-const describeCondition = (schema: CredentialSchema, condition: Condition): string => {
-  const claim = schema.claims.find((c) => BigInt(c.slot) === condition.claimIndex);
-  if (!claim) throw new Error(`Condition refers to slot ${condition.claimIndex}, not defined in ${schema.id}`);
-  const def = operatorByOp(condition.op);
-  const unit = claim.unit ? ` ${claim.unit}` : '';
-  switch (def.arity) {
-    case 'one':
-      return `${claim.label} ${def.label} ${decodeClaimValue(claim, condition.value)}${unit}`;
-    case 'two':
-      return `${claim.label} between ${decodeClaimValue(claim, condition.value)} and ${decodeClaimValue(claim, condition.value2)}${unit}`;
-    case 'set': {
-      const members = [...new Set(condition.set.map((v) => decodeClaimValue(claim, v)))];
-      return `${claim.label} ${def.label} ${members.join(', ')}`;
-    }
-  }
-};
-
-// A successful proof tells the verifier a claim's exact value when the conditions on that
-// slot, taken together, leave only one value (e.g. `eq`, or `>= 26` with `<= 26`).
-const pinnedEnum = (claim: ClaimDefinition, conditions: readonly Condition[]): boolean => {
-  const allowed = conditions.reduce<ReadonlySet<bigint>>((codes, c) => {
-    switch (c.op) {
-      case Op.eq:
-        return new Set([...codes].filter((v) => v === c.value));
-      case Op.neq:
-        return new Set([...codes].filter((v) => v !== c.value));
-      case Op.inSet:
-        return new Set([...codes].filter((v) => c.set.includes(v)));
-      default:
-        return codes;
-    }
-  }, new Set(Object.values(claim.codes ?? {}).map(BigInt)));
-  return allowed.size === 1;
-};
-
-const pinnedRange = (conditions: readonly Condition[]): boolean => {
-  const range = conditions.reduce(
-    (r, c) => {
-      switch (c.op) {
-        case Op.gte:
-          return { ...r, low: r.low > c.value ? r.low : c.value };
-        case Op.lte:
-          return { ...r, high: r.high < c.value ? r.high : c.value };
-        case Op.eq:
-          return { low: r.low > c.value ? r.low : c.value, high: r.high < c.value ? r.high : c.value };
-        case Op.between:
-          return { low: r.low > c.value ? r.low : c.value, high: r.high < c.value2 ? r.high : c.value2 };
-        default:
-          return r;
-      }
-    },
-    { low: 0n, high: MAX_CLAIM_VALUE },
-  );
-  const excluded = new Set(conditions.filter((c) => c.op === Op.neq).map((c) => c.value));
-  let { low, high } = range;
-  while (low <= high && excluded.has(low)) low += 1n;
-  while (high >= low && excluded.has(high)) high -= 1n;
-  return low === high;
-};
-
-const pinnedValue = (claim: ClaimDefinition, conditions: readonly Condition[]): boolean =>
-  conditions.length > 0 && (claim.type === 'enum' ? pinnedEnum(claim, conditions) : pinnedRange(conditions));
-
-export const describePolicy = (policy: Policy): PolicyDescription => {
-  const schema = schemaByIdBytes(policy.schemaId);
-  const active = policy.conditions.filter((c) => c.op !== Op.ignore);
-  const revealedClaim = policy.revealSlot.is_some
-    ? schema.claims.find((c) => BigInt(c.slot) === policy.revealSlot.value)
-    : undefined;
-  if (policy.revealSlot.is_some && !revealedClaim) throw new Error('Reveal slot is not defined in the schema');
-  const pinnedSlots = new Set(
-    schema.claims.filter((claim) => pinnedValue(claim, active.filter((c) => c.claimIndex === BigInt(claim.slot)))).map((c) => BigInt(c.slot)),
-  );
-  return {
-    schema,
-    issuerId: bytes32ToLabel(policy.issuerId),
-    conditions: active.map((c) => describeCondition(schema, c)),
-    revealed: revealedClaim ? revealedClaim.label : null,
-    notDisclosed: schema.claims.filter((c) => c !== revealedClaim && !pinnedSlots.has(BigInt(c.slot))).map((c) => c.label),
   };
 };

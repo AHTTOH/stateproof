@@ -1,0 +1,775 @@
+<!doctype html>
+<!--
+  StateProof 디자인 실험, 변형 G (2026-09-27)
+  source: Nutlope/hallmark, 고정 리비전 13ac0ec7e148655948100b6396439e481361d690 (skills/hallmark/SKILL.md v1.1.0 + references/)
+  바꾼 변수 하나: 스타일 source (hallmark 만 적용). 콘텐츠, 카피, 정보구조는 공통 브리프 그대로.
+
+  Hallmark | genre: modern-minimal | macrostructure: 13 Index-First | theme: Cobalt (catalog)
+  enrichment: none (typography only) | nav: N9 Edge-aligned minimal | footer: Ft2 Inline rule single line
+  sections: F3 Tabular spec sheet (영수증) | tone: technical, utilitarian | anchor hue: 257 cobalt
+  Hallmark pre-emit critique: P4 H4 E4 S5 R4 V4
+  slop test: 58 gates, all "no" after one fix pass (see 2 pass). Genre scoped: modern-minimal.
+
+  추론값 (hallmark Step 1, 질문 대신 브리프에서 추론):
+    audience = 해커톤 심사자 (ZK 개념은 알고 StateProof 는 처음 봄)
+    use case = 지갑 없이 3분 안에 실제 영지식 증명이 돌아가는 것 확인
+    tone     = technical, utilitarian (계기판처럼 조용하고 정확하게)
+
+  macrostructure 선택 이유: Index-First 는 "페이지가 곧 링크 목록, Hero 없음, 링크가 버튼"이다.
+    브리프가 요구한 첫 화면(대기 중인 요청, 체인 결과, 역할 입구로 바로 들어가는 시작점)과 구조가 같다.
+    Workbench 는 프레임에 넣은 스크린샷 투어라서 제외(가짜 크롬 금지, gate 47), Map/Diagram 은 공개 경계
+    한 장면에만 맞고 페이지 전체를 끌고 가지 못해 제외, Component Playground 는 코드 복사 유틸이라 제외.
+
+  사용한 다이얼, 스타일 값:
+    Cobalt 토큰: paper oklch(98.5% 0.004 250) #F8FAFD, ink oklch(24% 0.02 258) #192029,
+    body ink-2 oklch(34% 0.018 257) #323841, muted oklch(52% 0.013 255) #646970,
+    rule oklch(91% 0.008 255) #DEE2E7, rule-2 oklch(83% 0.011 255) #C3C8CE,
+    accent oklch(53% 0.19 257) 약 #0065DC (Cobalt 원값 58% 에서 대비 때문에 낮춤),
+    graphite oklch(24% 0.018 260) #1A2028 (페이지 하나에 어두운 띠 하나, 증명 진행 콘솔).
+    radius: control 6px, frame 10px. 간격: 4pt 스케일 --space-*. 이징: --ease-out 계열 3종.
+    서체: Space Grotesk (display, 라틴과 숫자), Pretendard Variable (본문, 한글 전부), JetBrains Mono (해시와 회로 이름만).
+
+  1 pass 토큰 계획:
+    Color   paper #F8FAFD 바탕, paper-2 #F1F4F7 브라우저 안쪽(비공개 쪽) 띠, ink #192029 제목,
+            ink-2 #323841 본문, accent cobalt 신호(주 버튼, 포커스, 네트워크 점, 경계선), graphite #1A2028 콘솔.
+    Type    Space Grotesk 600 제목 + Inter 본문 + JetBrains Mono 대문자 라벨 (Cobalt 원안).
+    Layout  modern-minimal 기본형: 왼쪽 제목과 리드, 오른쪽 라이브 코드 카드(창 막대 점 세 개),
+            아래 대기 요청 카드 둘, 영수증은 키값 목록.
+            +--------------------------------------------+
+            | StateProof               Preprod   KO / EN |
+            | 제목, 설명          | [코드 카드 ...]       |
+            | [요청 카드] [요청 카드]                     |
+            +--------------------------------------------+
+    Principles  한 가지 신호색, 선이 구조를 만든다, 코드가 주인공.
+
+  2 pass (브리프와 대조해 바꾼 것과 이유):
+    1. 라이브 코드 카드 Hero 삭제. 브리프가 Hero 기본값을 금지하고 첫 화면에 실제 시작점을 요구한다.
+       Index-First 로 바꿔 4:8 비대칭 그리드의 오른쪽 8칸 전체를 대기 요청, 체인 결과, 역할 목록에 준다.
+    2. 창 막대(점 세 개 + 파일명) 삭제. Cobalt 시그니처지만 hallmark 자체 규칙(gate 47 가짜 크롬)과 충돌.
+    3. 요청 카드 둘을 행 목록으로. 카드 테두리를 빼도 구조가 남도록 hairline 행 + 행 안 dl 로 바꿈.
+    4. JetBrains Mono 대문자 eyebrow 라벨 삭제. eyebrow 기본 OFF, 한글에는 대소문자도 없다.
+       mono 는 컨트랙트, 요청 id, submitProof 같은 실제 코드 값에만 남김.
+    5. Inter 본문을 Pretendard 로 교체 (브리프 한글 폰트 조건, typography.md 의 Inter 금지와도 일치).
+    6. 일반 스피너 진행 표시를 0~30초 눈금자로 교체. 실측 12~15초 구간, 보통 10~30초 구간, 경과 7초를
+       한 줄에 그려 이 제품의 실제 시간 정보만으로 진행을 보여 줌. 위치는 CSS 변수(--t-*)로 계산.
+    7. 공개 경계를 "알게 되는 것 / 넘어가지 않는 것" 두 목록에서 필드별 대응 표로 바꿈.
+       왼쪽 칸은 브라우저 안의 원본 값, 오른쪽 칸은 검증자가 받는 것. 가운데 cobalt 1px 선이 경계.
+    8. accent 를 58% 에서 53% 로. 원값은 paper 위 4.19:1, 흰 글자 4.25:1 로 본문 대비 4.5:1 미달.
+    9. Cobalt 의 스크롤 reveal 과 한 줄 타이핑 연출 삭제. 남은 모션은 증명 중 기능성 로더 하나.
+    10. slop test 1회차 수정: gate 34 (320px 에서 nav 넘침, 모바일 간격과 KO/EN 폭 축소, 모바일은 "Preprod" 만 표시),
+        gate 13 (링크 hover 가 색 + 밑줄 이중 효과, 밑줄 하나로), gate 35 (밑줄 offset 4px 를 2px 로),
+        gate 24 (calc 로 만든 14px padding 을 baseline 정렬로), gate 25 (measure 38ch 를 60ch 로),
+        gate 26 (행 링크와 KO/EN 에 :active 추가), gate 53 (라디오를 absolute 에서 문서 흐름 안 0 크기로),
+        gate 44 (첫 화면 아래 padding 을 위보다 크게).
+
+  브리프가 hallmark 보다 우선한 곳:
+    Cobalt 의 동작하는 Cmd+K 팔레트: 브리프에 없는 기능이라 넣지 않음.
+    hallmark 스탬프의 가운데점 구분자와 em대시: 파일 전체에서 쓰지 않음(스탬프는 | 로 구분).
+    hallmark 의 "없는 값은 대시 + 회색 블록": 대시 금지라 "값 확인 필요" 라벨 블록만 사용
+    (기준 시각, 요청 만료 값은 브리프와 저장소 문서에 없어서 지어내지 않음).
+    한 줄 설명의 "않고," 쉼표: README 첫 줄과 글자 단위로 같아야 해서 원문 유지.
+    Ft2 푸터 구분자: 가운데점 대신 세로 hairline.
+    gate 19 (Acme 류 스타트업 상투 이름): "ACME Corp 인사팀 (데모)" 는 체인에 실제로 등록된 데모 발급자 이름이라 그대로 둠.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StateProof 목업 G</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* Hallmark | genre: modern-minimal | macrostructure: Index-First | theme: Cobalt | enrichment: none | nav: N9 | footer: Ft2 | anchor hue: 257 */
+
+:root {
+  /* color: Cobalt, accent lightness tuned for 4.5:1 */
+  --color-paper:          oklch(98.5% 0.004 250);
+  --color-paper-2:        oklch(96.5% 0.005 252);
+  --color-rule:           oklch(91%   0.008 255);
+  --color-rule-2:         oklch(83%   0.011 255);
+  --color-muted:          oklch(52%   0.013 255);
+  --color-neutral:        oklch(46%   0.015 255);
+  --color-ink-2:          oklch(34%   0.018 257);
+  --color-ink:            oklch(24%   0.020 258);
+  --color-accent:         oklch(53%   0.19  257);
+  --color-accent-ink:     oklch(99%   0.004 256);
+  --color-accent-soft:    oklch(95%   0.025 256);
+  --color-focus:          oklch(53%   0.19  257);
+  --color-graphite:       oklch(24%   0.018 260);
+  --color-graphite-2:     oklch(30%   0.018 260);
+  --color-graphite-3:     oklch(40%   0.030 258);
+  --color-graphite-rule:  oklch(36%   0.016 258);
+  --color-graphite-ink:   oklch(94%   0.006 255);
+  --color-graphite-muted: oklch(74%   0.012 255);
+  --color-graphite-accent:oklch(72%   0.15  256);
+  --shadow-whisper:       0 1px 2px oklch(24% 0.02 258 / 0.05);
+
+  /* type */
+  --font-display: "Space Grotesk", "Pretendard Variable", Pretendard, sans-serif;
+  --font-body:    "Pretendard Variable", Pretendard, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.25rem;
+  --text-xl:   1.75rem;
+  --text-display: clamp(2.5rem, 4.5vw + 0.75rem, 4.5rem);
+  --lh-tight:  1.1;
+  --lh-snug:   1.3;
+  --lh-body:   1.6;
+  --tracking-display: -0.03em;
+  --tracking-tight:   -0.015em;
+  --weight-body:    400;
+  --weight-strong:  600;
+  --weight-display: 500;
+
+  /* space: 4pt */
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs:  0.5rem;
+  --space-sm:  0.75rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --gutter:    clamp(1rem, 4vw, 3rem);
+  --page-max:  76rem;
+  --measure:   60ch;
+
+  /* shape */
+  --radius-control: 6px;
+  --radius-frame:   10px;
+  --rule-hair: 1px;
+  --rule-mark: 2px;
+  --hit-min:   2.75rem;
+
+  /* motion */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-loop:  1400ms;
+
+  /* proof timing data (브리프 실측값). 눈금자 위치는 전부 이 값으로 계산한다 */
+  --t-scale:        30;
+  --t-typical-from: 10;
+  --t-typical-to:   30;
+  --t-measured-from:12;
+  --t-measured-to:  15;
+  --t-elapsed:      7;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--color-paper-2);
+  color: var(--color-ink-2);
+  font-family: var(--font-body);
+  font-weight: var(--weight-body);
+  font-size: var(--text-base);
+  line-height: var(--lh-body);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+h1, h2, h3, p, dl, dd, ul, ol, figure, table { margin: 0; }
+h1, h2, h3 { overflow-wrap: anywhere; min-width: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+.tnum { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: 0; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+:focus-visible { outline: var(--rule-mark) solid var(--color-focus); outline-offset: 2px; }
+
+/* ── stage: the three screens stacked ─────────────────────────── */
+.stage {
+  max-width: calc(var(--page-max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding: var(--space-xl) var(--space-md) var(--space-3xl);
+  display: grid;
+  gap: var(--space-2xl);
+}
+@media (min-width: 40rem) { .stage { padding-inline: var(--gutter); } }
+.shot { display: grid; gap: var(--space-sm); min-width: 0; }
+.shot__caption {
+  display: flex; gap: var(--space-xs); align-items: baseline;
+  font-size: var(--text-sm); color: var(--color-neutral);
+}
+.shot__caption b { font-weight: var(--weight-strong); color: var(--color-ink); }
+.screen {
+  background: var(--color-paper);
+  border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-frame);
+  box-shadow: var(--shadow-whisper);
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── N9 edge-aligned nav ──────────────────────────────────────── */
+.nav-edge {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--space-md);
+  padding: var(--space-sm) var(--gutter);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+.wordmark {
+  font-family: var(--font-display); font-weight: var(--weight-strong);
+  font-size: var(--text-lg); letter-spacing: var(--tracking-tight);
+  color: var(--color-ink); text-decoration: none; white-space: nowrap;
+}
+.nav-edge__right { display: flex; align-items: center; gap: var(--space-xs); }
+@media (min-width: 40rem) { .nav-edge__right { gap: var(--space-md); } }
+.net {
+  display: inline-flex; align-items: center; gap: var(--space-xs);
+  font-size: var(--text-sm); color: var(--color-ink-2); white-space: nowrap;
+}
+.net::before {
+  content: ""; width: 0.5rem; height: 0.5rem; border-radius: 50%;
+  background: var(--color-accent);
+}
+.net__long { display: none; }
+@media (min-width: 40rem) { .net__long { display: inline; } }
+.lang {
+  display: inline-flex; border: var(--rule-hair) solid var(--color-rule-2);
+  border-radius: var(--radius-control); overflow: hidden;
+}
+.lang button {
+  border: 0; background: transparent; cursor: pointer;
+  min-width: 2.25rem; min-height: 2.25rem; padding: 0 var(--space-xs);
+  font-size: var(--text-sm); font-weight: var(--weight-strong); color: var(--color-muted);
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+@media (min-width: 40rem) { .lang button { min-width: var(--hit-min); } }
+.lang button + button { border-left: var(--rule-hair) solid var(--color-rule-2); }
+.lang button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-paper); }
+.lang button:not([aria-pressed="true"]):hover { color: var(--color-ink); }
+.lang button:not([aria-pressed="true"]):active { background: var(--color-paper-2); }
+.lang button:focus-visible { outline-offset: -3px; }
+
+/* ── shared page frame inside a screen ────────────────────────── */
+.page { padding: var(--space-xl) var(--gutter) var(--space-2xl); display: grid; gap: var(--space-xl); min-width: 0; }
+.back {
+  font-size: var(--text-sm); color: var(--color-neutral); text-decoration: none; white-space: nowrap;
+  justify-self: start;
+}
+.back:hover { text-decoration: underline; text-decoration-color: var(--color-accent); text-underline-offset: 2px; }
+.back:active, .wordmark:active { color: var(--color-accent); }
+.h1 {
+  font-family: var(--font-display); font-weight: var(--weight-strong);
+  font-size: var(--text-xl); line-height: var(--lh-tight); letter-spacing: var(--tracking-tight);
+  color: var(--color-ink); min-width: 0;
+}
+.h2 {
+  font-family: var(--font-display); font-weight: var(--weight-strong);
+  font-size: var(--text-lg); line-height: var(--lh-snug); letter-spacing: var(--tracking-tight);
+  color: var(--color-ink);
+}
+.kv { display: grid; grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr); column-gap: var(--space-md); row-gap: var(--space-xs); align-items: baseline; }
+.kv dt { font-size: var(--text-sm); color: var(--color-muted); }
+.kv dd { color: var(--color-ink-2); min-width: 0; }
+
+/* ── buttons: 8 states ────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
+  min-height: var(--hit-min); padding: 0 var(--space-md);
+  border-radius: var(--radius-control); border: var(--rule-hair) solid transparent;
+  font-family: var(--font-body); font-size: var(--text-base); font-weight: var(--weight-strong);
+  white-space: nowrap; text-decoration: none; cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out),
+              color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+.btn:active { transform: translateY(1px); }
+.btn--primary { background: var(--color-accent); color: var(--color-accent-ink); }
+.btn--primary:hover { background: var(--color-ink); }
+.btn--secondary { background: transparent; color: var(--color-ink); border-color: var(--color-rule-2); }
+.btn--secondary:hover { border-color: var(--color-ink); }
+.btn[disabled], .btn[aria-disabled="true"] { cursor: not-allowed; transform: none; }
+.btn--secondary[disabled] { color: var(--color-muted); border-color: var(--color-rule); background: var(--color-paper-2); }
+.btn[data-state="loading"] { background: var(--color-graphite-3); color: var(--color-accent-ink); cursor: progress; }
+.btn[data-state="loading"]::before {
+  content: ""; width: 0.875rem; height: 0.875rem; border-radius: 50%;
+  border: var(--rule-mark) solid var(--color-graphite-muted); border-top-color: var(--color-accent-ink);
+  animation: spin var(--dur-loop) linear infinite;
+}
+@keyframes spin { to { transform: rotate(1turn); } }
+
+/* ── screen 1: home, Index-First ──────────────────────────────── */
+.home { padding: var(--space-xl) var(--gutter) var(--space-2xl); display: grid; gap: var(--space-xl); min-width: 0; }
+@media (min-width: 60rem) {
+  .home { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: var(--space-2xl); }
+}
+.intro { display: grid; gap: var(--space-lg); align-content: start; min-width: 0; }
+.intro__title {
+  font-family: var(--font-display); font-weight: var(--weight-strong);
+  font-size: var(--text-xl); line-height: var(--lh-tight); letter-spacing: var(--tracking-tight); color: var(--color-ink);
+}
+.intro__lede { font-size: var(--text-lg); line-height: var(--lh-snug); color: var(--color-ink-2); max-width: var(--measure); }
+.intro .kv { padding-top: var(--space-md); border-top: var(--rule-hair) solid var(--color-rule); }
+.intro .kv dt { grid-column: 1 / -1; padding: 0; }
+.intro .kv dd + dt { margin-top: var(--space-xs); }
+.intro .kv dd { grid-column: 1 / -1; }
+
+.index { display: grid; gap: var(--space-2xl); min-width: 0; }
+.index__group { display: grid; gap: var(--space-sm); min-width: 0; }
+.index__group--quiet { gap: var(--space-xs); }
+.rows { border-top: var(--rule-hair) solid var(--color-rule-2); }
+.rows > li { border-bottom: var(--rule-hair) solid var(--color-rule); }
+
+.req { display: grid; gap: var(--space-md); padding: var(--space-lg) 0; min-width: 0; }
+@media (min-width: 48rem) {
+  .req { grid-template-columns: minmax(0, 7rem) minmax(0, 1fr) auto; column-gap: var(--space-xl); align-items: start; }
+}
+.req__name { display: grid; gap: var(--space-2xs); }
+.req__name h3 { font-family: var(--font-display); font-size: var(--text-xl); line-height: var(--lh-tight); font-weight: var(--weight-strong); color: var(--color-ink); }
+.req__name .mono { color: var(--color-muted); }
+.req .kv { grid-template-columns: minmax(0, 6.5rem) minmax(0, 1fr); }
+.req .btn { justify-self: start; }
+
+.row-link {
+  display: grid; gap: var(--space-2xs) var(--space-lg); padding: var(--space-md) 0;
+  text-decoration: none; color: var(--color-ink-2); min-width: 0;
+  transition: background-color var(--dur-micro) var(--ease-out);
+}
+.row-link__title { font-weight: var(--weight-strong); color: var(--color-ink); text-underline-offset: 2px; text-decoration-color: var(--color-accent); }
+.row-link:hover .row-link__title { text-decoration-line: underline; }
+.row-link:active { background: var(--color-paper-2); }
+.row-link:focus-visible { outline-offset: -2px; }
+.row-link .mono { color: var(--color-muted); }
+@media (min-width: 48rem) {
+  .row-link--receipt { grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) minmax(0, 7rem) auto; align-items: baseline; }
+  .row-link--role    { grid-template-columns: minmax(0, 7rem) minmax(0, 1fr); align-items: baseline; }
+}
+.row-link--role .row-link__title { font-family: var(--font-display); font-size: var(--text-lg); }
+
+.foot-line {
+  display: flex; flex-wrap: wrap; gap: var(--space-2xs) 0;
+  padding: var(--space-md) var(--gutter); border-top: var(--rule-hair) solid var(--color-rule);
+  font-size: var(--text-sm); color: var(--color-muted);
+}
+.foot-line span { padding-inline: var(--space-sm); border-left: var(--rule-hair) solid var(--color-rule-2); }
+.foot-line span:first-child { padding-left: 0; border-left: 0; }
+
+/* ── screen 2: holder proof ───────────────────────────────────── */
+.proof-head { display: grid; gap: var(--space-xl); min-width: 0; }
+@media (min-width: 60rem) { .proof-head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--space-2xl); } }
+.proof-head__main { display: grid; gap: var(--space-lg); align-content: start; min-width: 0; }
+.proof-head__main .kv dd.mono { color: var(--color-neutral); }
+.holder { display: grid; gap: var(--space-lg); align-content: start; padding-top: var(--space-md); border-top: var(--rule-mark) solid var(--color-ink); min-width: 0; }
+.holder__who { display: grid; gap: var(--space-2xs); }
+.holder__label { font-size: var(--text-sm); color: var(--color-muted); }
+.holder__name { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-xs) var(--space-sm); }
+.holder__name strong { font-size: var(--text-xl); line-height: var(--lh-tight); font-weight: var(--weight-strong); color: var(--color-ink); }
+.holder__name span { font-size: var(--text-sm); color: var(--color-muted); }
+.switch { border: 0; padding: 0; margin: 0; display: grid; gap: var(--space-xs); min-width: 0; }
+.switch legend { padding: 0; font-size: var(--text-sm); color: var(--color-muted); }
+.switch__options { display: inline-flex; border: var(--rule-hair) solid var(--color-rule-2); border-radius: var(--radius-control); overflow: hidden; justify-self: start; }
+.switch__options label {
+  display: inline-flex; align-items: center; min-height: 2.5rem; padding: 0 var(--space-md);
+  font-size: var(--text-base); color: var(--color-neutral); cursor: pointer; white-space: nowrap;
+}
+.switch__options label + label { border-left: var(--rule-hair) solid var(--color-rule-2); }
+.switch__options input { width: 0; height: 0; margin: 0; opacity: 0; }
+.switch__options input:checked + label { background: var(--color-ink); color: var(--color-paper); font-weight: var(--weight-strong); }
+.switch__options input:focus-visible + label { outline: var(--rule-mark) solid var(--color-focus); outline-offset: -3px; }
+.switch[disabled] .switch__options { opacity: 0.55; }
+.switch[disabled] label { cursor: not-allowed; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); }
+
+/* the one dark band: proving console */
+.console {
+  background: var(--color-graphite); color: var(--color-graphite-ink);
+  padding: var(--space-xl) var(--gutter);
+  display: grid; gap: var(--space-xl); min-width: 0;
+}
+@media (min-width: 60rem) { .console { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: var(--space-2xl); align-items: start; } }
+.console :focus-visible { outline-color: var(--color-graphite-accent); }
+.console__status { display: grid; gap: var(--space-2xs); }
+.console__phase { font-size: var(--text-base); font-weight: var(--weight-strong); color: var(--color-graphite-ink); }
+.console__elapsed {
+  font-family: var(--font-display); font-weight: var(--weight-display);
+  font-size: var(--text-display); line-height: 1; letter-spacing: var(--tracking-display);
+  color: var(--color-graphite-ink);
+}
+.console__elapsed small { font-family: var(--font-body); font-size: 0.4em; font-weight: var(--weight-strong); letter-spacing: 0; margin-left: var(--space-2xs); color: var(--color-graphite-muted); }
+.console__detail { display: grid; gap: var(--space-lg); min-width: 0; }
+
+.ruler { position: relative; height: 2.75rem; }
+.ruler__track, .ruler__typical, .ruler__measured, .ruler__elapsed { position: absolute; top: 0.75rem; height: 0.5rem; border-radius: 2px; }
+.ruler__track    { left: 0; right: 0; background: var(--color-graphite-2); }
+.ruler__typical  { left: calc(var(--t-typical-from) / var(--t-scale) * 100%); width: calc((var(--t-typical-to) - var(--t-typical-from)) / var(--t-scale) * 100%); background: var(--color-graphite-rule); }
+.ruler__measured { left: calc(var(--t-measured-from) / var(--t-scale) * 100%); width: calc((var(--t-measured-to) - var(--t-measured-from)) / var(--t-scale) * 100%); background: var(--color-graphite-muted); }
+.ruler__elapsed  { left: 0; width: calc(var(--t-elapsed) / var(--t-scale) * 100%); background: var(--color-graphite-accent); overflow: hidden; }
+.ruler__elapsed::after {
+  content: ""; position: absolute; inset: 0; width: 40%;
+  background: linear-gradient(90deg, transparent, var(--color-graphite-ink), transparent);
+  opacity: 0.35; transform: translateX(-100%);
+  animation: sweep var(--dur-loop) var(--ease-in-out) infinite;
+}
+@keyframes sweep { to { transform: translateX(250%); } }
+.ruler__cursor { position: absolute; top: 0.25rem; height: 1.5rem; width: var(--rule-mark); left: calc(var(--t-elapsed) / var(--t-scale) * 100%); background: var(--color-graphite-ink); }
+.ruler__ticks { position: absolute; left: 0; right: 0; top: 1.625rem; height: 1.125rem; font-size: var(--text-sm); color: var(--color-graphite-muted); }
+.ruler__ticks span { position: absolute; transform: translateX(-50%); line-height: 1; white-space: nowrap; }
+.ruler__ticks span:first-child { transform: none; }
+.ruler__ticks span:last-child { transform: translateX(-100%); }
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-lg); font-size: var(--text-sm); color: var(--color-graphite-muted); }
+.legend li { display: inline-flex; align-items: center; gap: var(--space-xs); white-space: nowrap; }
+.legend i { display: inline-block; width: 0.875rem; height: 0.5rem; border-radius: 2px; }
+.legend .sw-elapsed  { background: var(--color-graphite-accent); }
+.legend .sw-measured { background: var(--color-graphite-muted); }
+.legend .sw-typical  { background: var(--color-graphite-rule); }
+.console .kv { border-top: var(--rule-hair) solid var(--color-graphite-rule); padding-top: var(--space-md); }
+.console .kv dt { color: var(--color-graphite-muted); }
+.console .kv dd { color: var(--color-graphite-ink); }
+@media (min-width: 48rem) {
+  .console .kv { grid-template-columns: repeat(2, minmax(0, 7rem) minmax(0, 1fr)); }
+}
+
+/* boundary: field-by-field mapping, cobalt hairline is the boundary */
+.boundary-wrap { display: grid; gap: var(--space-md); min-width: 0; }
+.boundary { width: 100%; border-collapse: collapse; table-layout: fixed; border-top: var(--rule-hair) solid var(--color-rule-2); }
+.boundary th, .boundary td { text-align: left; vertical-align: top; padding: var(--space-sm) var(--space-md); border-bottom: var(--rule-hair) solid var(--color-rule); }
+.boundary thead th { font-size: var(--text-sm); font-weight: var(--weight-strong); color: var(--color-neutral); padding-block: var(--space-xs); }
+.boundary .side-private { background: var(--color-paper-2); }
+.boundary .side-public  { border-left: var(--rule-hair) solid var(--color-accent); }
+.boundary thead .side-public { color: var(--color-accent); }
+.field { display: block; font-size: var(--text-sm); color: var(--color-muted); }
+.val { display: block; color: var(--color-ink); font-weight: var(--weight-strong); }
+.learned { color: var(--color-ink); }
+.learned b { font-weight: var(--weight-strong); }
+.sealed {
+  display: inline-block; padding: 0 var(--space-xs);
+  border: var(--rule-hair) dashed var(--color-rule-2); border-radius: var(--radius-control);
+  font-size: var(--text-sm); color: var(--color-neutral); white-space: nowrap;
+}
+.boundary-wrap .kv { grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr); padding-top: var(--space-xs); }
+
+/* ── screen 3: receipt, F3 spec sheet ─────────────────────────── */
+.receipt { display: grid; gap: var(--space-xl); min-width: 0; }
+@media (min-width: 60rem) { .receipt { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--space-2xl); } }
+.receipt__lead { display: grid; gap: var(--space-lg); align-content: start; min-width: 0; }
+.status {
+  display: inline-flex; align-items: center; gap: var(--space-xs); justify-self: start;
+  padding: var(--space-3xs) var(--space-sm); border-radius: var(--radius-control);
+  background: var(--color-accent-soft); color: var(--color-accent);
+  font-size: var(--text-sm); font-weight: var(--weight-strong); white-space: nowrap;
+}
+.status::before { content: ""; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--color-accent); }
+.reveal-value { display: grid; gap: var(--space-2xs); padding-top: var(--space-md); border-top: var(--rule-mark) solid var(--color-ink); }
+.reveal-value__label { font-size: var(--text-sm); color: var(--color-muted); }
+.reveal-value__value {
+  font-family: var(--font-display); font-weight: var(--weight-display);
+  font-size: var(--text-display); line-height: 1; letter-spacing: var(--tracking-display);
+  color: var(--color-ink); min-width: 0; overflow-wrap: anywhere;
+}
+.spec { width: 100%; border-collapse: collapse; table-layout: fixed; border-top: var(--rule-hair) solid var(--color-rule-2); }
+.spec th, .spec td { text-align: left; vertical-align: baseline; padding: var(--space-sm) 0; border-bottom: var(--rule-hair) solid var(--color-rule); }
+.spec th { width: 6rem; padding-right: var(--space-md); font-size: var(--text-sm); font-weight: var(--weight-body); color: var(--color-muted); }
+.spec td { color: var(--color-ink-2); min-width: 0; }
+.spec td.mono { color: var(--color-ink-2); line-height: var(--lh-snug); }
+.spec .strong { color: var(--color-ink); font-weight: var(--weight-strong); }
+.to-confirm {
+  display: inline-block; padding: 0 var(--space-xs);
+  border: var(--rule-hair) dashed var(--color-rule-2); border-radius: var(--radius-control);
+  background: var(--color-paper-2); font-size: var(--text-sm); color: var(--color-neutral); white-space: nowrap;
+}
+@media (min-width: 30rem) {
+  .spec th { width: 7.5rem; }
+}
+
+/* ── reduced motion ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 1ms !important; }
+  .ruler__elapsed::after { animation: none; opacity: 0; }
+  .btn[data-state="loading"]::before { animation-duration: calc(var(--dur-loop) * 2); }
+  .btn:active { transform: none; }
+}
+</style>
+</head>
+<body>
+<main class="stage">
+
+  <!-- ─────────────── 화면 1 ─────────────── -->
+  <section class="shot" aria-labelledby="cap-1">
+    <p class="shot__caption" id="cap-1"><b>화면 1</b><span>첫 화면</span></p>
+    <div class="screen">
+      <header class="nav-edge">
+        <a class="wordmark" href="#home">StateProof</a>
+        <div class="nav-edge__right">
+          <span class="net"><span><span class="net__long">Midnight </span>Preprod</span></span>
+          <div class="lang" role="group" aria-label="언어">
+            <button type="button" aria-pressed="true">KO</button>
+            <button type="button" aria-pressed="false">EN</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="home" id="home">
+        <div class="intro">
+          <h1 class="intro__title">StateProof</h1>
+          <p class="intro__lede">원본 개인정보를 넘기지 않고, 상대가 요구한 조건을 충족한다는 사실만 증명하는 Midnight 기반 ZK 크리덴셜 검증 서비스.</p>
+          <dl class="kv">
+            <dt>네트워크</dt>
+            <dd>Midnight Preprod (테스트넷)</dd>
+            <dt>컨트랙트</dt>
+            <dd class="mono">4ab5b848ababb8471f395bdc00a5a750c9b500833bbb3b983008868ceca47fa3</dd>
+          </dl>
+        </div>
+
+        <div class="index">
+          <section class="index__group" aria-labelledby="h-pending">
+            <h2 class="h2" id="h-pending">대기 중인 데모 요청</h2>
+            <ul class="rows">
+              <li>
+                <article class="req">
+                  <div class="req__name">
+                    <h3>고용</h3>
+                    <span class="mono">08da5a24…d91e</span>
+                  </div>
+                  <dl class="kv">
+                    <dt>조건</dt><dd>재직 상태가 재직 중, 근속 12개월 이상</dd>
+                    <dt>공개 요청 값</dt><dd>직무</dd>
+                    <dt>발급자</dt><dd>ACME Corp 인사팀 (데모)</dd>
+                  </dl>
+                  <a class="btn btn--primary" href="#proof">지갑 없이 증명해 보기</a>
+                </article>
+              </li>
+              <li>
+                <article class="req">
+                  <div class="req__name">
+                    <h3>신원</h3>
+                    <span class="mono">5d21cc83…6073</span>
+                  </div>
+                  <dl class="kv">
+                    <dt>조건</dt><dd>발급 시점 나이 19세 이상, 거주지 서울 또는 경기</dd>
+                    <dt>공개 요청 값</dt><dd>거주지</dd>
+                    <dt>발급자</dt><dd>데모 신원 발급기관</dd>
+                  </dl>
+                  <a class="btn btn--primary" href="#proof">지갑 없이 증명해 보기</a>
+                </article>
+              </li>
+            </ul>
+          </section>
+
+          <section class="index__group" aria-labelledby="h-results">
+            <h2 class="h2" id="h-results">체인에 기록된 결과</h2>
+            <ul class="rows">
+              <li>
+                <a class="row-link row-link--receipt" href="#receipt">
+                  <span class="row-link__title">고용 조건 검증 완료</span>
+                  <span>공개 값 없음</span>
+                  <span>Lace 로 제출</span>
+                  <span class="mono">9361207d…581a</span>
+                </a>
+              </li>
+              <li>
+                <a class="row-link row-link--receipt" href="#receipt">
+                  <span class="row-link__title">고용 조건 검증 완료</span>
+                  <span>공개 값 직무 Engineering</span>
+                  <span>CLI 로 제출</span>
+                  <span class="mono">04788db0…972f</span>
+                </a>
+              </li>
+            </ul>
+          </section>
+
+          <section class="index__group index__group--quiet" aria-labelledby="h-roles">
+            <h2 class="h2" id="h-roles">역할</h2>
+            <ul class="rows">
+              <li><a class="row-link row-link--role" href="#verifier"><span class="row-link__title">검증자</span><span>조건을 골라 요청을 올립니다.</span></a></li>
+              <li><a class="row-link row-link--role" href="#holder"><span class="row-link__title">홀더</span><span>브라우저에 크리덴셜을 두고 증명합니다.</span></a></li>
+              <li><a class="row-link row-link--role" href="#issuer"><span class="row-link__title">발급자</span><span>크리덴셜에 서명하고 공개키를 체인에 등록합니다.</span></a></li>
+            </ul>
+          </section>
+        </div>
+      </div>
+
+      <footer class="foot-line">
+        <span>StateProof</span>
+        <span>Midnight Preprod 테스트넷</span>
+        <span>박민지, 김소라는 데모용 가상 인물이며 실존하지 않습니다.</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ─────────────── 화면 2 ─────────────── -->
+  <section class="shot" aria-labelledby="cap-2">
+    <p class="shot__caption" id="cap-2"><b>화면 2</b><span>홀더 증명 화면, 증명 중 7초</span></p>
+    <div class="screen" id="proof">
+      <header class="nav-edge">
+        <a class="wordmark" href="#home">StateProof</a>
+        <div class="nav-edge__right">
+          <span class="net"><span><span class="net__long">Midnight </span>Preprod</span></span>
+          <div class="lang" role="group" aria-label="언어">
+            <button type="button" aria-pressed="true">KO</button>
+            <button type="button" aria-pressed="false">EN</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="proof-head">
+          <div class="proof-head__main">
+            <a class="back" href="#home">첫 화면</a>
+            <h1 class="h1">고용 요청</h1>
+            <dl class="kv">
+              <dt>조건</dt><dd>재직 상태가 재직 중, 근속 12개월 이상</dd>
+              <dt>공개 요청 값</dt><dd>직무</dd>
+              <dt>발급자</dt><dd>ACME Corp 인사팀 (데모)</dd>
+              <dt>요청 id</dt><dd class="mono">08da5a24a5528086cd5ca5079e641c2dae79238dbb27eb0bbfeaad5a5f40d91e</dd>
+            </dl>
+          </div>
+
+          <div class="holder">
+            <div class="holder__who">
+              <span class="holder__label">홀더</span>
+              <p class="holder__name"><strong>박민지</strong><span>데모용 가상 인물</span></p>
+            </div>
+            <fieldset class="switch" disabled>
+              <legend>인물 바꾸기</legend>
+              <div class="switch__options">
+                <input type="radio" name="persona" id="p-minji" checked>
+                <label for="p-minji">박민지</label>
+                <input type="radio" name="persona" id="p-sora">
+                <label for="p-sora">김소라</label>
+              </div>
+            </fieldset>
+            <div class="actions">
+              <button class="btn btn--primary" type="button" data-state="loading" aria-disabled="true" aria-describedby="proving">지갑 없이 증명해 보기</button>
+              <button class="btn btn--secondary" type="button" disabled>Lace로 제출</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="console" aria-label="증명 진행">
+        <div class="console__status" id="proving" role="status" aria-live="polite">
+          <p class="console__phase">영지식 증명 생성 중</p>
+          <p class="console__elapsed tnum">7<small>초</small></p>
+        </div>
+        <div class="console__detail">
+          <div class="ruler" role="img" aria-label="경과 7초, 실측 12초에서 15초, 보통 10초에서 30초">
+            <span class="ruler__track"></span>
+            <span class="ruler__typical"></span>
+            <span class="ruler__measured"></span>
+            <span class="ruler__elapsed"></span>
+            <span class="ruler__cursor"></span>
+            <div class="ruler__ticks tnum" aria-hidden="true">
+              <span style="left:0">0초</span>
+              <span style="left:calc(10 / var(--t-scale) * 100%)">10초</span>
+              <span style="left:calc(20 / var(--t-scale) * 100%)">20초</span>
+              <span style="left:100%">30초</span>
+            </div>
+          </div>
+          <ul class="legend tnum" aria-hidden="true">
+            <li><i class="sw-elapsed"></i>경과</li>
+            <li><i class="sw-measured"></i>실측 12~15초</li>
+            <li><i class="sw-typical"></i>보통 10~30초</li>
+          </ul>
+          <dl class="kv">
+            <dt>실행 위치</dt><dd>브라우저 Web Worker</dd>
+            <dt>회로</dt><dd class="mono">submitProof</dd>
+            <dt>결과 트랜잭션</dt><dd class="tnum">4.1KB</dd>
+            <dt>제출</dt><dd>하지 않음</dd>
+          </dl>
+        </div>
+      </section>
+
+      <div class="page">
+        <section class="boundary-wrap" aria-labelledby="h-boundary">
+          <h2 class="h2" id="h-boundary">공개 경계</h2>
+          <table class="boundary">
+            <thead>
+              <tr>
+                <th scope="col" class="side-private">박민지 크리덴셜 (브라우저 안)</th>
+                <th scope="col" class="side-public">검증자가 알게 되는 것</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="side-private"><span class="field">재직 상태</span><span class="val">재직 중</span></td>
+                <td class="side-public learned">재직 상태가 <b>재직 중</b></td>
+              </tr>
+              <tr>
+                <td class="side-private"><span class="field">근속</span><span class="val tnum">26개월</span></td>
+                <td class="side-public learned">근속 <b class="tnum">12개월 이상</b></td>
+              </tr>
+              <tr>
+                <td class="side-private"><span class="field">입사일</span><span class="val tnum">2024-07-01</span></td>
+                <td class="side-public"><span class="sealed">넘어가지 않음</span></td>
+              </tr>
+              <tr>
+                <td class="side-private"><span class="field">직무</span><span class="val">Engineering</span></td>
+                <td class="side-public learned"><b>Engineering</b> (공개 요청 값)</td>
+              </tr>
+              <tr>
+                <td class="side-private"><span class="field">발급자 서명</span><span class="val">서명 원본</span></td>
+                <td class="side-public learned"><b>ACME Corp 인사팀 (데모)</b> 서명 확인</td>
+              </tr>
+            </tbody>
+          </table>
+          <dl class="kv">
+            <dt>넘어가지 않는 것</dt><dd>정확한 입사일, 정확한 근속 개월 수, 크리덴셜 원본과 서명</dd>
+            <dt>기록되는 곳</dt><dd>Midnight 공개 원장 (결과, 공개 값)</dd>
+          </dl>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────── 화면 3 ─────────────── -->
+  <section class="shot" aria-labelledby="cap-3">
+    <p class="shot__caption" id="cap-3"><b>화면 3</b><span>영수증</span></p>
+    <div class="screen" id="receipt">
+      <header class="nav-edge">
+        <a class="wordmark" href="#home">StateProof</a>
+        <div class="nav-edge__right">
+          <span class="net"><span><span class="net__long">Midnight </span>Preprod</span></span>
+          <div class="lang" role="group" aria-label="언어">
+            <button type="button" aria-pressed="true">KO</button>
+            <button type="button" aria-pressed="false">EN</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="receipt">
+          <div class="receipt__lead">
+            <a class="back" href="#home">첫 화면</a>
+            <h1 class="h1">고용 요청 영수증</h1>
+            <span class="status">검증 완료</span>
+            <div class="reveal-value">
+              <span class="reveal-value__label">공개된 값, 직무</span>
+              <p class="reveal-value__value">Engineering</p>
+            </div>
+          </div>
+
+          <table class="spec">
+            <caption class="visually-hidden">영수증 항목</caption>
+            <tbody>
+              <tr><th scope="row">상태</th><td class="strong">검증 완료</td></tr>
+              <tr><th scope="row">증명된 조건</th><td>재직 상태가 재직 중, 근속 12개월 이상</td></tr>
+              <tr><th scope="row">공개된 값</th><td>직무 Engineering</td></tr>
+              <tr><th scope="row">넘어가지 않은 값</th><td>정확한 입사일, 정확한 근속 개월 수, 크리덴셜 원본과 서명</td></tr>
+              <tr><th scope="row">발급자</th><td>ACME Corp 인사팀 (데모)</td></tr>
+              <tr><th scope="row">기준 시각</th><td><span class="to-confirm">값 확인 필요</span></td></tr>
+              <tr><th scope="row">요청 만료</th><td><span class="to-confirm">값 확인 필요</span></td></tr>
+              <tr><th scope="row">요청 id</th><td class="mono">04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f</td></tr>
+              <tr><th scope="row">제출</th><td>CLI</td></tr>
+              <tr><th scope="row">기록</th><td>Midnight Preprod 공개 원장</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

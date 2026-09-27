@@ -22,7 +22,7 @@ exitOnError(
     const proved = await wallet.runTx('submitProof', () => submitProof(providers, contract, requestId, proofInputsFor(holder, schema)));
     logger.info(`submitProof tx ${proved.txHash} (block ${proved.blockHeight}) in ${Math.round((Date.now() - started) / 1000)}s`);
     const ledger = await readLedger(providers.publicDataProvider, contractAddress);
-    const receipt = buildReceipt(requestId, ledger.requests.lookup(requestId), ledger.results.member(requestId) ? ledger.results.lookup(requestId) : null, BigInt(Math.floor(Date.now() / 1000)));
+    const receipt = buildReceipt(requestId, ledger.requests.lookup(requestId), ledger.results.member(requestId) ? ledger.results.lookup(requestId) : null, BigInt(Math.floor(Date.now() / 1000)), 'en');
     logger.info(`Receipt: status=${receipt.status} revealed=${JSON.stringify(receipt.revealed)} conditions=${JSON.stringify(receipt.policy.conditions)}`);
     if (receipt.status !== 'verified') throw new Error(`Expected verified, got ${receipt.status}`);
   }),

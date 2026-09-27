@@ -1,47 +1,61 @@
-/* StateProof design tokens (2026-09-25).
-   Palette: cool mist ground, one semantic green for "proven", one indigo for "stays private".
-   2026-09-27: proven green darkened to 5.2:1 on its wash, control edge token for 3:1 input borders. */
+/* StateProof design tokens: "봉인선" (2026-09-27, docs/decisions/2026-09-27-design-direction.md).
+   Colour carries meaning only: midnight = stays in this browser, cobalt = crosses to the verifier
+   and the public ledger, yellow = the one value a request asks to see, red = a condition not met. */
 :root {
   color-scheme: light;
-  --c-ground: #e9edea;
-  --c-paper: #fbfcfa;
-  --c-ink: #17211d;
-  --c-ink-soft: #3a4641;
-  --c-muted: #5a6660;
-  --c-rule: #c9d1cc;
-  --c-control-edge: #8a958f;
-  --c-proven: #0b6e51;
-  --c-proven-wash: #dcefe6;
-  --c-sealed: #3b3a8f;
-  --c-sealed-deep: #25246b;
-  --c-sealed-wash: #e4e3f4;
-  --c-alert: #a4262c;
-  --c-alert-wash: #f6e1e1;
-  --c-pending: #8a5d00;
-  --c-pending-wash: #f5ead2;
 
-  --f-sans: 'IBM Plex Sans', system-ui, sans-serif;
-  --f-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --c-ground: #eef1f5;
+  --c-surface: #ffffff;
+  --c-ink: #131a2b;
+  --c-ink-soft: #475169;
+  --c-muted: #5c667d;
+  --c-rule: #d6dce6;
+  --c-control-edge: #8791a6;
+
+  --c-ledger: #1f4bc4;
+  --c-ledger-deep: #173a9c;
+  --c-ledger-wash: #e7edfc;
+
+  --c-sealed: #161d3b;
+  --c-sealed-raised: #202a52;
+  --c-sealed-ink: #c9cfea;
+  --c-sealed-hatch: rgba(201, 207, 234, 0.14);
+
+  --c-mark: #ffd84d;
+  --c-mark-ink: #5c4500;
+
+  --c-fail: #b42318;
+  --c-fail-wash: #fce9e7;
+  --c-pending: #8a5a00;
+  --c-pending-wash: #fbf1dc;
+
+  --f-sans: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
+  --f-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   --t-xs: 0.8125rem;
   --t-sm: 0.9375rem;
   --t-base: 1rem;
-  --t-lg: 1.25rem;
-  --t-xl: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
-  --t-hero: clamp(2.25rem, 1.4rem + 3.6vw, 3.75rem);
+  --t-lg: 1.1875rem;
+  --t-xl: clamp(1.5rem, 1.15rem + 1.4vw, 2rem);
+  --t-display: clamp(1.5rem, 1.15rem + 1.3vw, 2.125rem);
+  --t-numeral: clamp(3.5rem, 2.4rem + 4.6vw, 6rem);
 
   --s-1: 0.25rem;
   --s-2: 0.5rem;
   --s-3: 0.75rem;
   --s-4: 1rem;
+  --s-5: 1.25rem;
   --s-6: 1.5rem;
   --s-8: 2rem;
+  --s-10: 2.5rem;
   --s-12: 3rem;
   --s-16: 4rem;
 
   --r-control: 6px;
-  --r-panel: 14px;
-  --w-column: 58rem;
+  --r-band: 10px;
+  --w-page: 72rem;
+  --w-text: 40rem;
+  --seal-line: 3px;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --d-fast: 140ms;

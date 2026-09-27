@@ -3,6 +3,7 @@ import networks from '../../../../config/networks.json';
 import deployments from '../../../../config/deployments.json';
 import issuers from '../../../../config/issuers.json';
 import demoRequests from '../../../../config/demo-requests.json';
+import { TRANSLATED_LOCALES, type Locale, type TranslatedLocale } from '@stateproof/core/locale';
 
 declare const __STATEPROOF_NETWORK__: string;
 declare const __STATEPROOF_ZK_ROUTE__: string;
@@ -18,6 +19,7 @@ export interface NetworkEndpoints {
 export interface IssuerInfo {
   readonly id: string;
   readonly name: string;
+  readonly i18n: Readonly<Record<TranslatedLocale, { readonly name: string }>>;
   readonly schemas: readonly string[];
   readonly publicKey: { readonly x: string; readonly y: string } | null;
 }
@@ -42,7 +44,19 @@ export const requireContractAddress = (): string => {
   return address;
 };
 
-export const ISSUERS: readonly IssuerInfo[] = (issuers as { issuers: IssuerInfo[] }).issuers;
+// Every issuer needs a display name in every translated locale; a gap fails at startup.
+const withNames = (list: readonly IssuerInfo[]): readonly IssuerInfo[] => {
+  for (const issuer of list) {
+    for (const locale of TRANSLATED_LOCALES) {
+      if (!issuer.i18n?.[locale]?.name) throw new Error(`${issuer.id} has no ${locale} name in config/issuers.json`);
+    }
+  }
+  return list;
+};
+
+export const ISSUERS: readonly IssuerInfo[] = withNames((issuers as { issuers: IssuerInfo[] }).issuers);
+
+export const issuerName = (issuer: IssuerInfo, locale: Locale): string => (locale === 'en' ? issuer.name : issuer.i18n[locale].name);
 
 export const issuerInfo = (id: string): IssuerInfo => {
   const entry = ISSUERS.find((i) => i.id === id);
@@ -50,17 +64,21 @@ export const issuerInfo = (id: string): IssuerInfo => {
   return entry;
 };
 
+export type LocalizedText = Readonly<Record<Locale, string>>;
+
 export interface DemoRequest {
   readonly requestId: string;
-  readonly title: string;
+  readonly title: LocalizedText;
 }
 
 export interface PendingDemoRequest extends DemoRequest {
   // Label of the one value the request asks to see, or null when it asks for none.
-  readonly reveals: string | null;
+  readonly reveals: LocalizedText | null;
 }
 
 export interface DemoRequests {
+  // The request and demo persona the home page uses to show the seal line.
+  readonly preview: { readonly requestId: string; readonly personaId: string };
   readonly pending: readonly PendingDemoRequest[];
   readonly verified: readonly DemoRequest[];
 }

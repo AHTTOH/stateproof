@@ -18,6 +18,7 @@ import {
   issueCredential,
   labelToBytes32,
   toContractCredential,
+  validateSchema,
   verifyCredentialDocument,
   type PolicyInput,
 } from '../src/index.js';
@@ -99,7 +100,7 @@ describe('policy builder', () => {
   });
 
   it('describes the policy for the holder, including what is not disclosed', () => {
-    const d = describePolicy(buildPolicy(demo));
+    const d = describePolicy(buildPolicy(demo), 'en');
     expect(d.conditions).toEqual(['Age at issuance at least 19 years', 'Region of residence is one of Seoul, Gyeonggi', 'Nationality is KR']);
     expect(d.revealed).toBe('Region of residence');
     expect(d.notDisclosed).toEqual(['Date of birth', 'Age at issuance']);
@@ -115,13 +116,14 @@ describe('policy builder', () => {
         ],
         reveal: null,
       }),
+      'en',
     );
     expect(d.notDisclosed).toEqual(['Age at issuance', 'Nationality']);
   });
 
   it('treats conditions that together leave one value as disclosing it', () => {
     const employment = { schema: 'employment', issuerId: 'issuer:acme-hr', reveal: null } as const;
-    const notDisclosed = (conditions: PolicyInput['conditions']) => describePolicy(buildPolicy({ ...employment, conditions })).notDisclosed;
+    const notDisclosed = (conditions: PolicyInput['conditions']) => describePolicy(buildPolicy({ ...employment, conditions }), 'en').notDisclosed;
     const startDay = { claim: 'employmentStartDate', op: 'gte', value: '2024-07-01' } as const;
     expect(notDisclosed([startDay, { claim: 'employmentStartDate', op: 'lte', value: '2024-07-01' }])).not.toContain('Employment start date');
     expect(notDisclosed([startDay, { claim: 'employmentStartDate', op: 'lte', value: '2024-07-02' }, { claim: 'employmentStartDate', op: 'neq', value: '2024-07-02' }])).not.toContain('Employment start date');
@@ -190,10 +192,52 @@ describe('receipt', () => {
   const id = labelToBytes32('req');
 
   it('reports pending, expired and verified states', () => {
-    expect(buildReceipt(id, request, null, 1_790_000_100n).status).toBe('pending');
-    expect(buildReceipt(id, request, null, 1_790_086_400n).status).toBe('expired');
-    const verified = buildReceipt(id, request, { revealed: { is_some: true, value: 2n } }, 1_790_000_100n);
+    expect(buildReceipt(id, request, null, 1_790_000_100n, 'en').status).toBe('pending');
+    expect(buildReceipt(id, request, null, 1_790_086_400n, 'en').status).toBe('expired');
+    const verified = buildReceipt(id, request, { revealed: { is_some: true, value: 2n } }, 1_790_000_100n, 'en');
     expect(verified.status).toBe('verified');
     expect(verified.revealed).toEqual({ label: 'Job category', value: 'Design' });
+    expect(buildReceipt(id, request, { revealed: { is_some: true, value: 2n } }, 1_790_000_100n, 'ko').revealed).toEqual({ label: '직무', value: '디자인' });
+  });
+});
+
+describe('korean text', () => {
+  it('describes the demo policies in Korean', () => {
+    const employment = describePolicy(
+      buildPolicy({
+        schema: 'employment',
+        issuerId: 'issuer:acme-hr',
+        conditions: [
+          { claim: 'employmentStatus', op: 'eq', value: 'Active' },
+          { claim: 'employmentMonths', op: 'gte', value: 12 },
+        ],
+        reveal: 'jobCategory',
+      }),
+      'ko',
+    );
+    expect(employment.conditions).toEqual(['재직 상태 재직 중', '근속 기간 12개월 이상']);
+    expect(employment.revealed).toBe('직무');
+    expect(employment.notDisclosed).toEqual(['입사일', '근속 기간']);
+    const identity = describePolicy(
+      buildPolicy({
+        schema: 'identity',
+        issuerId: 'issuer:gov-id-demo',
+        conditions: [
+          { claim: 'ageYears', op: 'gte', value: 19 },
+          { claim: 'region', op: 'inSet', values: ['Seoul', 'Gyeonggi'] },
+        ],
+        reveal: 'region',
+      }),
+      'ko',
+    );
+    expect(identity.conditions).toEqual(['발급 시점 나이 19세 이상', '거주지 서울, 경기 중 하나']);
+  });
+
+  it('refuses a schema whose Korean text is incomplete instead of showing English', () => {
+    const schema = getSchema('employment');
+    const [status, ...rest] = schema.claims;
+    const withoutLeave = { ...status, i18n: { ko: { ...status.i18n.ko, values: { Active: '재직 중', Terminated: '퇴사' } } } };
+    expect(() => validateSchema({ ...schema, claims: [withoutLeave, ...rest] })).toThrow(/no text for Leave/);
+    expect(() => validateSchema({ ...schema, i18n: { ko: { title: '' } } })).toThrow(/title is required/);
   });
 });

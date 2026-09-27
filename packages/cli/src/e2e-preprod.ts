@@ -67,7 +67,7 @@ export const runE2E = async ({ config, logger, providers, wallet }: Session): Pr
   logger.info(`submitProof tx ${proved.txHash} (block ${proved.blockHeight}) in ${Math.round((Date.now() - t) / 1000)}s`);
 
   const ledger = await readLedger(providers.publicDataProvider, contractAddress);
-  const receipt = buildReceipt(requestId, ledger.requests.lookup(requestId), ledger.results.member(requestId) ? ledger.results.lookup(requestId) : null, BigInt(Math.floor(Date.now() / 1000)));
+  const receipt = buildReceipt(requestId, ledger.requests.lookup(requestId), ledger.results.member(requestId) ? ledger.results.lookup(requestId) : null, BigInt(Math.floor(Date.now() / 1000)), 'en');
   logger.info(`Receipt: ${JSON.stringify({ ...receipt, policy: { conditions: receipt.policy.conditions, notDisclosed: receipt.policy.notDisclosed } })}`);
   if (receipt.status !== 'verified') throw new Error(`Expected verified, got ${receipt.status}`);
 };

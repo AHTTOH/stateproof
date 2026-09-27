@@ -15,10 +15,11 @@ import type { HolderProofInputs } from '@stateproof/contract';
 import { issuerInfo } from '../app/env';
 import demo from './demo-personas.json';
 
-const STORAGE_KEY = 'stateproof.holder.v1';
+// v2 stores the demo persona id instead of an English display name, so the UI can name it in any language.
+const STORAGE_KEY = 'stateproof.holder.v2';
 
 export interface HolderWallet {
-  readonly label: string;
+  readonly personaId: string;
   readonly holderSecret: string;
   readonly credentials: readonly CredentialDocument[];
 }
@@ -42,8 +43,6 @@ const saveHolderWallet = (wallet: HolderWallet): HolderWallet => {
   return wallet;
 };
 
-export const clearHolderWallet = (): void => window.localStorage.removeItem(STORAGE_KEY);
-
 export const issuerSignatureValid = (doc: CredentialDocument): boolean => {
   const issuer = issuerInfo(doc.issuer.id);
   if (issuer.publicKey === null) throw new Error(`${issuer.id} has no published public key`);
@@ -59,7 +58,7 @@ const assertImportable = (wallet: HolderWallet, doc: CredentialDocument): void =
 };
 
 export const adoptDemoPersona = (persona: DemoPersona): HolderWallet => {
-  const wallet: HolderWallet = { label: persona.displayName, holderSecret: persona.holderSecret, credentials: persona.credentials };
+  const wallet: HolderWallet = { personaId: persona.id, holderSecret: persona.holderSecret, credentials: persona.credentials };
   persona.credentials.forEach((doc) => assertImportable(wallet, doc));
   return saveHolderWallet(wallet);
 };

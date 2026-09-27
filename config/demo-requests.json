@@ -1,27 +1,49 @@
 {
   "preprod": {
+    "preview": {
+      "requestId": "08da5a24a5528086cd5ca5079e641c2dae79238dbb27eb0bbfeaad5a5f40d91e",
+      "personaId": "minji"
+    },
     "pending": [
       {
         "requestId": "08da5a24a5528086cd5ca5079e641c2dae79238dbb27eb0bbfeaad5a5f40d91e",
-        "title": "Employment: status Active and at least 12 months employed",
-        "reveals": "Job category",
+        "title": {
+          "ko": "고용: 재직 중, 근속 12개월 이상",
+          "en": "Employment: status Active and at least 12 months employed"
+        },
+        "reveals": {
+          "ko": "직무",
+          "en": "Job category"
+        },
         "createdAt": "2026-09-27T02:50:00+09:00"
       },
       {
         "requestId": "5d21cc83a45e9552ad1b447cd0c6677654cb9c692d4e33ee381cdb28260c6073",
-        "title": "Identity: 19 or older at issuance, living in Seoul or Gyeonggi",
-        "reveals": "Region of residence",
+        "title": {
+          "ko": "신원: 발급 시점 19세 이상, 서울 또는 경기 거주",
+          "en": "Identity: 19 or older at issuance, living in Seoul or Gyeonggi"
+        },
+        "reveals": {
+          "ko": "거주지",
+          "en": "Region of residence"
+        },
         "createdAt": "2026-09-27T05:53:00+09:00"
       }
     ],
     "verified": [
       {
         "requestId": "9361207d82adafcad3064fddf20ec813590f5d94d21df62e42a7ffdbb24f581a",
-        "title": "Employment, verified through Lace, no value revealed"
+        "title": {
+          "ko": "고용 조건 검증 완료, 공개 값 없음 (Lace)",
+          "en": "Employment, verified through Lace, no value revealed"
+        }
       },
       {
         "requestId": "04788db0ef6d7653109ea0577ff909ab1f8a8a64150d714c093b5e085c9c972f",
-        "title": "Employment, verified from the CLI, job category revealed"
+        "title": {
+          "ko": "고용 조건 검증 완료, 직무 공개 (CLI)",
+          "en": "Employment, verified from the CLI, job category revealed"
+        }
       }
     ]
   }
