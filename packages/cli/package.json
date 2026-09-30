@@ -5,13 +5,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "deploy": "tsx src/deploy.ts",
-    "register-issuer": "tsx src/register-issuer.ts",
-    "e2e": "tsx src/e2e-preprod.ts",
-    "status": "tsx src/status.ts",
+    "cli": "tsx src/main.ts",
     "operator": "tsx src/operator.ts",
-    "prove": "tsx src/prove.ts",
-    "demo-request": "tsx src/demo-requests.ts",
+    "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

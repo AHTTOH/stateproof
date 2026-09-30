@@ -1,83 +1,131 @@
-// Issues credentials for the fictional demo personas and writes the holder bundles
-// the web app offers under "Load a demo persona".
+// Demo personas for the web demo and the CLI e2e.
+//
+// Here the script plays two roles. As the HOLDER it creates each persona's holder secret and an
+// IssuanceRequest (commitment only). As the ISSUER it signs through issueFromRequest, which never
+// sees the secret. The holder secrets are then written to the output next to the credentials so
+// anyone can replay the demo: they are PUBLIC BY DESIGN and marked "demoOnly": true. A real holder
+// app keeps its secret on the device and sends only the IssuanceRequest.
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   createHolderSecret,
-  holderCommitOf,
+  createIssuanceRequest,
   holderSecretToHex,
-  issueCredential,
   issuerKeyPairFromHex,
-  publicKeyFromJson,
-  verifyCredentialDocument,
   type CredentialDocument,
   type CredentialSubject,
+  type IssuanceRequest,
 } from '@stateproof/core';
-import { REPO_ROOT, findIssuer, issuerSecretHex, loadRegistry, type IssuerRegistry } from '../registry.js';
+import type { IssuerKeyPair } from '@stateproof/contract';
+import { REPO_ROOT, findIssuer, issuerSecretHex, loadRegistry, type IssuerEntry, type IssuerRegistry } from '../registry.js';
+import { issueFromRequest } from './issue.js';
 
-const PERSONAS_FILE = fileURLToPath(new URL('./personas.json', import.meta.url));
-export const DEMO_BUNDLE_FILE = path.join(REPO_ROOT, 'packages', 'web', 'src', 'state', 'demo-personas.json');
+export const PERSONAS_SPEC_FILE = fileURLToPath(new URL('./personas.json', import.meta.url));
+export const DEMO_PERSONAS_FILE = path.join(REPO_ROOT, 'config', 'demo-personas.v2.json');
 
-interface PersonaCredentialSpec {
+export interface PersonaCredentialSpec {
   readonly issuer: string;
   readonly schema: string;
-  readonly subject: CredentialSubject;
+  readonly claims: CredentialSubject;
 }
 
-interface PersonaSpec {
+export interface PersonaSpec {
   readonly id: string;
-  readonly displayName: string;
+  readonly role: string;
+  readonly name: string;
+  readonly birthDate: string;
   readonly credentials: readonly PersonaCredentialSpec[];
 }
 
-interface PersonasFile {
+export interface PersonasSpecFile {
   readonly validity: { readonly issuedAt: string; readonly expiresAt: string };
   readonly personas: readonly PersonaSpec[];
 }
 
-export interface PersonaBundle {
-  readonly id: string;
-  readonly displayName: string;
-  readonly holderSecret: string;
-  readonly credentials: readonly CredentialDocument[];
+export interface PersonaCredential {
+  readonly issuanceRequest: IssuanceRequest;
+  readonly credential: CredentialDocument;
 }
 
-const issueForPersona = (registry: IssuerRegistry, file: PersonasFile, persona: PersonaSpec): PersonaBundle => {
-  const holderSecret = createHolderSecret();
-  const holderCommit = holderCommitOf(holderSecret);
-  const credentials = persona.credentials.map((spec) => {
-    const entry = findIssuer(registry, spec.issuer);
-    if (!entry.schemas.includes(spec.schema)) throw new Error(`${spec.issuer} does not issue ${spec.schema}`);
-    if (entry.publicKey === null) throw new Error(`${spec.issuer} has no public key yet; run keygen`);
-    const keyPair = issuerKeyPairFromHex(issuerSecretHex(entry));
-    const doc = issueCredential(
-      {
-        schema: spec.schema,
-        issuer: { id: entry.id, name: entry.name },
-        issuedAt: file.validity.issuedAt,
-        expiresAt: file.validity.expiresAt,
-        credentialSubject: spec.subject,
-        holderCommit,
-      },
-      keyPair,
-    );
-    if (!verifyCredentialDocument(doc, publicKeyFromJson(entry.publicKey))) {
-      throw new Error(`${spec.issuer}: .env secret does not match the public key in config/issuers.json`);
+export interface PersonaBundle {
+  readonly id: string;
+  readonly role: string;
+  readonly name: string;
+  readonly birthDate: string;
+  // Demo only: a real holder secret never leaves the holder's device.
+  readonly holderSecret: string;
+  readonly credentials: readonly PersonaCredential[];
+}
+
+export interface DemoPersonasFile {
+  readonly $comment: string;
+  readonly format: 'jobproof-demo-personas/v2';
+  readonly demoOnly: true;
+  readonly generatedAt: string;
+  readonly issuers: readonly { readonly id: string; readonly schema: string; readonly epoch: number }[];
+  readonly personas: readonly PersonaBundle[];
+}
+
+export type KeyLookup = (entry: IssuerEntry) => IssuerKeyPair;
+
+export const envKeyLookup: KeyLookup = (entry) => issuerKeyPairFromHex(issuerSecretHex(entry));
+
+export const loadPersonaSpec = async (file: string = PERSONAS_SPEC_FILE): Promise<PersonasSpecFile> =>
+  JSON.parse(await readFile(file, 'utf8')) as PersonasSpecFile;
+
+export const buildPersonas = async (
+  registry: IssuerRegistry,
+  spec: PersonasSpecFile,
+  keys: KeyLookup,
+  now: Date = new Date(),
+): Promise<DemoPersonasFile> => {
+  const personas: PersonaBundle[] = [];
+  const used = new Map<string, IssuerEntry>();
+  for (const persona of spec.personas) {
+    // Holder role: one secret per person, a fresh issuance request per credential.
+    const holderSecret = createHolderSecret();
+    const credentials: PersonaCredential[] = [];
+    for (const c of persona.credentials) {
+      const issuer = findIssuer(registry, c.issuer);
+      if (issuer.schema !== c.schema) throw new Error(`${persona.id}: ${c.issuer} issues ${issuer.schema}, not ${c.schema}`);
+      used.set(issuer.id, issuer);
+      const issuanceRequest = createIssuanceRequest(c.schema, holderSecret);
+      // Issuer role: only the request (commitment) and the checked facts cross this line.
+      const credential = await issueFromRequest({
+        issuer,
+        keyPair: keys(issuer),
+        request: issuanceRequest,
+        subject: { name: persona.name, birthDate: persona.birthDate, claims: c.claims },
+        issuedAt: spec.validity.issuedAt,
+        expiresAt: spec.validity.expiresAt,
+      });
+      credentials.push({ issuanceRequest, credential });
     }
-    return doc;
-  });
-  return { id: persona.id, displayName: persona.displayName, holderSecret: holderSecretToHex(holderSecret), credentials };
+    personas.push({
+      id: persona.id,
+      role: persona.role,
+      name: persona.name,
+      birthDate: persona.birthDate,
+      holderSecret: holderSecretToHex(holderSecret),
+      credentials,
+    });
+  }
+  return {
+    $comment:
+      'DEMO ONLY. Fictional people. The holder secrets below are public by design so anyone can replay the demo; a real holder secret never leaves the holder device and an issuer only ever receives the issuanceRequest (commitment). Generated by `npm run issue -w @stateproof/issuer -- personas`.',
+    format: 'jobproof-demo-personas/v2',
+    demoOnly: true,
+    generatedAt: now.toISOString(),
+    issuers: [...used.values()].map((i) => ({ id: i.id, schema: i.schema, epoch: i.epoch })),
+    personas,
+  };
 };
 
-export const issuePersonas = async (): Promise<string> => {
+export const issuePersonas = async (outFile: string = DEMO_PERSONAS_FILE): Promise<string> => {
   const registry = await loadRegistry();
-  const file = JSON.parse(await readFile(PERSONAS_FILE, 'utf8')) as PersonasFile;
-  const bundles = file.personas.map((p) => issueForPersona(registry, file, p));
-  const output = {
-    $comment: `Generated ${new Date().toISOString()} by packages/issuer (personas). Fictional people; holder secrets are public on purpose so anyone can replay the demo.`,
-    personas: bundles,
-  };
-  await writeFile(DEMO_BUNDLE_FILE, `${JSON.stringify(output, null, 2)}\n`, 'utf8');
-  return `Issued ${bundles.reduce((n, b) => n + b.credentials.length, 0)} credentials for ${bundles.length} personas -> ${path.relative(REPO_ROOT, DEMO_BUNDLE_FILE)}`;
+  const file = await buildPersonas(registry, await loadPersonaSpec(), envKeyLookup);
+  await writeFile(outFile, `${JSON.stringify(file, null, 2)}\n`, 'utf8');
+  const count = file.personas.reduce((n, p) => n + p.credentials.length, 0);
+  return `Issued ${count} credentials for ${file.personas.length} personas -> ${path.relative(REPO_ROOT, outFile)}`;
 };

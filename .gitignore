@@ -39,3 +39,6 @@ midnight-level-db/
 
 # NOTE: packages/contract/src/managed/ is committed on purpose (decision 5):
 # reviewers can run tests and the UI without installing the Compact compiler.
+
+# Downloaded Midnight proving parameters and keys (CLI WASM prover)
+.cache/

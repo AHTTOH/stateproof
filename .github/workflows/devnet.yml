@@ -1,0 +1,110 @@
+name: Devnet e2e (real proofs)
+
+# Starts a throw-away local Midnight network (infra/devnet: node + indexer + proof server) and
+# runs the whole JobProof story with real proofs and transactions (`npm run devnet:e2e`):
+# deploy, schemas, issuers, issuance, postings, valid proofs, the circuit refusals, epoch
+# revocation and re-issue, and a leak scan of the indexed contract state.
+# The run record docs/devnet-run.json is uploaded as an artifact.
+# The cold-start handling below (indexer race, genesis DUST) follows the devnet workflow of
+# JustEnough (Apache-2.0), which met both on the same image set.
+on:
+  push:
+    branches: [v2, 'v2-*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devnet-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  devnet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: compiled contract artifacts are present
+        run: |
+          test -f packages/contract/src/managed/stateproof/contract/index.js
+          test -f packages/contract/src/managed/stateproof/keys/submitProof.prover
+          jq -r '"compactc " + ."compiler-version"' packages/contract/src/managed/stateproof/compiler/contract-info.json
+      - name: pull images
+        run: docker compose -f infra/devnet/docker-compose.yml pull --quiet
+      # On a cold runner the indexer can start before the node's first block and exit with
+      # "Cannot construct OnlineClientAtBlock: block number 1 not found"; retry the whole stack.
+      - name: start the local network (retry the indexer cold-start race)
+        run: |
+          for i in 1 2 3; do
+            if npm run devnet:up; then exit 0; fi
+            echo "::warning::devnet:up attempt $i failed"
+            docker compose -f infra/devnet/docker-compose.yml ps -a || true
+            docker compose -f infra/devnet/docker-compose.yml logs --no-color --tail 80 indexer || true
+            docker compose -f infra/devnet/docker-compose.yml down -v || true
+            sleep 15
+          done
+          exit 1
+      # Genesis DUST is valued at the latest indexed block's time, so fees cannot be balanced
+      # while the indexer is still at block 0. Wait until it is past genesis.
+      - name: wait until the indexer is past genesis
+        run: |
+          for i in $(seq 1 120); do
+            h=$(curl -s -X POST -H 'content-type: application/json' \
+              --data '{"query":"{ block { height } }"}' http://127.0.0.1:8088/api/v4/graphql \
+              | jq -r '.data.block.height // 0' 2>/dev/null || echo 0)
+            echo "indexer height ${h:-0}"
+            if [ "${h:-0}" -ge 2 ]; then exit 0; fi
+            sleep 2
+          done
+          echo "::error::indexer stayed at genesis for 240 s"
+          exit 1
+      - name: JobProof e2e with real proofs
+        shell: bash
+        env:
+          CI: 'true'
+          LOG_LEVEL: info
+        run: |
+          mkdir -p logs
+          for i in 1 2 3; do
+            set +e
+            npm run devnet:e2e 2>&1 | tee logs/devnet-e2e.log
+            code=${PIPESTATUS[0]}
+            set -e
+            if [ "$code" = 0 ]; then exit 0; fi
+            # Only a DUST shortage right after genesis is worth another attempt.
+            if ! grep -Eq 'Insufficient Funds|No spendable DUST' logs/devnet-e2e.log; then exit "$code"; fi
+            echo "::warning::devnet:e2e attempt $i: DUST not ready yet, waiting 20 s"
+            sleep 20
+          done
+          exit 1
+      - name: run record summary
+        if: always()
+        run: |
+          if [ -f docs/devnet-run.json ]; then
+            jq '{ok, network: .network.name, contractAddress, totalSeconds, summary, refusals: [.refusals[] | {attack, ok, message}], leakHits: ((.leakScan.ledgerHits // []) + (.leakScan.publicCallDataHits // []) | length), failures}' docs/devnet-run.json
+          else
+            echo "no docs/devnet-run.json"
+          fi
+      - name: container logs on failure
+        if: failure()
+        run: |
+          mkdir -p logs
+          docker compose -f infra/devnet/docker-compose.yml ps -a > logs/compose-ps.log 2>&1 || true
+          docker compose -f infra/devnet/docker-compose.yml logs --no-color > logs/compose.log 2>&1 || true
+          tail -n 120 logs/compose.log || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: devnet-run
+          path: |
+            docs/devnet-run.json
+            logs/
+          if-no-files-found: warn
+      - if: always()
+        run: npm run devnet:down

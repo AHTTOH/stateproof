@@ -1,0 +1,56 @@
+name: CI
+
+# Typecheck and tests for contract, core, issuer and cli, plus the stated-test-count check.
+# The web build is its own job so a web failure never hides the other results.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: typecheck, tests, test count
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: typecheck
+        run: >-
+          npm run typecheck
+          -w @stateproof/contract -w @stateproof/core -w @stateproof/issuer -w @stateproof/cli
+      - name: tests
+        run: >-
+          npm test
+          -w @stateproof/contract -w @stateproof/core -w @stateproof/issuer -w @stateproof/cli
+      - name: test count (stated numbers must match the real run)
+        run: node scripts/check-test-count.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-count
+          path: docs/test-count.json
+          if-no-files-found: ignore
+
+  web:
+    name: web build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w @stateproof/web

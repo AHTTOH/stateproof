@@ -1,20 +1,19 @@
-// Long-running operator: restores the wallet once (minutes) and then runs tasks on request,
-// so repeated commands do not pay the restore cost. Listens on 127.0.0.1 only.
-//   npm run operator -w @stateproof/cli
-//   curl -X POST http://127.0.0.1:$OPERATOR_PORT/status | /register-issuer | /e2e | /exit
+// Long-running operator: restores the wallet once (minutes on Preprod) and then runs tasks on
+// request, so repeated commands do not pay the restore cost. Listens on 127.0.0.1 only.
+//   npm run operator -w @stateproof/cli -- --network preprod
+//   curl -X POST http://127.0.0.1:$OPERATOR_PORT/status | /register-schemas | /register-issuers | /exit
 import { createServer } from 'node:http';
-import { requireEnv } from './config.js';
-import { runE2E } from './e2e-preprod.js';
-import { registerIssuers } from './register-issuer.js';
-import { exitOnError, runSession, type Session } from './session.js';
-import { walletStatus } from './status.js';
+import { parseArgs } from 'node:util';
+import { loadCliConfig, requireEnv, resolveNetworkName } from './config.js';
+import { registerIssuers, registerSchemas, walletStatus } from './commands.js';
+import { runSession, type Session } from './session.js';
 
 const LISTEN_HOST = '127.0.0.1';
 
 const TASKS: Record<string, (s: Session) => Promise<unknown>> = {
   '/status': walletStatus,
-  '/register-issuer': registerIssuers,
-  '/e2e': runE2E,
+  '/register-schemas': registerSchemas,
+  '/register-issuers': registerIssuers,
 };
 
 const serve = (session: Session, port: number): Promise<void> =>
@@ -53,4 +52,11 @@ const serve = (session: Session, port: number): Promise<void> =>
     server.listen(port, LISTEN_HOST, () => session.logger.info(`operator ready on http://${LISTEN_HOST}:${port}`));
   });
 
-exitOnError(runSession('operator', (session) => serve(session, Number(requireEnv('OPERATOR_PORT')))));
+const { values } = parseArgs({ options: { network: { type: 'string' } } });
+runSession('operator', loadCliConfig(resolveNetworkName(values.network)), (session) => serve(session, Number(requireEnv('OPERATOR_PORT')))).then(
+  () => process.exit(0),
+  (error: unknown) => {
+    process.stderr.write(`${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`);
+    process.exit(1);
+  },
+);

@@ -19,7 +19,13 @@
     "compile": "bash scripts/compile.sh",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present"
+    "build": "npm run build --workspaces --if-present",
+    "cli": "npm run cli -w @stateproof/cli --",
+    "issue": "npm run issue -w @stateproof/issuer --",
+    "devnet:up": "docker compose -f infra/devnet/docker-compose.yml up -d --wait",
+    "devnet:down": "docker compose -f infra/devnet/docker-compose.yml down -v",
+    "devnet:e2e": "npm run cli -w @stateproof/cli -- e2e --network undeployed",
+    "test:count": "node scripts/check-test-count.mjs"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "0.16.0",

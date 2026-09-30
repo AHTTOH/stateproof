@@ -1,11 +1,15 @@
-// Midnight.js providers for the CLI: WASM proving from local files, level private state.
+// Midnight.js providers for the CLI: level private state, indexer public data, and a prover that
+// is either the zkir-v2 WASM prover (remote networks) or a proof server (local devnet).
+// Every proveTx is timed, so commands can report pure proving time next to the tx id.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { WebSocket } from 'ws';
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
+import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
+import type { ProofProvider } from '@midnight-ntwrk/midnight-js-types';
 import type { StateProofCircuitId, StateProofPrivateState, StateProofPrivateStateId, StateProofProviders } from '@stateproof/contract';
 import { createWasmProofProvider, midnightKeyUrls, paramsUrl, type KeyMaterialSource } from '@stateproof/contract/proving';
 import { CONTRACT_MANAGED_DIR, type CliConfig } from './config.js';
@@ -56,31 +60,67 @@ export const nodeKeyMaterialSource = (config: CliConfig, logger: Logger): KeyMat
   };
 };
 
-export const buildProviders = (config: CliConfig, wallet: OperatorWallet, logger: Logger): StateProofProviders => {
+// Counts and times every proof. A refusal that happens "at the circuit" leaves count unchanged:
+// the local circuit run throws before any proof is requested.
+export interface ProvingMeter {
+  readonly count: number;
+  readonly lastMs: number | null;
+}
+
+const timedProofProvider = (inner: ProofProvider): { provider: ProofProvider; meter: ProvingMeter } => {
+  const meter = { count: 0, lastMs: null as number | null };
+  const provider: ProofProvider = {
+    proveTx: async (tx, cfg) => {
+      const started = performance.now();
+      const proven = await inner.proveTx(tx, cfg);
+      meter.lastMs = Math.round(performance.now() - started);
+      meter.count += 1;
+      return proven;
+    },
+  };
+  return { provider, meter };
+};
+
+export interface BuiltProviders {
+  readonly providers: StateProofProviders;
+  readonly proving: ProvingMeter;
+}
+
+export const buildProviders = (config: CliConfig, wallet: OperatorWallet, logger: Logger): BuiltProviders => {
   setNetworkId(config.network.networkId);
+  const zkConfigProvider = new NodeZkConfigProvider<StateProofCircuitId>(CONTRACT_MANAGED_DIR);
+  const inner =
+    config.prover === 'proof-server'
+      ? httpClientProofProvider(config.network.proofServer, zkConfigProvider)
+      : createWasmProofProvider(nodeKeyMaterialSource(config, logger));
+  const { provider: proofProvider, meter } = timedProofProvider(inner);
+  logger.info(`Proving StateProof circuits with ${config.prover === 'proof-server' ? `the proof server at ${config.network.proofServer}` : 'the zkir-v2 WASM prover'}`);
   return {
-    privateStateProvider: levelPrivateStateProvider<StateProofPrivateStateId, StateProofPrivateState>({
-      midnightDbName: path.join(config.privateStateDir, 'midnight-level-db'),
-      privateStateStoreName: 'stateproof-private-state',
-      signingKeyStoreName: 'stateproof-signing-keys',
-      privateStoragePasswordProvider: () => config.privateStatePassword,
-      accountId: config.operatorSeed,
-    }),
-    publicDataProvider: indexerPublicDataProvider(config.network.indexer, config.network.indexerWS),
-    zkConfigProvider: new NodeZkConfigProvider<StateProofCircuitId>(CONTRACT_MANAGED_DIR),
-    proofProvider: createWasmProofProvider(nodeKeyMaterialSource(config, logger)),
-    walletProvider: wallet.provider,
-    midnightProvider: {
-      // A rejected submission must hand its DUST coin back: without revert the wallet keeps
-      // treating the coin as spent and the balance silently shrinks (seen on Preprod 2026-09-26).
-      submitTx: async (tx) => {
-        try {
-          return await wallet.provider.submitTx(tx);
-        } catch (e) {
-          await wallet.provider.wallet.revertTransaction(tx);
-          logger.warn('Submission rejected; reverted the transaction in the wallet so its DUST coin is spendable again');
-          throw e;
-        }
+    proving: meter,
+    providers: {
+      privateStateProvider: levelPrivateStateProvider<StateProofPrivateStateId, StateProofPrivateState>({
+        midnightDbName: path.join(config.privateStateDir, 'midnight-level-db'),
+        privateStateStoreName: 'stateproof-private-state',
+        signingKeyStoreName: 'stateproof-signing-keys',
+        privateStoragePasswordProvider: () => config.privateStatePassword,
+        accountId: config.operatorSeed,
+      }),
+      publicDataProvider: indexerPublicDataProvider(config.network.indexer, config.network.indexerWS),
+      zkConfigProvider,
+      proofProvider,
+      walletProvider: wallet.provider,
+      midnightProvider: {
+        // A rejected submission must hand its DUST coin back: without revert the wallet keeps
+        // treating the coin as spent and the balance silently shrinks (seen on Preprod 2026-09-26).
+        submitTx: async (tx) => {
+          try {
+            return await wallet.provider.submitTx(tx);
+          } catch (e) {
+            await wallet.provider.wallet.revertTransaction(tx);
+            logger.warn('Submission rejected; reverted the transaction in the wallet so its DUST coin is spendable again');
+            throw e;
+          }
+        },
       },
     },
   };

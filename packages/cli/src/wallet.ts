@@ -48,7 +48,7 @@ export const toEnvironmentConfiguration = (config: CliConfig): EnvironmentConfig
   indexerWS: config.network.indexerWS,
   node: config.network.node,
   nodeWS: config.network.nodeWS,
-  faucet: config.network.faucet,
+  faucet: config.network.faucet ?? undefined,
   proofServer: config.network.proofServer,
 } as EnvironmentConfiguration);
 
@@ -67,8 +67,8 @@ const dustOptions = () => ({
   feeBlocksMargin: FEE_BLOCKS_MARGIN,
 });
 
-const readSavedState = async (file: string, networkId: string): Promise<SavedWalletState | null> => {
-  if (!existsSync(file)) return null;
+const readSavedState = async (file: string | null, networkId: string): Promise<SavedWalletState | null> => {
+  if (file === null || !existsSync(file)) return null;
   const saved = JSON.parse(await readFile(file, 'utf8')) as SavedWalletState;
   if (saved.networkId !== networkId) throw new Error(`${file} belongs to ${saved.networkId}, not ${networkId}`);
   return saved;
@@ -90,7 +90,13 @@ export const openOperatorWallet = async (config: CliConfig, logger: Logger): Pro
   const saved = await readSavedState(config.walletStateFile, env.walletNetworkId);
   const dust = dustOptions();
 
-  logger.info(saved ? `Restoring wallet state saved at ${saved.savedAt}` : 'No saved wallet state: full sync from genesis (hours on Preprod)');
+  logger.info(
+    saved
+      ? `Restoring wallet state saved at ${saved.savedAt}`
+      : config.walletStateFile === null
+        ? 'Local devnet: syncing the genesis wallet from block 0 (state is not persisted)'
+        : 'No saved wallet state: full sync from genesis (hours on Preprod)',
+  );
   const shielded = saved
     ? ShieldedWallet(walletConfig).restore(saved.shielded)
     : WalletFactory.createShieldedWallet(walletConfig, seeds.shielded);
@@ -112,6 +118,8 @@ export const openOperatorWallet = async (config: CliConfig, logger: Logger): Pro
   await provider.start(false);
 
   const saveState = async (): Promise<void> => {
+    const file = config.walletStateFile;
+    if (file === null) return;
     const state: SavedWalletState = {
       savedAt: new Date().toISOString(),
       networkId: env.walletNetworkId,
@@ -119,14 +127,15 @@ export const openOperatorWallet = async (config: CliConfig, logger: Logger): Pro
       unshielded: await facade.unshielded.serializeState(),
       dust: await facade.dust.serializeState(),
     };
-    await mkdir(path.dirname(config.walletStateFile), { recursive: true });
-    const tmp = `${config.walletStateFile}.tmp`;
+    await mkdir(path.dirname(file), { recursive: true });
+    const tmp = `${file}.tmp`;
     await writeFile(tmp, JSON.stringify(state));
-    await rename(tmp, config.walletStateFile);
-    logger.info(`Wallet state saved to ${config.walletStateFile}`);
+    await rename(tmp, file);
+    logger.info(`Wallet state saved to ${file}`);
   };
 
   await waitForSync(facade, logger);
+  await waitForDust(facade, logger);
   await saveState();
   return {
     provider,
@@ -192,6 +201,20 @@ const settle = async (facade: Facade, before: bigint, label: string, logger: Log
     ),
   );
   logger.info(`${label}: wallet synced the transaction in ${Math.round((Date.now() - started) / 1000)}s`);
+};
+
+// Fees are paid in DUST. On a fresh local devnet the genesis NIGHT starts generating DUST only
+// once the chain moves past genesis, so the first transaction must wait for a spendable coin.
+const DUST_WAIT_MS = 600_000;
+const waitForDust = async (facade: Facade, logger: Logger): Promise<void> => {
+  const started = Date.now();
+  const state = await Rx.firstValueFrom(
+    facade.state().pipe(
+      Rx.filter((s) => allComplete(s) && s.dust.availableCoins.length > 0 && s.dust.balance(new Date()) > 0n),
+      Rx.timeout({ first: DUST_WAIT_MS, with: () => Rx.throwError(() => new Error(`No spendable DUST after ${DUST_WAIT_MS / 1000}s; fund the wallet (NIGHT) and register it for DUST generation`)) }),
+    ),
+  );
+  logger.info(`DUST ready after ${Math.round((Date.now() - started) / 1000)}s: balance ${String(state.dust.balance(new Date()))}, ${state.dust.availableCoins.length} coin(s)`);
 };
 
 const waitForSync = async (facade: Facade, logger: Logger): Promise<void> => {

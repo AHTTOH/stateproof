@@ -1,39 +1,48 @@
 {
-  "$comment": "Demo issuers (2026-09-25). Public keys are filled by `npm run issue -w @stateproof/issuer -- keygen --issuer <id>`; secrets go to .env under secretEnv and are never committed. All issuers and people are fictional.",
+  "$comment": "JobProof v2 demo issuers. One entry = one on-chain registration registerIssuer(id, schema, publicKey, slot). Public keys are written by `npm run issue -w @stateproof/issuer -- keygen --issuer <id>`; secrets go to .env under secretEnv and are never committed. epoch is the epoch new credentials are issued in (rotate-epoch increments it). All issuers are fictional.",
+  "version": 2,
   "issuers": [
     {
       "id": "issuer:acme-hr",
       "name": "ACME Corp HR",
       "i18n": {
         "ko": {
-          "name": "ACME Corp 인사팀"
+          "name": "ACME 주식회사 인사팀"
         }
       },
-      "schemas": [
-        "employment"
-      ],
-      "secretEnv": "ISSUER_SECRET_ACME_HR",
-      "publicKey": {
-        "x": "0x21509fdcfdabab8f4fbd53873d6dd0cd741a7bcca21b9c7a79504310c4883157",
-        "y": "0x442d11d16d63c8c4e4ceb37f48684e4269e8c827e531b7830d1eb7bc601b7e2d"
-      }
+      "schema": "career",
+      "slot": 0,
+      "epoch": 0,
+      "secretEnv": "ISSUER_V2_SECRET_ACME_HR",
+      "publicKey": null
     },
     {
-      "id": "issuer:gov-id-demo",
-      "name": "Identity Authority",
+      "id": "issuer:nova-hr",
+      "name": "Nova Labs People Team",
       "i18n": {
         "ko": {
-          "name": "신원 발급기관"
+          "name": "노바랩스 피플팀"
         }
       },
-      "schemas": [
-        "identity"
-      ],
-      "secretEnv": "ISSUER_SECRET_GOV_ID_DEMO",
-      "publicKey": {
-        "x": "0x1c414c4b50be55667f9c8408d4a0a42668a461359f802b12a19714fe9451cdf5",
-        "y": "0x1a6d878cddfdcb886b7719862db9d6b9ff75451d831be9f30573a88dfccea268"
-      }
+      "schema": "career",
+      "slot": 1,
+      "epoch": 0,
+      "secretEnv": "ISSUER_V2_SECRET_NOVA_HR",
+      "publicKey": null
+    },
+    {
+      "id": "issuer:youth-work-center",
+      "name": "Youth Work Center",
+      "i18n": {
+        "ko": {
+          "name": "청년일자리센터"
+        }
+      },
+      "schema": "youth-work",
+      "slot": 2,
+      "epoch": 0,
+      "secretEnv": "ISSUER_V2_SECRET_YOUTH_WORK_CENTER",
+      "publicKey": null
     }
   ]
 }

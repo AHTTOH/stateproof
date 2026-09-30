@@ -1,5 +1,5 @@
 {
-  "$comment": "Single source of network endpoints (2026-09-25). Code reads these values and fails fast when one is missing. proofServer is used only by the wallet for its own small proofs (DUST fees); the public instance rejects contract-circuit proofs (body > 8KB -> 403), so StateProof circuits are proved with the zkir-v2 WASM prover, which downloads public parameters from zkArtifacts. See docs/decisions/2026-09-25-proving-strategy.md.",
+  "$comment": "Single source of network endpoints (2026-09-25). Code reads these values and fails fast when one is missing. proofServer is used only by the wallet for its own small proofs (DUST fees); the public instance rejects contract-circuit proofs (body > 8KB -> 403), so StateProof circuits are proved with the zkir-v2 WASM prover, which downloads public parameters from zkArtifacts. See docs/decisions/2026-09-25-proving-strategy.md. undeployed is the local devnet in infra/devnet (midnight-node 1.0.0, indexer-standalone 4.3.3, proof-server 8.1.0): its genesisWalletSeed is the publicly known pre-funded wallet of the node dev preset, and StateProof circuits are proved by the local proof server (prover: proof-server).",
   "preprod": {
     "networkId": "preprod",
     "indexer": "https://indexer.preprod.midnight.network/api/v4/graphql",
@@ -10,7 +10,8 @@
     "faucet": "https://midnight-tmnight-preprod.nethermind.dev/",
     "explorer": "https://explorer.preprod.midnight.network",
     "zkArtifacts": "https://midnight-s3-fileshare-dev-eu-west-1.s3.eu-west-1.amazonaws.com",
-    "midnightKeyVersion": 9
+    "midnightKeyVersion": 9,
+    "prover": "wasm"
   },
   "preview": {
     "networkId": "preview",
@@ -22,6 +23,21 @@
     "faucet": "https://midnight-tmnight-preview.nethermind.dev/",
     "explorer": "https://explorer.preview.midnight.network",
     "zkArtifacts": "https://midnight-s3-fileshare-dev-eu-west-1.s3.eu-west-1.amazonaws.com",
-    "midnightKeyVersion": 9
+    "midnightKeyVersion": 9,
+    "prover": "wasm"
+  },
+  "undeployed": {
+    "networkId": "undeployed",
+    "indexer": "http://127.0.0.1:8088/api/v4/graphql",
+    "indexerWS": "ws://127.0.0.1:8088/api/v4/graphql/ws",
+    "node": "http://127.0.0.1:9944",
+    "nodeWS": "ws://127.0.0.1:9944",
+    "proofServer": "http://127.0.0.1:6300",
+    "faucet": null,
+    "explorer": null,
+    "zkArtifacts": "https://midnight-s3-fileshare-dev-eu-west-1.s3.eu-west-1.amazonaws.com",
+    "midnightKeyVersion": 9,
+    "prover": "proof-server",
+    "genesisWalletSeed": "0000000000000000000000000000000000000000000000000000000000000001"
   }
 }

@@ -1,52 +1,69 @@
 {
-  "$comment": "Fictional demo people (2026-09-25). No real personal data. Each persona gets one holder secret and one credential per entry.",
+  "$comment": "Fictional demo people for JobProof v2. No real personal data: names and dates are invented. The persona generator plays the holder for these people and therefore creates their holder secrets; the output is demo-only and public by design.",
   "validity": { "issuedAt": "2026-09-01T00:00:00Z", "expiresAt": "2027-09-01T00:00:00Z" },
   "personas": [
     {
       "id": "minji",
-      "displayName": "Minji Park (fictional)",
+      "role": "경력직 지원자, 조건 충족 (연봉 5,000만원 이상, 개발 36개월 이상)",
+      "name": "박민지",
+      "birthDate": "1993-05-14",
       "credentials": [
         {
           "issuer": "issuer:acme-hr",
-          "schema": "employment",
-          "subject": { "employmentStatus": "Active", "jobCategory": "Engineering", "employmentStartDate": "2024-07-01", "employmentMonths": 26 }
-        },
+          "schema": "career",
+          "claims": { "employmentStatus": "Active", "jobCategory": "Engineering", "careerMonths": 48, "annualSalary": 6200, "employmentType": "Permanent" }
+        }
+      ]
+    },
+    {
+      "id": "junho",
+      "role": "경력직 지원자, 조건 미충족 (개발 40개월은 충족하지만 연봉 4,200만원). 연봉 위조 공격에 쓰임",
+      "name": "이준호",
+      "birthDate": "1996-11-02",
+      "credentials": [
         {
-          "issuer": "issuer:gov-id-demo",
-          "schema": "identity",
-          "subject": { "birthDate": "1995-03-14", "ageYears": 31, "nationality": "KR", "region": "Gyeonggi" }
+          "issuer": "issuer:acme-hr",
+          "schema": "career",
+          "claims": { "employmentStatus": "Active", "jobCategory": "Engineering", "careerMonths": 40, "annualSalary": 4200, "employmentType": "Permanent" }
         }
       ]
     },
     {
       "id": "sora",
-      "displayName": "Sora Kim (fictional)",
+      "role": "조건을 충족하는 친구. 민지에게만 보낸 지원 링크로 대신 답하려는 공격(대리 응시)에 쓰임",
+      "name": "최소라",
+      "birthDate": "1991-02-27",
       "credentials": [
         {
-          "issuer": "issuer:acme-hr",
-          "schema": "employment",
-          "subject": { "employmentStatus": "Active", "jobCategory": "Design", "employmentStartDate": "2026-03-02", "employmentMonths": 6 }
-        },
-        {
-          "issuer": "issuer:gov-id-demo",
-          "schema": "identity",
-          "subject": { "birthDate": "2008-11-02", "ageYears": 17, "nationality": "KR", "region": "Busan" }
+          "issuer": "issuer:nova-hr",
+          "schema": "career",
+          "claims": { "employmentStatus": "Active", "jobCategory": "Engineering", "careerMonths": 60, "annualSalary": 7000, "employmentType": "Permanent" }
         }
       ]
     },
     {
-      "id": "jun",
-      "displayName": "Jun Lee (fictional)",
+      "id": "haneul",
+      "role": "알바 청년, 조건 충족 (만 19~24세, 서울 거주, 알바 14개월)",
+      "name": "김하늘",
+      "birthDate": "2004-08-21",
       "credentials": [
         {
-          "issuer": "issuer:acme-hr",
-          "schema": "employment",
-          "subject": { "employmentStatus": "Terminated", "jobCategory": "Sales", "employmentStartDate": "2021-05-10", "employmentMonths": 40 }
-        },
+          "issuer": "issuer:youth-work-center",
+          "schema": "youth-work",
+          "claims": { "birthDate": "2004-08-21", "region": "Seoul", "studentStatus": "Enrolled", "partTimeMonths": 14 }
+        }
+      ]
+    },
+    {
+      "id": "woojin",
+      "role": "알바 청년, 조건 미충족 (만 27세, 부산 거주)",
+      "name": "정우진",
+      "birthDate": "1999-03-09",
+      "credentials": [
         {
-          "issuer": "issuer:gov-id-demo",
-          "schema": "identity",
-          "subject": { "birthDate": "1988-06-30", "ageYears": 38, "nationality": "KR", "region": "Seoul" }
+          "issuer": "issuer:youth-work-center",
+          "schema": "youth-work",
+          "claims": { "birthDate": "1999-03-09", "region": "Busan", "studentStatus": "NotStudent", "partTimeMonths": 30 }
         }
       ]
     }
