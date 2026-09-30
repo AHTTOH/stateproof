@@ -34,6 +34,9 @@ jobs:
         with:
           name: zk-params
           path: .zk-params
+          # upload-artifact v4 skips hidden paths unless told otherwise.
+          include-hidden-files: true
+          if-no-files-found: error
           retention-days: 90
       - uses: actions/setup-node@v4
         with:
