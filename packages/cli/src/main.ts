@@ -9,6 +9,7 @@
 //   prove --request <hex> --persona <id> --schema <id> [--nonce <hex>]
 //                                              submit one proof with a demo persona (config/demo-personas.v2.json)
 //   rotate-epoch --issuer <id>                 the issuer rotates its epoch (revokes everything it issued)
+//   address                                    the operator wallet's unshielded address (for the faucet), no sync
 //   status                                     wallet NIGHT / DUST balances
 //   e2e [--out <file>]                         the whole story on a fresh contract, writes docs/<network>-run.json
 //
@@ -18,8 +19,9 @@ import { loadCliConfig, resolveNetworkName, type ProverKind } from './config.js'
 import { demoRequests, deploy, prove, registerIssuers, registerSchemas, rotateEpoch, walletStatus } from './commands.js';
 import { defaultRunFile, runE2E } from './e2e.js';
 import { runSession } from './session.js';
+import { unshieldedAddress } from './wallet.js';
 
-const USAGE = 'usage: main.ts <deploy|register-schemas|register-issuers|demo-requests|prove|rotate-epoch|status|e2e> --network <name> [options]';
+const USAGE = 'usage: main.ts <address|deploy|register-schemas|register-issuers|demo-requests|prove|rotate-epoch|status|e2e> --network <name> [options]';
 
 const main = async (): Promise<number> => {
   const { positionals, values } = parseArgs({
@@ -70,6 +72,10 @@ const main = async (): Promise<number> => {
       await runSession(command, config, (s) => rotateEpoch(s, { issuer }));
       return 0;
     }
+    case 'address':
+      process.stdout.write(`${unshieldedAddress(config)}
+`);
+      return 0;
     case 'status':
       await runSession(command, config, async (s) => void (await walletStatus(s)));
       return 0;

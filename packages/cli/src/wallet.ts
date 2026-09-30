@@ -7,7 +7,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as Rx from 'rxjs';
-import { MidnightWalletProvider, WalletFactory, WalletSeeds, type EnvironmentConfiguration } from '@midnight-ntwrk/testkit-js';
+import { MidnightWalletProvider, WalletFactory, WalletSeeds, waitForFunds, type EnvironmentConfiguration } from '@midnight-ntwrk/testkit-js';
 import {
   DustWallet,
   InMemoryTransactionHistoryStorage,
@@ -74,6 +74,15 @@ const readSavedState = async (file: string | null, networkId: string): Promise<S
   return saved;
 };
 
+const bech32 = (keystore: ReturnType<typeof createKeystore>): string => {
+  const address = keystore.getBech32Address() as unknown as { asString?: () => string };
+  return address.asString ? address.asString() : String(address);
+};
+
+// The unshielded (NIGHT) address to paste into the faucet. Derived from the seed, no sync.
+export const unshieldedAddress = (config: CliConfig): string =>
+  bech32(createKeystore(WalletSeeds.fromMasterSeed(config.operatorSeed).unshielded, config.network.networkId));
+
 export interface OperatorWallet {
   readonly provider: MidnightWalletProvider;
   // Runs one transaction and waits until the wallet has synced its effects.
@@ -135,6 +144,12 @@ export const openOperatorWallet = async (config: CliConfig, logger: Logger): Pro
   };
 
   await waitForSync(facade, logger);
+  if (config.walletStateFile !== null && (await Rx.firstValueFrom(facade.state())).dust.balance(new Date()) === 0n) {
+    // Remote network, no DUST yet: register the wallet's NIGHT UTXOs for DUST generation
+    // (a transaction of its own; testkit's waitForFunds does this when DUST is zero).
+    logger.info(`No DUST yet; registering NIGHT for DUST generation. Unshielded address: ${bech32(keystore)}`);
+    await waitForFunds(facade, env, false, keystore);
+  }
   await waitForDust(facade, logger);
   await saveState();
   return {

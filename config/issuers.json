@@ -14,7 +14,10 @@
       "slot": 0,
       "epoch": 0,
       "secretEnv": "ISSUER_V2_SECRET_ACME_HR",
-      "publicKey": null
+      "publicKey": {
+        "x": "0x3429291af46949a1129375257382250b7ab51d6d7ad82e766ee27377ea832af0",
+        "y": "0x38e75cb66a673cbc2a09fb7b2ca83992973a5381eb16d46d594f1c0d5b0ae1ac"
+      }
     },
     {
       "id": "issuer:nova-hr",
@@ -28,7 +31,10 @@
       "slot": 1,
       "epoch": 0,
       "secretEnv": "ISSUER_V2_SECRET_NOVA_HR",
-      "publicKey": null
+      "publicKey": {
+        "x": "0x5937043e15e109c69e1d5930ccdc6fb8547021e3714ac55596c8b177905bd66b",
+        "y": "0x2b10ec124a92a0be64ee1a44c349244d4789aaa815ae8b974935595d8736be0c"
+      }
     },
     {
       "id": "issuer:youth-work-center",
@@ -42,7 +48,10 @@
       "slot": 2,
       "epoch": 0,
       "secretEnv": "ISSUER_V2_SECRET_YOUTH_WORK_CENTER",
-      "publicKey": null
+      "publicKey": {
+        "x": "0x34ec549dc0e90af3bc0bdc97ee1a41eeade4a99781e9effbabf8ff77625356",
+        "y": "0x73625d89550464f2ea6bff4da0d73aa1605ffa961c35283e58cc7f50e3352a8e"
+      }
     }
   ]
 }

@@ -96,9 +96,12 @@ export const loadCliConfig = (networkName: string, options: { prover?: ProverKin
       prover,
     };
   }
+  // Optional: a local proof server (e.g. infra/proof-server on :6300) instead of the public one,
+  // used by the wallet for fee proofs and by --prover proof-server for StateProof circuits.
+  const proofServer = optionalEnv('STATEPROOF_PROOF_SERVER');
   return {
     networkName,
-    network,
+    network: proofServer ? { ...network, proofServer } : network,
     operatorSeed: requireEnv('OPERATOR_WALLET_SEED'),
     walletStateFile: path.resolve(REPO_ROOT, requireEnv('WALLET_STATE_FILE')),
     zkParamsCacheDir: path.resolve(REPO_ROOT, requireEnv('ZK_PARAMS_CACHE_DIR')),

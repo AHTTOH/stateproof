@@ -471,6 +471,14 @@ const writeReport = async (
     },
     compiler: `compactc ${await compilerVersion()}`,
     prover: config.prover === 'proof-server' ? `proof server ${config.network.proofServer}` : 'zkir-v2 WASM prover (Node)',
+    // Where the run happened: a GitHub Actions run (traceable) or a local machine.
+    ranBy: process.env.GITHUB_RUN_ID
+      ? {
+          githubRun: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+          commit: process.env.GITHUB_SHA ?? null,
+          ref: process.env.GITHUB_REF_NAME ?? null,
+        }
+      : { local: true },
     ranAt: new Date(r.started).toISOString(),
     finishedAt: new Date().toISOString(),
     totalSeconds: Math.round((Date.now() - r.started) / 1000),

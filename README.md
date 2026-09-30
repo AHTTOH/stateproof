@@ -202,11 +202,19 @@ config/                 네트워크 엔드포인트, 발급자 공개키, 배�
 packages/contract       Compact 컨트랙트, 컴파일 산출물, 서명·API·증명 모듈, 시뮬레이터 테스트
 packages/core           스키마, 클레임 인코딩, 정책 빌더, 크리덴셜 문서, 영수증
 packages/issuer         발급자 키 생성, 데모 인물 발급
-packages/cli            운영자 지갑(상태 저장), 배포, 발급자 등록, Preprod E2E
+packages/cli            운영자 지갑(상태 저장), 배포, 스키마·발급자 등록, 공고, 증명, epoch 회전, devnet·Preprod E2E
 packages/web            Verifier / Holder / Issuer 웹 앱
 scripts/                컴파일 버전 가드, 재현 검증, proof server 프록시
 docs/                   계획서, 결정 기록(ADR), 데모 기록
 ```
+
+## v2 운영 도구 (JobProof)
+
+- `npm run devnet:e2e`: 로컬 devnet(`infra/devnet`, Docker)에서 배포부터 스키마·발급자 등록, 발급, 공고, 정상 증명, 회로가 거절해야 하는 공격(연봉 위조, 대리 응시, 중복 응답, 과잉 질의, 격자 밖 반복 질의, 취소된 크리덴셜), 재발급, 인덱서 상태 유출 검사까지 실제 증명과 트랜잭션으로 돌리고 `docs/devnet-run.json` 에 남긴다. 기대와 다르면 0이 아닌 코드로 끝난다. GitHub Actions `Devnet e2e` 워크플로가 `v2`, `v2-*` 브랜치 push 마다 실행한다.
+- `npm run cli -- <command> --network <undeployed|preprod>`: deploy, register-schemas, register-issuers, demo-requests, prove, rotate-epoch, status, e2e.
+- `npm run issue -- issue ...`: 발급자는 홀더의 발급 요청(`schema`, `holderCommit`)만 받는다. 홀더 비밀값이 들어 있는 요청은 거절한다.
+- **`config/demo-personas.v2.json` 은 데모 전용이다(`"demoOnly": true`).** 가상 인물의 홀더 비밀값을 누구나 데모를 재현할 수 있도록 일부러 공개했다. 실제 홀더 비밀값은 기기를 떠나지 않는다.
+- Preprod 배포 절차: [docs/runbook-preprod.md](docs/runbook-preprod.md). v2 는 아직 Preprod 에 배포되지 않았다.
 
 ## 한계 (해커톤 범위)
 
@@ -227,4 +235,4 @@ docs/                   계획서, 결정 기록(ADR), 데모 기록
 
 ## 라이선스
 
-Apache-2.0. `create-mn-app` bboard 템플릿(Apache-2.0, Midnight Foundation)의 설정과 `in-memory-private-state-provider.ts` 를 가져와 썼다.
+Apache-2.0. `create-mn-app` bboard 템플릿(Apache-2.0, Midnight Foundation)의 설정과 `in-memory-private-state-provider.ts` 를 가져와 썼다. 로컬 devnet 구성(`infra/devnet`)과 devnet 워크플로의 콜드 스타트 처리, 테스트 수 검사 아이디어는 JustEnough(Apache-2.0)를 참고했다.
