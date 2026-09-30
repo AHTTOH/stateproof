@@ -21,6 +21,9 @@ midnight-level-db/
 # Scratch output of compact --skip-zk runs
 .compact-cache/
 
+# Midnight public BLS parameters (downloaded; scripts/fetch-zk-params.sh)
+.zk-params/
+
 # Editors and OS
 .DS_Store
 .idea/

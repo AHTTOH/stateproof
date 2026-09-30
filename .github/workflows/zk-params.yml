@@ -1,0 +1,48 @@
+name: ZK params and proving time
+
+# 1) Mirrors Midnight's public BLS parameters (bls_midnight_2p{k}) as an artifact, so machines
+#    whose network blocks the public S3 bucket can still build the web app and prove locally
+#    (scripts/fetch-zk-params.sh).
+# 2) Produces a real proof for every v2 circuit with the zkir-v2 WASM prover and records the
+#    proving time (docs/proving-times.json in the artifact).
+on:
+  push:
+    branches: [v2]
+    paths:
+      - 'packages/contract/src/managed/**'
+      - 'packages/contract/scripts/measure-proving.ts'
+      - '.github/workflows/zk-params.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  params:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download public parameters k=10..16
+        run: |
+          mkdir -p .zk-params
+          base="$(node -p "require('./config/networks.json').preprod.zkArtifacts")"
+          for k in 10 11 12 13 14 15 16; do
+            curl -fsSL --retry 5 --retry-delay 3 -o ".zk-params/bls_midnight_2p$k" "$base/bls_midnight_2p$k"
+          done
+          ls -la .zk-params
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zk-params
+          path: .zk-params
+          retention-days: 90
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Prove every circuit and time it
+        run: npx tsx packages/contract/scripts/measure-proving.ts --out docs/proving-times.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: proving-times
+          path: docs/proving-times.json
