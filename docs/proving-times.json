@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-09-30T02:10:37.355Z",
+  "measuredAt": "2026-09-30T02:20:58.790Z",
   "runtime": "node v24.21.0",
   "platform": "linux-x64",
   "prover": "@midnight-ntwrk/zkir-v2 WASM",
@@ -8,35 +8,35 @@
       "circuit": "registerSchema",
       "k": 13,
       "proofBytes": 4501,
-      "proveMs": 13190,
+      "proveMs": 20847,
       "checked": true
     },
     {
       "circuit": "registerIssuer",
       "k": 14,
       "proofBytes": 4853,
-      "proveMs": 26407,
+      "proveMs": 40684,
       "checked": true
     },
     {
       "circuit": "createRequest",
-      "k": 13,
+      "k": 14,
       "proofBytes": 2933,
-      "proveMs": 9214,
+      "proveMs": 26472,
       "checked": true
     },
     {
       "circuit": "submitProof",
       "k": 14,
       "proofBytes": 4853,
-      "proveMs": 26056,
+      "proveMs": 40728,
       "checked": true
     },
     {
       "circuit": "rotateIssuerEpoch",
       "k": 13,
       "proofBytes": 4853,
-      "proveMs": 13750,
+      "proveMs": 21402,
       "checked": true
     }
   ]
