@@ -1,0 +1,456 @@
+{
+  "format": "stateproof-e2e-run/v2",
+  "ok": true,
+  "network": {
+    "name": "undeployed",
+    "networkId": "undeployed",
+    "images": [
+      "midnightntwrk/proof-server:8.1.0",
+      "midnightntwrk/indexer-standalone:4.3.3",
+      "midnightntwrk/midnight-node:1.0.0"
+    ]
+  },
+  "compiler": "compactc 0.31.1",
+  "prover": "proof server http://127.0.0.1:6300",
+  "ranBy": {
+    "githubRun": "https://github.com/AHTTOH/stateproof/actions/runs/36661910537",
+    "commit": "f1207262bb21a110b9cfa0f196decc3ed7e9998b",
+    "ref": "v2-ops"
+  },
+  "ranAt": "2026-09-30T02:55:35.319Z",
+  "finishedAt": "2026-09-30T03:01:08.852Z",
+  "totalSeconds": 334,
+  "contractAddress": "f46caff4c137d2739ce77e4475e736b22cf4b4496635049bf209e21ea1abd6fb",
+  "summary": {
+    "transactions": 14,
+    "refusalsExpected": 9,
+    "refusalsAsExpected": 9,
+    "provingMs": {
+      "registerSchema(career)": 1992,
+      "registerSchema(youth-work)": 1643,
+      "registerIssuer(issuer:acme-hr, career, slot 0)": 3911,
+      "registerIssuer(issuer:nova-hr, career, slot 1)": 3158,
+      "registerIssuer(issuer:youth-work-center, youth-work, slot 2)": 3143,
+      "createRequest(career open posting)": 2506,
+      "createRequest(youth-work open posting)": 2051,
+      "createRequest(career, sealed to one applicant)": 2087,
+      "submitProof(minji -> career open posting)": 3915,
+      "submitProof(sora -> career open posting, other issuer)": 3173,
+      "submitProof(haneul -> youth-work open posting)": 3185,
+      "rotateIssuerEpoch(issuer:acme-hr) -> epoch 1": 2058,
+      "submitProof(minji re-issued epoch 1 -> sealed request)": 3181
+    }
+  },
+  "steps": [
+    {
+      "step": "deploy",
+      "txId": "007e7464e8259df45137977d1f42fb39431a94ea556cfecbf6bb856f250e8be748",
+      "blockHeight": 11,
+      "wallMs": 21473,
+      "contractAddress": "f46caff4c137d2739ce77e4475e736b22cf4b4496635049bf209e21ea1abd6fb"
+    },
+    {
+      "step": "registerSchema(career)",
+      "txId": "005cbf419e2c68baeb86765280516bc77d13d9085b2f9ce313f19783c1fc7709ca",
+      "blockHeight": 15,
+      "provingMs": 1992,
+      "wallMs": 23793
+    },
+    {
+      "step": "registerSchema(youth-work)",
+      "txId": "00e035e1feed03f592ff09d66f7637e4c7c4bf5602128493c58c5b8dc61748fca7",
+      "blockHeight": 19,
+      "provingMs": 1643,
+      "wallMs": 23907
+    },
+    {
+      "step": "registerIssuer(issuer:acme-hr, career, slot 0)",
+      "txId": "0008a67e0e54830829390efe9d8c8a25e740d0b840e3e4a6ac8ad6283e8dffc5ec",
+      "blockHeight": 23,
+      "provingMs": 3911,
+      "wallMs": 23907
+    },
+    {
+      "step": "registerIssuer(issuer:nova-hr, career, slot 1)",
+      "txId": "0001399edcaf0c681f7a797543b00920f2bf7d8831430432aa53abf6604a07a914",
+      "blockHeight": 27,
+      "provingMs": 3158,
+      "wallMs": 23912
+    },
+    {
+      "step": "registerIssuer(issuer:youth-work-center, youth-work, slot 2)",
+      "txId": "00bce612c9d08e6644e10eb4704bacfbeea1af570a28b50a043bd428e0a27aabd0",
+      "blockHeight": 31,
+      "provingMs": 3143,
+      "wallMs": 23918
+    },
+    {
+      "step": "issue(minji, issuer:acme-hr, epoch 0)",
+      "offChain": true,
+      "schema": "career"
+    },
+    {
+      "step": "issue(junho, issuer:acme-hr, epoch 0)",
+      "offChain": true,
+      "schema": "career"
+    },
+    {
+      "step": "issue(sora, issuer:nova-hr, epoch 0)",
+      "offChain": true,
+      "schema": "career"
+    },
+    {
+      "step": "issue(haneul, issuer:youth-work-center, epoch 0)",
+      "offChain": true,
+      "schema": "youth-work"
+    },
+    {
+      "step": "issue(woojin, issuer:youth-work-center, epoch 0)",
+      "offChain": true,
+      "schema": "youth-work"
+    },
+    {
+      "step": "createRequest(career open posting)",
+      "txId": "007c6752a79136d254c668668dcef727eefbe08ba8ac699b46d97baeea4fb8123f",
+      "blockHeight": 35,
+      "provingMs": 2506,
+      "wallMs": 23835
+    },
+    {
+      "step": "createRequest(youth-work open posting)",
+      "txId": "008ff74b4f8a4934968ee7d9158761b1fda512537baea4f830656aeb8fd1d1c736",
+      "blockHeight": 39,
+      "provingMs": 2051,
+      "wallMs": 23910
+    },
+    {
+      "step": "createRequest(career, sealed to one applicant)",
+      "txId": "00f049d2f3f98c3e1f07e6e279c59fb7437d5a9afac202e34d7c7fe82926d8f5c0",
+      "blockHeight": 43,
+      "provingMs": 2087,
+      "wallMs": 23911
+    },
+    {
+      "step": "submitProof(minji -> career open posting)",
+      "txId": "00f1a175cc167414367b6687c30e646b3335b772ae661b9d4a8724fef53271259c",
+      "blockHeight": 47,
+      "provingMs": 3915,
+      "wallMs": 23894,
+      "pseudonym": "73cfafd259650100c00edae6aefbc64c4cd42548a493df8c3c7c9f4770ea1800"
+    },
+    {
+      "step": "submitProof(sora -> career open posting, other issuer)",
+      "txId": "0003191be8600a160231d5bf6ca601f0afcda4b77aa1ab90077487f191f7ffca0c",
+      "blockHeight": 51,
+      "provingMs": 3173,
+      "wallMs": 23881,
+      "pseudonym": "645f48ca2948148642ab11544461dcd82c5ae33169d380840bf717adec312800"
+    },
+    {
+      "step": "submitProof(haneul -> youth-work open posting)",
+      "txId": "00362878a2bb8261072f1028cabd0a53ea1fc9e196a43d4df604dff17e8d25e29d",
+      "blockHeight": 55,
+      "provingMs": 3185,
+      "wallMs": 23887,
+      "pseudonym": "6b89d2763d0f8e64d942a3f420e653b881b51687a7ce6d7df8cdb4fb4e277a00"
+    },
+    {
+      "step": "rotateIssuerEpoch(issuer:acme-hr) -> epoch 1",
+      "txId": "00db74ced6e560bd1291a05673a0716a0ac951408b2b9b88844cbe229faaeb0955",
+      "blockHeight": 59,
+      "provingMs": 2058,
+      "wallMs": 21960
+    },
+    {
+      "step": "holder app check on the stale credential (off-chain)",
+      "offChain": true,
+      "message": "This credential is from issuer epoch 0; the issuer is now at 1. Ask for a re-issued credential."
+    },
+    {
+      "step": "issue(minji, issuer:acme-hr, epoch 1)",
+      "offChain": true,
+      "schema": "career"
+    },
+    {
+      "step": "submitProof(minji re-issued epoch 1 -> sealed request)",
+      "txId": "00306d5e8225e4ab6dd317aa39f1ef66938dfaeecb952a4c8e17634611d559d63a",
+      "blockHeight": 63,
+      "provingMs": 3181,
+      "wallMs": 23648,
+      "pseudonym": "65fa46a9f07bfeeaec1765e8381ab8cb1c51b2384656183812fc88cf7e1f5400"
+    }
+  ],
+  "refusals": [
+    {
+      "attack": "control: honest applicant below the salary bar (junho, 4,200만원)",
+      "circuit": "submitProof",
+      "expected": "Policy conditions are not satisfied",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: Policy conditions are not satisfied",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    },
+    {
+      "attack": "control: honest youth applicant outside the age/region bar (woojin)",
+      "circuit": "submitProof",
+      "expected": "Policy conditions are not satisfied",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: Policy conditions are not satisfied",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    },
+    {
+      "attack": "1. forged salary (claims edited after signing)",
+      "circuit": "submitProof",
+      "expected": "Invalid issuer signature",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: Invalid issuer signature",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    },
+    {
+      "attack": "2. stand-in answer on a sealed request (sora uses minji's link)",
+      "circuit": "submitProof",
+      "expected": "different person",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: Credential belongs to a different person than the one this request is for",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    },
+    {
+      "attack": "3. duplicate answer (minji, same posting)",
+      "circuit": "submitProof",
+      "expected": "already answered this request",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: This holder already answered this request",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    },
+    {
+      "attack": "4a. over-asking: exact salary (= 5,210만원)",
+      "circuit": "createRequest",
+      "expected": "narrows a protected value",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: Policy narrows a protected value too far",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    },
+    {
+      "attack": "4b. over-asking: salary band narrower than 500만원 (5,000..5,100)",
+      "circuit": "createRequest",
+      "expected": "narrows a protected value",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: Policy narrows a protected value too far",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    },
+    {
+      "attack": "6. repeated-query attack: off-grid salary bound (>= 5,100만원)",
+      "circuit": "createRequest",
+      "expected": "must sit on its grid",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: Bounds on a protected value must sit on its grid",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    },
+    {
+      "attack": "5. revoked credential (epoch 0 after the issuer rotated to epoch 1)",
+      "circuit": "submitProof",
+      "expected": "not in the current issuer set",
+      "message": "Unexpected error executing scoped transaction '<unnamed>': Error: failed assert: Credential issuer is not in the current issuer set",
+      "failedAtCircuit": true,
+      "proofsGenerated": 0,
+      "ok": true
+    }
+  ],
+  "leakScan": {
+    "source": "indexer http://127.0.0.1:8088/api/v4/graphql queryContractState(f46caff4c137d2739ce77e4475e736b22cf4b4496635049bf209e21ea1abd6fb) + public data of 13 calls",
+    "ledgerTokens": 111,
+    "secretsScanned": 75,
+    "secretNames": [
+      "admin secret",
+      "issuer secret (issuer:acme-hr)",
+      "issuer secret (issuer:nova-hr)",
+      "issuer secret (issuer:youth-work-center)",
+      "sealed request nonce",
+      "minji: holder secret",
+      "minji: name (UTF-8)",
+      "minji: birth date (text)",
+      "minji/career/epoch 0: holder commitment",
+      "minji/career/epoch 0: subject id",
+      "minji/career/epoch 0: salt",
+      "minji/career/epoch 0: issuedAt",
+      "minji/career/epoch 0: expiresAt",
+      "minji/career/epoch 0: signature s",
+      "minji/career/epoch 0: signature r.x",
+      "minji/career/epoch 0: claim careerMonths = 48",
+      "minji/career/epoch 0: claim annualSalary = 6200",
+      "minji/career/epoch 1: holder commitment",
+      "minji/career/epoch 1: subject id",
+      "minji/career/epoch 1: salt",
+      "minji/career/epoch 1: issuedAt",
+      "minji/career/epoch 1: expiresAt",
+      "minji/career/epoch 1: signature s",
+      "minji/career/epoch 1: signature r.x",
+      "minji/career/epoch 1: claim careerMonths = 48",
+      "minji/career/epoch 1: claim annualSalary = 6200",
+      "junho: holder secret",
+      "junho: name (UTF-8)",
+      "junho: birth date (text)",
+      "junho/career/epoch 0: holder commitment",
+      "junho/career/epoch 0: subject id",
+      "junho/career/epoch 0: salt",
+      "junho/career/epoch 0: issuedAt",
+      "junho/career/epoch 0: expiresAt",
+      "junho/career/epoch 0: signature s",
+      "junho/career/epoch 0: signature r.x",
+      "junho/career/epoch 0: claim careerMonths = 40",
+      "junho/career/epoch 0: claim annualSalary = 4200",
+      "sora: holder secret",
+      "sora: name (UTF-8)",
+      "sora: birth date (text)",
+      "sora/career/epoch 0: holder commitment",
+      "sora/career/epoch 0: subject id",
+      "sora/career/epoch 0: salt",
+      "sora/career/epoch 0: issuedAt",
+      "sora/career/epoch 0: expiresAt",
+      "sora/career/epoch 0: signature s",
+      "sora/career/epoch 0: signature r.x",
+      "sora/career/epoch 0: claim careerMonths = 60",
+      "sora/career/epoch 0: claim annualSalary = 7000",
+      "haneul: holder secret",
+      "haneul: name (UTF-8)",
+      "haneul: birth date (text)",
+      "haneul/youth-work/epoch 0: holder commitment",
+      "haneul/youth-work/epoch 0: subject id",
+      "haneul/youth-work/epoch 0: salt",
+      "haneul/youth-work/epoch 0: issuedAt",
+      "haneul/youth-work/epoch 0: expiresAt",
+      "haneul/youth-work/epoch 0: signature s",
+      "haneul/youth-work/epoch 0: signature r.x",
+      "haneul/youth-work/epoch 0: claim birthDate = 2004-08-21",
+      "haneul/youth-work/epoch 0: claim partTimeMonths = 14",
+      "woojin: holder secret",
+      "woojin: name (UTF-8)",
+      "woojin: birth date (text)",
+      "woojin/youth-work/epoch 0: holder commitment",
+      "woojin/youth-work/epoch 0: subject id",
+      "woojin/youth-work/epoch 0: salt",
+      "woojin/youth-work/epoch 0: issuedAt",
+      "woojin/youth-work/epoch 0: expiresAt",
+      "woojin/youth-work/epoch 0: signature s",
+      "woojin/youth-work/epoch 0: signature r.x",
+      "woojin/youth-work/epoch 0: claim birthDate = 1999-03-09",
+      "woojin/youth-work/epoch 0: claim region = Busan",
+      "woojin/youth-work/epoch 0: claim partTimeMonths = 30"
+    ],
+    "ledgerHits": [],
+    "publicCallDataHits": [],
+    "signerIdentityInSubmitProof": {
+      "submitProofCalls": 4,
+      "secretsScanned": 15,
+      "hits": []
+    },
+    "notScannable": [
+      {
+        "name": "minji/career/epoch 0: claim employmentStatus = Active",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "minji/career/epoch 0: claim jobCategory = Engineering",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "minji/career/epoch 0: claim employmentType = Permanent",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "minji/career/epoch 1: claim employmentStatus = Active",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "minji/career/epoch 1: claim jobCategory = Engineering",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "minji/career/epoch 1: claim employmentType = Permanent",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "junho/career/epoch 0: claim employmentStatus = Active",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "junho/career/epoch 0: claim jobCategory = Engineering",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "junho/career/epoch 0: claim employmentType = Permanent",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "sora/career/epoch 0: claim employmentStatus = Active",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "sora/career/epoch 0: claim jobCategory = Engineering",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "sora/career/epoch 0: claim employmentType = Permanent",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "haneul/youth-work/epoch 0: claim region = Seoul",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "haneul/youth-work/epoch 0: claim studentStatus = Enrolled",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      },
+      {
+        "name": "woojin/youth-work/epoch 0: claim studentStatus = NotStudent",
+        "reason": "equals a value that is public on purpose (policy constant, slot, epoch or count); an exact-token scan cannot tell them apart"
+      }
+    ],
+    "positiveControls": [
+      {
+        "name": "public threshold annualSalary >= 5000",
+        "source": "ledger state (indexer)",
+        "found": true
+      },
+      {
+        "name": "minji pseudonym for the career posting",
+        "source": "ledger state (indexer)",
+        "found": true
+      },
+      {
+        "name": "issuer:acme-hr id (public registry)",
+        "source": "ledger state (indexer)",
+        "found": true
+      },
+      {
+        "name": "issuer:acme-hr public key x (public registry)",
+        "source": "ledger state (indexer)",
+        "found": true
+      },
+      {
+        "name": "minji pseudonym",
+        "source": "submitProof(minji -> career open posting) (public call data)",
+        "found": true
+      },
+      {
+        "name": "minji holder secret",
+        "source": "submitProof(minji -> career open posting) (prover-only data)",
+        "found": true
+      },
+      {
+        "name": "minji salary 6,200",
+        "source": "submitProof(minji -> career open posting) (prover-only data)",
+        "found": true
+      }
+    ]
+  },
+  "failures": [],
+  "fatal": null
+}
