@@ -196,16 +196,17 @@ const _descriptor_19 = new _IssuerRecord_0();
 
 class _SlotRule_0 {
   alignment() {
-    return _descriptor_7.alignment().concat(_descriptor_3.alignment());
+    return _descriptor_7.alignment().concat(_descriptor_3.alignment().concat(_descriptor_3.alignment()));
   }
   fromValue(value_0) {
     return {
       sensitive: _descriptor_7.fromValue(value_0),
-      minWidth: _descriptor_3.fromValue(value_0)
+      minWidth: _descriptor_3.fromValue(value_0),
+      step: _descriptor_3.fromValue(value_0)
     }
   }
   toValue(value_0) {
-    return _descriptor_7.toValue(value_0.sensitive).concat(_descriptor_3.toValue(value_0.minWidth));
+    return _descriptor_7.toValue(value_0.sensitive).concat(_descriptor_3.toValue(value_0.minWidth).concat(_descriptor_3.toValue(value_0.step)));
   }
 }
 
@@ -229,6 +230,25 @@ class _SchemaRule_0 {
 
 const _descriptor_22 = new _SchemaRule_0();
 
+class _GridPoint_0 {
+  alignment() {
+    return _descriptor_3.alignment().concat(_descriptor_3.alignment());
+  }
+  fromValue(value_0) {
+    return {
+      lo: _descriptor_3.fromValue(value_0),
+      hi: _descriptor_3.fromValue(value_0)
+    }
+  }
+  toValue(value_0) {
+    return _descriptor_3.toValue(value_0.lo).concat(_descriptor_3.toValue(value_0.hi));
+  }
+}
+
+const _descriptor_23 = new _GridPoint_0();
+
+const _descriptor_24 = new __compactRuntime.CompactTypeVector(4, _descriptor_23);
+
 class _MerkleTreePathEntry_0 {
   alignment() {
     return _descriptor_13.alignment().concat(_descriptor_7.alignment());
@@ -244,26 +264,26 @@ class _MerkleTreePathEntry_0 {
   }
 }
 
-const _descriptor_23 = new _MerkleTreePathEntry_0();
+const _descriptor_25 = new _MerkleTreePathEntry_0();
 
-const _descriptor_24 = new __compactRuntime.CompactTypeVector(6, _descriptor_23);
+const _descriptor_26 = new __compactRuntime.CompactTypeVector(6, _descriptor_25);
 
 class _MerkleTreePath_0 {
   alignment() {
-    return _descriptor_0.alignment().concat(_descriptor_24.alignment());
+    return _descriptor_0.alignment().concat(_descriptor_26.alignment());
   }
   fromValue(value_0) {
     return {
       leaf: _descriptor_0.fromValue(value_0),
-      path: _descriptor_24.fromValue(value_0)
+      path: _descriptor_26.fromValue(value_0)
     }
   }
   toValue(value_0) {
-    return _descriptor_0.toValue(value_0.leaf).concat(_descriptor_24.toValue(value_0.path));
+    return _descriptor_0.toValue(value_0.leaf).concat(_descriptor_26.toValue(value_0.path));
   }
 }
 
-const _descriptor_25 = new _MerkleTreePath_0();
+const _descriptor_27 = new _MerkleTreePath_0();
 
 class _Signature_0 {
   alignment() {
@@ -280,13 +300,13 @@ class _Signature_0 {
   }
 }
 
-const _descriptor_26 = new _Signature_0();
+const _descriptor_28 = new _Signature_0();
 
-const _descriptor_27 = new __compactRuntime.CompactTypeVector(8, _descriptor_3);
+const _descriptor_29 = new __compactRuntime.CompactTypeVector(8, _descriptor_3);
 
 class _Credential_0 {
   alignment() {
-    return _descriptor_0.alignment().concat(_descriptor_0.alignment().concat(_descriptor_18.alignment().concat(_descriptor_10.alignment().concat(_descriptor_10.alignment().concat(_descriptor_27.alignment().concat(_descriptor_3.alignment().concat(_descriptor_3.alignment().concat(_descriptor_0.alignment()))))))));
+    return _descriptor_0.alignment().concat(_descriptor_0.alignment().concat(_descriptor_18.alignment().concat(_descriptor_10.alignment().concat(_descriptor_10.alignment().concat(_descriptor_29.alignment().concat(_descriptor_3.alignment().concat(_descriptor_3.alignment().concat(_descriptor_0.alignment()))))))));
   }
   fromValue(value_0) {
     return {
@@ -295,18 +315,18 @@ class _Credential_0 {
       epoch: _descriptor_18.fromValue(value_0),
       holderCommit: _descriptor_10.fromValue(value_0),
       subjectId: _descriptor_10.fromValue(value_0),
-      claims: _descriptor_27.fromValue(value_0),
+      claims: _descriptor_29.fromValue(value_0),
       issuedAt: _descriptor_3.fromValue(value_0),
       expiresAt: _descriptor_3.fromValue(value_0),
       salt: _descriptor_0.fromValue(value_0)
     }
   }
   toValue(value_0) {
-    return _descriptor_0.toValue(value_0.schemaId).concat(_descriptor_0.toValue(value_0.issuerId).concat(_descriptor_18.toValue(value_0.epoch).concat(_descriptor_10.toValue(value_0.holderCommit).concat(_descriptor_10.toValue(value_0.subjectId).concat(_descriptor_27.toValue(value_0.claims).concat(_descriptor_3.toValue(value_0.issuedAt).concat(_descriptor_3.toValue(value_0.expiresAt).concat(_descriptor_0.toValue(value_0.salt)))))))));
+    return _descriptor_0.toValue(value_0.schemaId).concat(_descriptor_0.toValue(value_0.issuerId).concat(_descriptor_18.toValue(value_0.epoch).concat(_descriptor_10.toValue(value_0.holderCommit).concat(_descriptor_10.toValue(value_0.subjectId).concat(_descriptor_29.toValue(value_0.claims).concat(_descriptor_3.toValue(value_0.issuedAt).concat(_descriptor_3.toValue(value_0.expiresAt).concat(_descriptor_0.toValue(value_0.salt)))))))));
   }
 }
 
-const _descriptor_28 = new _Credential_0();
+const _descriptor_30 = new _Credential_0();
 
 class _Bounds_0 {
   alignment() {
@@ -324,50 +344,30 @@ class _Bounds_0 {
   }
 }
 
-const _descriptor_29 = new _Bounds_0();
+const _descriptor_31 = new _Bounds_0();
 
-const _descriptor_30 = new __compactRuntime.CompactTypeVector(8, _descriptor_1);
+const _descriptor_32 = new __compactRuntime.CompactTypeVector(8, _descriptor_1);
 
-const _descriptor_31 = new __compactRuntime.CompactTypeBytes(6);
+const _descriptor_33 = new __compactRuntime.CompactTypeVector(2, _descriptor_0);
+
+const _descriptor_34 = new __compactRuntime.CompactTypeBytes(6);
 
 class _LeafPreimage_0 {
   alignment() {
-    return _descriptor_31.alignment().concat(_descriptor_0.alignment());
+    return _descriptor_34.alignment().concat(_descriptor_0.alignment());
   }
   fromValue(value_0) {
     return {
-      domain_sep: _descriptor_31.fromValue(value_0),
+      domain_sep: _descriptor_34.fromValue(value_0),
       data: _descriptor_0.fromValue(value_0)
     }
   }
   toValue(value_0) {
-    return _descriptor_31.toValue(value_0.domain_sep).concat(_descriptor_0.toValue(value_0.data));
+    return _descriptor_34.toValue(value_0.domain_sep).concat(_descriptor_0.toValue(value_0.data));
   }
 }
 
-const _descriptor_32 = new _LeafPreimage_0();
-
-const _descriptor_33 = new __compactRuntime.CompactTypeVector(2, _descriptor_10);
-
-const _descriptor_34 = new __compactRuntime.CompactTypeVector(2, _descriptor_0);
-
-class _PseudonymPreimage_0 {
-  alignment() {
-    return _descriptor_0.alignment().concat(_descriptor_0.alignment().concat(_descriptor_0.alignment()));
-  }
-  fromValue(value_0) {
-    return {
-      domain: _descriptor_0.fromValue(value_0),
-      requestId: _descriptor_0.fromValue(value_0),
-      secret: _descriptor_0.fromValue(value_0)
-    }
-  }
-  toValue(value_0) {
-    return _descriptor_0.toValue(value_0.domain).concat(_descriptor_0.toValue(value_0.requestId).concat(_descriptor_0.toValue(value_0.secret)));
-  }
-}
-
-const _descriptor_35 = new _PseudonymPreimage_0();
+const _descriptor_35 = new _LeafPreimage_0();
 
 class _IssuerLeafPreimage_0 {
   alignment() {
@@ -389,22 +389,7 @@ class _IssuerLeafPreimage_0 {
 
 const _descriptor_36 = new _IssuerLeafPreimage_0();
 
-class _SubjectIdPreimage_0 {
-  alignment() {
-    return _descriptor_0.alignment().concat(_descriptor_0.alignment());
-  }
-  fromValue(value_0) {
-    return {
-      domain: _descriptor_0.fromValue(value_0),
-      digest: _descriptor_0.fromValue(value_0)
-    }
-  }
-  toValue(value_0) {
-    return _descriptor_0.toValue(value_0.domain).concat(_descriptor_0.toValue(value_0.digest));
-  }
-}
-
-const _descriptor_37 = new _SubjectIdPreimage_0();
+const _descriptor_37 = new __compactRuntime.CompactTypeVector(2, _descriptor_10);
 
 class _SubjectCommitPreimage_0 {
   alignment() {
@@ -424,24 +409,23 @@ class _SubjectCommitPreimage_0 {
 
 const _descriptor_38 = new _SubjectCommitPreimage_0();
 
-class _ChallengePreimage_0 {
+class _PseudonymPreimage_0 {
   alignment() {
-    return _descriptor_0.alignment().concat(_descriptor_10.alignment().concat(_descriptor_17.alignment().concat(_descriptor_17.alignment())));
+    return _descriptor_0.alignment().concat(_descriptor_0.alignment().concat(_descriptor_0.alignment()));
   }
   fromValue(value_0) {
     return {
       domain: _descriptor_0.fromValue(value_0),
-      root: _descriptor_10.fromValue(value_0),
-      publicKey: _descriptor_17.fromValue(value_0),
-      r: _descriptor_17.fromValue(value_0)
+      requestId: _descriptor_0.fromValue(value_0),
+      secret: _descriptor_0.fromValue(value_0)
     }
   }
   toValue(value_0) {
-    return _descriptor_0.toValue(value_0.domain).concat(_descriptor_10.toValue(value_0.root).concat(_descriptor_17.toValue(value_0.publicKey).concat(_descriptor_17.toValue(value_0.r))));
+    return _descriptor_0.toValue(value_0.domain).concat(_descriptor_0.toValue(value_0.requestId).concat(_descriptor_0.toValue(value_0.secret)));
   }
 }
 
-const _descriptor_39 = new _ChallengePreimage_0();
+const _descriptor_39 = new _PseudonymPreimage_0();
 
 class _HolderPreimage_0 {
   alignment() {
@@ -460,22 +444,58 @@ class _HolderPreimage_0 {
 
 const _descriptor_40 = new _HolderPreimage_0();
 
-class _CredentialPreimage_0 {
+class _SubjectIdPreimage_0 {
   alignment() {
-    return _descriptor_0.alignment().concat(_descriptor_28.alignment());
+    return _descriptor_0.alignment().concat(_descriptor_0.alignment());
   }
   fromValue(value_0) {
     return {
       domain: _descriptor_0.fromValue(value_0),
-      credential: _descriptor_28.fromValue(value_0)
+      digest: _descriptor_0.fromValue(value_0)
     }
   }
   toValue(value_0) {
-    return _descriptor_0.toValue(value_0.domain).concat(_descriptor_28.toValue(value_0.credential));
+    return _descriptor_0.toValue(value_0.domain).concat(_descriptor_0.toValue(value_0.digest));
   }
 }
 
-const _descriptor_41 = new _CredentialPreimage_0();
+const _descriptor_41 = new _SubjectIdPreimage_0();
+
+class _CredentialPreimage_0 {
+  alignment() {
+    return _descriptor_0.alignment().concat(_descriptor_30.alignment());
+  }
+  fromValue(value_0) {
+    return {
+      domain: _descriptor_0.fromValue(value_0),
+      credential: _descriptor_30.fromValue(value_0)
+    }
+  }
+  toValue(value_0) {
+    return _descriptor_0.toValue(value_0.domain).concat(_descriptor_30.toValue(value_0.credential));
+  }
+}
+
+const _descriptor_42 = new _CredentialPreimage_0();
+
+class _ChallengePreimage_0 {
+  alignment() {
+    return _descriptor_0.alignment().concat(_descriptor_10.alignment().concat(_descriptor_17.alignment().concat(_descriptor_17.alignment())));
+  }
+  fromValue(value_0) {
+    return {
+      domain: _descriptor_0.fromValue(value_0),
+      root: _descriptor_10.fromValue(value_0),
+      publicKey: _descriptor_17.fromValue(value_0),
+      r: _descriptor_17.fromValue(value_0)
+    }
+  }
+  toValue(value_0) {
+    return _descriptor_0.toValue(value_0.domain).concat(_descriptor_10.toValue(value_0.root).concat(_descriptor_17.toValue(value_0.publicKey).concat(_descriptor_17.toValue(value_0.r))));
+  }
+}
+
+const _descriptor_43 = new _ChallengePreimage_0();
 
 class _Either_0 {
   alignment() {
@@ -493,9 +513,9 @@ class _Either_0 {
   }
 }
 
-const _descriptor_42 = new _Either_0();
+const _descriptor_44 = new _Either_0();
 
-const _descriptor_43 = new __compactRuntime.CompactTypeUnsignedInteger(340282366920938463463374607431768211455n, 16);
+const _descriptor_45 = new __compactRuntime.CompactTypeUnsignedInteger(340282366920938463463374607431768211455n, 16);
 
 class _ContractAddress_0 {
   alignment() {
@@ -511,7 +531,7 @@ class _ContractAddress_0 {
   }
 }
 
-const _descriptor_44 = new _ContractAddress_0();
+const _descriptor_46 = new _ContractAddress_0();
 
 export class Contract {
   witnesses;
@@ -630,6 +650,15 @@ export class Contract {
       respectsSensitiveSlots(context, ...args_1) {
         return { result: pureCircuits.respectsSensitiveSlots(...args_1), context };
       },
+      ruleForSlot(context, ...args_1) {
+        return { result: pureCircuits.ruleForSlot(...args_1), context };
+      },
+      conditionOnGrid(context, ...args_1) {
+        return { result: pureCircuits.conditionOnGrid(...args_1), context };
+      },
+      boundsOnGrid(context, ...args_1) {
+        return { result: pureCircuits.boundsOnGrid(...args_1), context };
+      },
       revealedClaim(context, ...args_1) {
         return { result: pureCircuits.revealedClaim(...args_1), context };
       },
@@ -657,11 +686,11 @@ export class Contract {
                                      'Bytes<32>',
                                      schemaId_0)
         }
-        if (!(typeof(rule_0) === 'object' && Array.isArray(rule_0.slots) && rule_0.slots.length === 8 && rule_0.slots.every((t) => typeof(t) === 'object' && typeof(t.sensitive) === 'boolean' && typeof(t.minWidth) === 'bigint' && t.minWidth >= 0n && t.minWidth <= 18446744073709551615n))) {
+        if (!(typeof(rule_0) === 'object' && Array.isArray(rule_0.slots) && rule_0.slots.length === 8 && rule_0.slots.every((t) => typeof(t) === 'object' && typeof(t.sensitive) === 'boolean' && typeof(t.minWidth) === 'bigint' && t.minWidth >= 0n && t.minWidth <= 18446744073709551615n && typeof(t.step) === 'bigint' && t.step >= 0n && t.step <= 18446744073709551615n))) {
           __compactRuntime.typeError('registerSchema',
                                      'argument 2 (argument 3 as invoked from Typescript)',
                                      'stateproof.compact line 78 char 1',
-                                     'struct SchemaRule<slots: Vector<8, struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>>>>',
+                                     'struct SchemaRule<slots: Vector<8, struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>, step: Uint<0..18446744073709551616>>>>',
                                      rule_0)
         }
         const context = { ...contextOrig_0, gasCost: __compactRuntime.emptyRunningCost() };
@@ -693,28 +722,28 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('registerIssuer',
                                      'argument 1 (as invoked from Typescript)',
-                                     'stateproof.compact line 85 char 1',
+                                     'stateproof.compact line 89 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(issuerId_0.buffer instanceof ArrayBuffer && issuerId_0.BYTES_PER_ELEMENT === 1 && issuerId_0.length === 32)) {
           __compactRuntime.typeError('registerIssuer',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'stateproof.compact line 85 char 1',
+                                     'stateproof.compact line 89 char 1',
                                      'Bytes<32>',
                                      issuerId_0)
         }
         if (!(schemaId_0.buffer instanceof ArrayBuffer && schemaId_0.BYTES_PER_ELEMENT === 1 && schemaId_0.length === 32)) {
           __compactRuntime.typeError('registerIssuer',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'stateproof.compact line 85 char 1',
+                                     'stateproof.compact line 89 char 1',
                                      'Bytes<32>',
                                      schemaId_0)
         }
         if (!(typeof(slot_0) === 'bigint' && slot_0 >= 0n && slot_0 <= 18446744073709551615n)) {
           __compactRuntime.typeError('registerIssuer',
                                      'argument 4 (argument 5 as invoked from Typescript)',
-                                     'stateproof.compact line 85 char 1',
+                                     'stateproof.compact line 89 char 1',
                                      'Uint<0..18446744073709551616>',
                                      slot_0)
         }
@@ -746,14 +775,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('rotateIssuerEpoch',
                                      'argument 1 (as invoked from Typescript)',
-                                     'stateproof.compact line 103 char 1',
+                                     'stateproof.compact line 107 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(issuerId_0.buffer instanceof ArrayBuffer && issuerId_0.BYTES_PER_ELEMENT === 1 && issuerId_0.length === 32)) {
           __compactRuntime.typeError('rotateIssuerEpoch',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'stateproof.compact line 103 char 1',
+                                     'stateproof.compact line 107 char 1',
                                      'Bytes<32>',
                                      issuerId_0)
         }
@@ -782,14 +811,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('deactivateIssuer',
                                      'argument 1 (as invoked from Typescript)',
-                                     'stateproof.compact line 121 char 1',
+                                     'stateproof.compact line 125 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(issuerId_0.buffer instanceof ArrayBuffer && issuerId_0.BYTES_PER_ELEMENT === 1 && issuerId_0.length === 32)) {
           __compactRuntime.typeError('deactivateIssuer',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'stateproof.compact line 121 char 1',
+                                     'stateproof.compact line 125 char 1',
                                      'Bytes<32>',
                                      issuerId_0)
         }
@@ -810,62 +839,70 @@ export class Contract {
         return { result: result_0, context: context, proofData: partialProofData, gasCost: context.gasCost };
       },
       createRequest: (...args_1) => {
-        if (args_1.length !== 6) {
-          throw new __compactRuntime.CompactError(`createRequest: expected 6 arguments (as invoked from Typescript), received ${args_1.length}`);
+        if (args_1.length !== 7) {
+          throw new __compactRuntime.CompactError(`createRequest: expected 7 arguments (as invoked from Typescript), received ${args_1.length}`);
         }
         const contextOrig_0 = args_1[0];
         const requestId_0 = args_1[1];
         const policy_0 = args_1[2];
-        const referenceTime_0 = args_1[3];
-        const expiresAt_0 = args_1[4];
-        const subjectCommit_0 = args_1[5];
+        const grid_0 = args_1[3];
+        const referenceTime_0 = args_1[4];
+        const expiresAt_0 = args_1[5];
+        const subjectCommit_0 = args_1[6];
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('createRequest',
                                      'argument 1 (as invoked from Typescript)',
-                                     'stateproof.compact line 136 char 1',
+                                     'stateproof.compact line 140 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(requestId_0.buffer instanceof ArrayBuffer && requestId_0.BYTES_PER_ELEMENT === 1 && requestId_0.length === 32)) {
           __compactRuntime.typeError('createRequest',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'stateproof.compact line 136 char 1',
+                                     'stateproof.compact line 140 char 1',
                                      'Bytes<32>',
                                      requestId_0)
         }
         if (!(typeof(policy_0) === 'object' && policy_0.schemaId.buffer instanceof ArrayBuffer && policy_0.schemaId.BYTES_PER_ELEMENT === 1 && policy_0.schemaId.length === 32 && Array.isArray(policy_0.conditions) && policy_0.conditions.length === 4 && policy_0.conditions.every((t) => typeof(t) === 'object' && typeof(t.claimIndex) === 'bigint' && t.claimIndex >= 0n && t.claimIndex <= 255n && typeof(t.op) === 'number' && t.op >= 0 && t.op <= 6 && typeof(t.value) === 'bigint' && t.value >= 0n && t.value <= 18446744073709551615n && typeof(t.value2) === 'bigint' && t.value2 >= 0n && t.value2 <= 18446744073709551615n && Array.isArray(t.set) && t.set.length === 4 && t.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n)) && typeof(policy_0.revealSlot) === 'object' && typeof(policy_0.revealSlot.is_some) === 'boolean' && typeof(policy_0.revealSlot.value) === 'bigint' && policy_0.revealSlot.value >= 0n && policy_0.revealSlot.value <= 255n)) {
           __compactRuntime.typeError('createRequest',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'stateproof.compact line 136 char 1',
+                                     'stateproof.compact line 140 char 1',
                                      'struct Policy<schemaId: Bytes<32>, conditions: Vector<4, struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>>, revealSlot: struct Maybe<is_some: Boolean, value: Uint<0..256>>>',
                                      policy_0)
         }
-        if (!(typeof(referenceTime_0) === 'bigint' && referenceTime_0 >= 0n && referenceTime_0 <= 18446744073709551615n)) {
+        if (!(Array.isArray(grid_0) && grid_0.length === 4 && grid_0.every((t) => typeof(t) === 'object' && typeof(t.lo) === 'bigint' && t.lo >= 0n && t.lo <= 18446744073709551615n && typeof(t.hi) === 'bigint' && t.hi >= 0n && t.hi <= 18446744073709551615n))) {
           __compactRuntime.typeError('createRequest',
                                      'argument 3 (argument 4 as invoked from Typescript)',
-                                     'stateproof.compact line 136 char 1',
+                                     'stateproof.compact line 140 char 1',
+                                     'Vector<4, struct GridPoint<lo: Uint<0..18446744073709551616>, hi: Uint<0..18446744073709551616>>>',
+                                     grid_0)
+        }
+        if (!(typeof(referenceTime_0) === 'bigint' && referenceTime_0 >= 0n && referenceTime_0 <= 18446744073709551615n)) {
+          __compactRuntime.typeError('createRequest',
+                                     'argument 4 (argument 5 as invoked from Typescript)',
+                                     'stateproof.compact line 140 char 1',
                                      'Uint<0..18446744073709551616>',
                                      referenceTime_0)
         }
         if (!(typeof(expiresAt_0) === 'bigint' && expiresAt_0 >= 0n && expiresAt_0 <= 18446744073709551615n)) {
           __compactRuntime.typeError('createRequest',
-                                     'argument 4 (argument 5 as invoked from Typescript)',
-                                     'stateproof.compact line 136 char 1',
+                                     'argument 5 (argument 6 as invoked from Typescript)',
+                                     'stateproof.compact line 140 char 1',
                                      'Uint<0..18446744073709551616>',
                                      expiresAt_0)
         }
         if (!(typeof(subjectCommit_0) === 'object' && typeof(subjectCommit_0.is_some) === 'boolean' && typeof(subjectCommit_0.value) === 'bigint' && subjectCommit_0.value >= 0 && subjectCommit_0.value <= __compactRuntime.MAX_FIELD)) {
           __compactRuntime.typeError('createRequest',
-                                     'argument 5 (argument 6 as invoked from Typescript)',
-                                     'stateproof.compact line 136 char 1',
+                                     'argument 6 (argument 7 as invoked from Typescript)',
+                                     'stateproof.compact line 140 char 1',
                                      'struct Maybe<is_some: Boolean, value: Field>',
                                      subjectCommit_0)
         }
         const context = { ...contextOrig_0, gasCost: __compactRuntime.emptyRunningCost() };
         const partialProofData = {
           input: {
-            value: _descriptor_0.toValue(requestId_0).concat(_descriptor_9.toValue(policy_0).concat(_descriptor_3.toValue(referenceTime_0).concat(_descriptor_3.toValue(expiresAt_0).concat(_descriptor_11.toValue(subjectCommit_0))))),
-            alignment: _descriptor_0.alignment().concat(_descriptor_9.alignment().concat(_descriptor_3.alignment().concat(_descriptor_3.alignment().concat(_descriptor_11.alignment()))))
+            value: _descriptor_0.toValue(requestId_0).concat(_descriptor_9.toValue(policy_0).concat(_descriptor_24.toValue(grid_0).concat(_descriptor_3.toValue(referenceTime_0).concat(_descriptor_3.toValue(expiresAt_0).concat(_descriptor_11.toValue(subjectCommit_0)))))),
+            alignment: _descriptor_0.alignment().concat(_descriptor_9.alignment().concat(_descriptor_24.alignment().concat(_descriptor_3.alignment().concat(_descriptor_3.alignment().concat(_descriptor_11.alignment())))))
           },
           output: undefined,
           publicTranscript: [],
@@ -875,6 +912,7 @@ export class Contract {
                                                partialProofData,
                                                requestId_0,
                                                policy_0,
+                                               grid_0,
                                                referenceTime_0,
                                                expiresAt_0,
                                                subjectCommit_0);
@@ -890,14 +928,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('submitProof',
                                      'argument 1 (as invoked from Typescript)',
-                                     'stateproof.compact line 166 char 1',
+                                     'stateproof.compact line 172 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(requestId_0.buffer instanceof ArrayBuffer && requestId_0.BYTES_PER_ELEMENT === 1 && requestId_0.length === 32)) {
           __compactRuntime.typeError('submitProof',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'stateproof.compact line 166 char 1',
+                                     'stateproof.compact line 172 char 1',
                                      'Bytes<32>',
                                      requestId_0)
         }
@@ -1125,11 +1163,11 @@ export class Contract {
     return !this._blockTimeLt_0(context, partialProofData, time_0);
   }
   _transientHash_0(value_0) {
-    const result_0 = __compactRuntime.transientHash(_descriptor_41, value_0);
+    const result_0 = __compactRuntime.transientHash(_descriptor_42, value_0);
     return result_0;
   }
   _transientHash_1(value_0) {
-    const result_0 = __compactRuntime.transientHash(_descriptor_39, value_0);
+    const result_0 = __compactRuntime.transientHash(_descriptor_43, value_0);
     return result_0;
   }
   _transientHash_2(value_0) {
@@ -1137,7 +1175,7 @@ export class Contract {
     return result_0;
   }
   _transientHash_3(value_0) {
-    const result_0 = __compactRuntime.transientHash(_descriptor_37, value_0);
+    const result_0 = __compactRuntime.transientHash(_descriptor_41, value_0);
     return result_0;
   }
   _transientHash_4(value_0) {
@@ -1145,7 +1183,7 @@ export class Contract {
     return result_0;
   }
   _transientHash_5(value_0) {
-    const result_0 = __compactRuntime.transientHash(_descriptor_35, value_0);
+    const result_0 = __compactRuntime.transientHash(_descriptor_39, value_0);
     return result_0;
   }
   _transientHash_6(value_0) {
@@ -1153,15 +1191,15 @@ export class Contract {
     return result_0;
   }
   _transientHash_7(value_0) {
-    const result_0 = __compactRuntime.transientHash(_descriptor_33, value_0);
+    const result_0 = __compactRuntime.transientHash(_descriptor_37, value_0);
     return result_0;
   }
   _persistentHash_0(value_0) {
-    const result_0 = __compactRuntime.persistentHash(_descriptor_34, value_0);
+    const result_0 = __compactRuntime.persistentHash(_descriptor_33, value_0);
     return result_0;
   }
   _persistentHash_1(value_0) {
-    const result_0 = __compactRuntime.persistentHash(_descriptor_32, value_0);
+    const result_0 = __compactRuntime.persistentHash(_descriptor_35, value_0);
     return result_0;
   }
   _degradeToTransient_0(x_0) {
@@ -1425,6 +1463,36 @@ export class Contract {
                           rule_0.slots,
                           this._slotIndexes_0());
   }
+  _ruleForSlot_0(rule_0, index_0) {
+    return this._folder_7(((acc_0, r_0, slot_0) =>
+                           {
+                             if (this._equal_6(slot_0, index_0)) {
+                               return r_0;
+                             } else {
+                               return acc_0;
+                             }
+                           }),
+                          { sensitive: false, minWidth: 0n, step: 1n },
+                          rule_0.slots,
+                          this._slotIndexes_0());
+  }
+  _conditionOnGrid_0(rule_0, c_0, g_0) {
+    const r_0 = this._ruleForSlot_0(rule_0, c_0.claimIndex);
+    const loOk_0 = this._equal_7(c_0.value, g_0.lo * r_0.step);
+    const hiOk_0 = c_0.op !== 5 || this._equal_8(c_0.value2, g_0.hi * r_0.step);
+    return !r_0.sensitive || c_0.op === 0 || loOk_0 && hiOk_0;
+  }
+  _boundsOnGrid_0(policy_0, rule_0, grid_0) {
+    return this._folder_8(((acc_0, c_0, g_0) =>
+                           {
+                             return acc_0
+                                    &&
+                                    this._conditionOnGrid_0(rule_0, c_0, g_0);
+                           }),
+                          true,
+                          policy_0.conditions,
+                          grid_0);
+  }
   _revealedClaim_0(claims_0, revealSlot_0) {
     if (revealSlot_0.is_some) {
       return this._some_0(this._selectClaim_0(claims_0, revealSlot_0.value));
@@ -1479,8 +1547,8 @@ export class Contract {
                                  result_0)
     }
     partialProofData.privateTranscriptOutputs.push({
-      value: _descriptor_28.toValue(result_0),
-      alignment: _descriptor_28.alignment()
+      value: _descriptor_30.toValue(result_0),
+      alignment: _descriptor_30.alignment()
     });
     return result_0;
   }
@@ -1496,8 +1564,8 @@ export class Contract {
                                  result_0)
     }
     partialProofData.privateTranscriptOutputs.push({
-      value: _descriptor_26.toValue(result_0),
-      alignment: _descriptor_26.alignment()
+      value: _descriptor_28.toValue(result_0),
+      alignment: _descriptor_28.alignment()
     });
     return result_0;
   }
@@ -1540,8 +1608,8 @@ export class Contract {
                                  result_0)
     }
     partialProofData.privateTranscriptOutputs.push({
-      value: _descriptor_25.toValue(result_0),
-      alignment: _descriptor_25.alignment()
+      value: _descriptor_27.toValue(result_0),
+      alignment: _descriptor_27.alignment()
     });
     return result_0;
   }
@@ -1566,7 +1634,7 @@ export class Contract {
     return this._persistentHash_0([this._adminDomain_0(), secret_0]);
   }
   _requireAdmin_0(context, partialProofData) {
-    __compactRuntime.assert(this._equal_6(this._adminKey_0(this._adminSecret_0(context,
+    __compactRuntime.assert(this._equal_9(this._adminKey_0(this._adminSecret_0(context,
                                                                                partialProofData)),
                                           _descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                                     partialProofData,
@@ -1586,6 +1654,7 @@ export class Contract {
   _registerSchema_0(context, partialProofData, schemaId_0, rule_0) {
     this._requireAdmin_0(context, partialProofData);
     const id_0 = schemaId_0;
+    const r_0 = rule_0;
     __compactRuntime.assert(!_descriptor_7.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                        partialProofData,
                                                                                        [
@@ -1603,6 +1672,17 @@ export class Contract {
                                                                                         { popeq: { cached: true,
                                                                                                    result: undefined } }]).value),
                             'Schema already registered');
+    this._folder_9(context,
+                   partialProofData,
+                   ((context, partialProofData, t_0, slot_0) =>
+                    {
+                      let t_1;
+                      __compactRuntime.assert((t_1 = slot_0.step, t_1 > 0n),
+                                              'Grid step must be positive');
+                      return t_0;
+                    }),
+                   [],
+                   r_0.slots);
     __compactRuntime.queryLedgerState(context,
                                       partialProofData,
                                       [
@@ -1616,7 +1696,7 @@ export class Contract {
                                                  value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(id_0),
                                                                                               alignment: _descriptor_0.alignment() }).encode() } },
                                        { push: { storage: true,
-                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_22.toValue(rule_0),
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_22.toValue(r_0),
                                                                                               alignment: _descriptor_22.alignment() }).encode() } },
                                        { ins: { cached: false, n: 1 } },
                                        { ins: { cached: true, n: 1 } }]);
@@ -1817,7 +1897,7 @@ export class Contract {
                             'Only the issuer can rotate its epoch');
     const next_0 = ((t1) => {
                      if (t1 > 4294967295n) {
-                       throw new __compactRuntime.CompactError('stateproof.compact line 109 char 16: cast from Field or Uint value to smaller Uint value failed: ' + t1 + ' is greater than 4294967295');
+                       throw new __compactRuntime.CompactError('stateproof.compact line 113 char 16: cast from Field or Uint value to smaller Uint value failed: ' + t1 + ' is greater than 4294967295');
                      }
                      return t1;
                    })(record_0.epoch + 1n);
@@ -2005,6 +2085,7 @@ export class Contract {
                    partialProofData,
                    requestId_0,
                    policy_0,
+                   grid_0,
                    referenceTime_0,
                    expiresAt_0,
                    subjectCommit_0)
@@ -2051,27 +2132,30 @@ export class Contract {
                             'Schema is not registered');
     this._assertWellFormedPolicy_0(publicPolicy_0);
     let tmp_1;
+    const rule_0 = (tmp_1 = publicPolicy_0.schemaId,
+                    _descriptor_22.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                               partialProofData,
+                                                                               [
+                                                                                { dup: { n: 0 } },
+                                                                                { idx: { cached: false,
+                                                                                         pushPath: false,
+                                                                                         path: [
+                                                                                                { tag: 'value',
+                                                                                                  value: { value: _descriptor_1.toValue(4n),
+                                                                                                           alignment: _descriptor_1.alignment() } }] } },
+                                                                                { idx: { cached: false,
+                                                                                         pushPath: false,
+                                                                                         path: [
+                                                                                                { tag: 'value',
+                                                                                                  value: { value: _descriptor_0.toValue(tmp_1),
+                                                                                                           alignment: _descriptor_0.alignment() } }] } },
+                                                                                { popeq: { cached: false,
+                                                                                           result: undefined } }]).value));
     __compactRuntime.assert(this._respectsSensitiveSlots_0(publicPolicy_0,
-                                                           (tmp_1 = publicPolicy_0.schemaId,
-                                                            _descriptor_22.fromValue(__compactRuntime.queryLedgerState(context,
-                                                                                                                       partialProofData,
-                                                                                                                       [
-                                                                                                                        { dup: { n: 0 } },
-                                                                                                                        { idx: { cached: false,
-                                                                                                                                 pushPath: false,
-                                                                                                                                 path: [
-                                                                                                                                        { tag: 'value',
-                                                                                                                                          value: { value: _descriptor_1.toValue(4n),
-                                                                                                                                                   alignment: _descriptor_1.alignment() } }] } },
-                                                                                                                        { idx: { cached: false,
-                                                                                                                                 pushPath: false,
-                                                                                                                                 path: [
-                                                                                                                                        { tag: 'value',
-                                                                                                                                          value: { value: _descriptor_0.toValue(tmp_1),
-                                                                                                                                                   alignment: _descriptor_0.alignment() } }] } },
-                                                                                                                        { popeq: { cached: false,
-                                                                                                                                   result: undefined } }]).value))),
+                                                           rule_0),
                             'Policy narrows a protected value too far');
+    __compactRuntime.assert(this._boundsOnGrid_0(publicPolicy_0, rule_0, grid_0),
+                            'Bounds on a protected value must sit on its grid');
     __compactRuntime.assert(this._blockTimeGte_0(context,
                                                  partialProofData,
                                                  reference_0),
@@ -2080,7 +2164,7 @@ export class Contract {
                                                 partialProofData,
                                                 ((t1) => {
                                                   if (t1 > 18446744073709551615n) {
-                                                    throw new __compactRuntime.CompactError('stateproof.compact line 154 char 22: cast from Field or Uint value to smaller Uint value failed: ' + t1 + ' is greater than 18446744073709551615');
+                                                    throw new __compactRuntime.CompactError('stateproof.compact line 160 char 22: cast from Field or Uint value to smaller Uint value failed: ' + t1 + ' is greater than 18446744073709551615');
                                                   }
                                                   return t1;
                                                 })(reference_0
@@ -2194,14 +2278,14 @@ export class Contract {
     const signature_0 = this._credentialSignature_0(context, partialProofData);
     const issuerKey_0 = this._issuerPublicKey_0(context, partialProofData);
     const path_0 = this._issuerPath_0(context, partialProofData);
-    __compactRuntime.assert(this._equal_7(cred_0.schemaId,
-                                          request_0.policy.schemaId),
+    __compactRuntime.assert(this._equal_10(cred_0.schemaId,
+                                           request_0.policy.schemaId),
                             'Credential schema does not match the policy');
-    __compactRuntime.assert(this._equal_8(path_0.leaf,
-                                          this._issuerLeaf_0(cred_0.issuerId,
-                                                             cred_0.schemaId,
-                                                             issuerKey_0,
-                                                             cred_0.epoch)),
+    __compactRuntime.assert(this._equal_11(path_0.leaf,
+                                           this._issuerLeaf_0(cred_0.issuerId,
+                                                              cred_0.schemaId,
+                                                              issuerKey_0,
+                                                              cred_0.epoch)),
                             'Issuer path does not belong to this credential');
     let tmp_0;
     __compactRuntime.assert((tmp_0 = this._merkleTreePathRoot_0(path_0),
@@ -2377,14 +2461,38 @@ export class Contract {
     return x;
   }
   _equal_6(x0, y0) {
-    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    if (x0 !== y0) { return false; }
     return true;
   }
+  _folder_7(f, x, a0, a1) {
+    for (let i = 0; i < 8; i++) { x = f(x, a0[i], a1[i]); }
+    return x;
+  }
   _equal_7(x0, y0) {
-    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    if (x0 !== y0) { return false; }
     return true;
   }
   _equal_8(x0, y0) {
+    if (x0 !== y0) { return false; }
+    return true;
+  }
+  _folder_8(f, x, a0, a1) {
+    for (let i = 0; i < 4; i++) { x = f(x, a0[i], a1[i]); }
+    return x;
+  }
+  _equal_9(x0, y0) {
+    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    return true;
+  }
+  _folder_9(context, partialProofData, f, x, a0) {
+    for (let i = 0; i < 8; i++) { x = f(context, partialProofData, x, a0[i]); }
+    return x;
+  }
+  _equal_10(x0, y0) {
+    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    return true;
+  }
+  _equal_11(x0, y0) {
     if (!x0.every((x, i) => y0[i] === x)) { return false; }
     return true;
   }
@@ -3560,14 +3668,14 @@ export const pureCircuits = {
     if (!(Array.isArray(claims_0) && claims_0.length === 8 && claims_0.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n))) {
       __compactRuntime.typeError('selectClaim',
                                  'argument 1',
-                                 'policy.compact line 45 char 1',
+                                 'policy.compact line 55 char 1',
                                  'Vector<8, Uint<0..18446744073709551616>>',
                                  claims_0)
     }
     if (!(typeof(index_0) === 'bigint' && index_0 >= 0n && index_0 <= 255n)) {
       __compactRuntime.typeError('selectClaim',
                                  'argument 2',
-                                 'policy.compact line 45 char 1',
+                                 'policy.compact line 55 char 1',
                                  'Uint<0..256>',
                                  index_0)
     }
@@ -3582,14 +3690,14 @@ export const pureCircuits = {
     if (!(Array.isArray(claims_0) && claims_0.length === 8 && claims_0.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n))) {
       __compactRuntime.typeError('conditionHolds',
                                  'argument 1',
-                                 'policy.compact line 55 char 1',
+                                 'policy.compact line 65 char 1',
                                  'Vector<8, Uint<0..18446744073709551616>>',
                                  claims_0)
     }
     if (!(typeof(condition_0) === 'object' && typeof(condition_0.claimIndex) === 'bigint' && condition_0.claimIndex >= 0n && condition_0.claimIndex <= 255n && typeof(condition_0.op) === 'number' && condition_0.op >= 0 && condition_0.op <= 6 && typeof(condition_0.value) === 'bigint' && condition_0.value >= 0n && condition_0.value <= 18446744073709551615n && typeof(condition_0.value2) === 'bigint' && condition_0.value2 >= 0n && condition_0.value2 <= 18446744073709551615n && Array.isArray(condition_0.set) && condition_0.set.length === 4 && condition_0.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n))) {
       __compactRuntime.typeError('conditionHolds',
                                  'argument 2',
-                                 'policy.compact line 55 char 1',
+                                 'policy.compact line 65 char 1',
                                  'struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>',
                                  condition_0)
     }
@@ -3604,14 +3712,14 @@ export const pureCircuits = {
     if (!(Array.isArray(claims_0) && claims_0.length === 8 && claims_0.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n))) {
       __compactRuntime.typeError('policyHolds',
                                  'argument 1',
-                                 'policy.compact line 71 char 1',
+                                 'policy.compact line 81 char 1',
                                  'Vector<8, Uint<0..18446744073709551616>>',
                                  claims_0)
     }
     if (!(typeof(policy_0) === 'object' && policy_0.schemaId.buffer instanceof ArrayBuffer && policy_0.schemaId.BYTES_PER_ELEMENT === 1 && policy_0.schemaId.length === 32 && Array.isArray(policy_0.conditions) && policy_0.conditions.length === 4 && policy_0.conditions.every((t) => typeof(t) === 'object' && typeof(t.claimIndex) === 'bigint' && t.claimIndex >= 0n && t.claimIndex <= 255n && typeof(t.op) === 'number' && t.op >= 0 && t.op <= 6 && typeof(t.value) === 'bigint' && t.value >= 0n && t.value <= 18446744073709551615n && typeof(t.value2) === 'bigint' && t.value2 >= 0n && t.value2 <= 18446744073709551615n && Array.isArray(t.set) && t.set.length === 4 && t.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n)) && typeof(policy_0.revealSlot) === 'object' && typeof(policy_0.revealSlot.is_some) === 'boolean' && typeof(policy_0.revealSlot.value) === 'bigint' && policy_0.revealSlot.value >= 0n && policy_0.revealSlot.value <= 255n)) {
       __compactRuntime.typeError('policyHolds',
                                  'argument 2',
-                                 'policy.compact line 71 char 1',
+                                 'policy.compact line 81 char 1',
                                  'struct Policy<schemaId: Bytes<32>, conditions: Vector<4, struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>>, revealSlot: struct Maybe<is_some: Boolean, value: Uint<0..256>>>',
                                  policy_0)
     }
@@ -3625,7 +3733,7 @@ export const pureCircuits = {
     if (!(typeof(policy_0) === 'object' && policy_0.schemaId.buffer instanceof ArrayBuffer && policy_0.schemaId.BYTES_PER_ELEMENT === 1 && policy_0.schemaId.length === 32 && Array.isArray(policy_0.conditions) && policy_0.conditions.length === 4 && policy_0.conditions.every((t) => typeof(t) === 'object' && typeof(t.claimIndex) === 'bigint' && t.claimIndex >= 0n && t.claimIndex <= 255n && typeof(t.op) === 'number' && t.op >= 0 && t.op <= 6 && typeof(t.value) === 'bigint' && t.value >= 0n && t.value <= 18446744073709551615n && typeof(t.value2) === 'bigint' && t.value2 >= 0n && t.value2 <= 18446744073709551615n && Array.isArray(t.set) && t.set.length === 4 && t.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n)) && typeof(policy_0.revealSlot) === 'object' && typeof(policy_0.revealSlot.is_some) === 'boolean' && typeof(policy_0.revealSlot.value) === 'bigint' && policy_0.revealSlot.value >= 0n && policy_0.revealSlot.value <= 255n)) {
       __compactRuntime.typeError('assertWellFormedPolicy',
                                  'argument 1',
-                                 'policy.compact line 79 char 1',
+                                 'policy.compact line 89 char 1',
                                  'struct Policy<schemaId: Bytes<32>, conditions: Vector<4, struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>>, revealSlot: struct Maybe<is_some: Boolean, value: Uint<0..256>>>',
                                  policy_0)
     }
@@ -3640,14 +3748,14 @@ export const pureCircuits = {
     if (!(Array.isArray(conditions_0) && conditions_0.length === 4 && conditions_0.every((t) => typeof(t) === 'object' && typeof(t.claimIndex) === 'bigint' && t.claimIndex >= 0n && t.claimIndex <= 255n && typeof(t.op) === 'number' && t.op >= 0 && t.op <= 6 && typeof(t.value) === 'bigint' && t.value >= 0n && t.value <= 18446744073709551615n && typeof(t.value2) === 'bigint' && t.value2 >= 0n && t.value2 <= 18446744073709551615n && Array.isArray(t.set) && t.set.length === 4 && t.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n)))) {
       __compactRuntime.typeError('slotBounds',
                                  'argument 1',
-                                 'policy.compact line 97 char 1',
+                                 'policy.compact line 107 char 1',
                                  'Vector<4, struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>>',
                                  conditions_0)
     }
     if (!(typeof(slot_0) === 'bigint' && slot_0 >= 0n && slot_0 <= 255n)) {
       __compactRuntime.typeError('slotBounds',
                                  'argument 2',
-                                 'policy.compact line 97 char 1',
+                                 'policy.compact line 107 char 1',
                                  'Uint<0..256>',
                                  slot_0)
     }
@@ -3663,21 +3771,21 @@ export const pureCircuits = {
     if (!(typeof(policy_0) === 'object' && policy_0.schemaId.buffer instanceof ArrayBuffer && policy_0.schemaId.BYTES_PER_ELEMENT === 1 && policy_0.schemaId.length === 32 && Array.isArray(policy_0.conditions) && policy_0.conditions.length === 4 && policy_0.conditions.every((t) => typeof(t) === 'object' && typeof(t.claimIndex) === 'bigint' && t.claimIndex >= 0n && t.claimIndex <= 255n && typeof(t.op) === 'number' && t.op >= 0 && t.op <= 6 && typeof(t.value) === 'bigint' && t.value >= 0n && t.value <= 18446744073709551615n && typeof(t.value2) === 'bigint' && t.value2 >= 0n && t.value2 <= 18446744073709551615n && Array.isArray(t.set) && t.set.length === 4 && t.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n)) && typeof(policy_0.revealSlot) === 'object' && typeof(policy_0.revealSlot.is_some) === 'boolean' && typeof(policy_0.revealSlot.value) === 'bigint' && policy_0.revealSlot.value >= 0n && policy_0.revealSlot.value <= 255n)) {
       __compactRuntime.typeError('slotRespected',
                                  'argument 1',
-                                 'policy.compact line 110 char 1',
+                                 'policy.compact line 120 char 1',
                                  'struct Policy<schemaId: Bytes<32>, conditions: Vector<4, struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>>, revealSlot: struct Maybe<is_some: Boolean, value: Uint<0..256>>>',
                                  policy_0)
     }
-    if (!(typeof(r_0) === 'object' && typeof(r_0.sensitive) === 'boolean' && typeof(r_0.minWidth) === 'bigint' && r_0.minWidth >= 0n && r_0.minWidth <= 18446744073709551615n)) {
+    if (!(typeof(r_0) === 'object' && typeof(r_0.sensitive) === 'boolean' && typeof(r_0.minWidth) === 'bigint' && r_0.minWidth >= 0n && r_0.minWidth <= 18446744073709551615n && typeof(r_0.step) === 'bigint' && r_0.step >= 0n && r_0.step <= 18446744073709551615n)) {
       __compactRuntime.typeError('slotRespected',
                                  'argument 2',
-                                 'policy.compact line 110 char 1',
-                                 'struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>>',
+                                 'policy.compact line 120 char 1',
+                                 'struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>, step: Uint<0..18446744073709551616>>',
                                  r_0)
     }
     if (!(typeof(slot_0) === 'bigint' && slot_0 >= 0n && slot_0 <= 255n)) {
       __compactRuntime.typeError('slotRespected',
                                  'argument 3',
-                                 'policy.compact line 110 char 1',
+                                 'policy.compact line 120 char 1',
                                  'Uint<0..256>',
                                  slot_0)
     }
@@ -3692,18 +3800,100 @@ export const pureCircuits = {
     if (!(typeof(policy_0) === 'object' && policy_0.schemaId.buffer instanceof ArrayBuffer && policy_0.schemaId.BYTES_PER_ELEMENT === 1 && policy_0.schemaId.length === 32 && Array.isArray(policy_0.conditions) && policy_0.conditions.length === 4 && policy_0.conditions.every((t) => typeof(t) === 'object' && typeof(t.claimIndex) === 'bigint' && t.claimIndex >= 0n && t.claimIndex <= 255n && typeof(t.op) === 'number' && t.op >= 0 && t.op <= 6 && typeof(t.value) === 'bigint' && t.value >= 0n && t.value <= 18446744073709551615n && typeof(t.value2) === 'bigint' && t.value2 >= 0n && t.value2 <= 18446744073709551615n && Array.isArray(t.set) && t.set.length === 4 && t.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n)) && typeof(policy_0.revealSlot) === 'object' && typeof(policy_0.revealSlot.is_some) === 'boolean' && typeof(policy_0.revealSlot.value) === 'bigint' && policy_0.revealSlot.value >= 0n && policy_0.revealSlot.value <= 255n)) {
       __compactRuntime.typeError('respectsSensitiveSlots',
                                  'argument 1',
-                                 'policy.compact line 118 char 1',
+                                 'policy.compact line 128 char 1',
                                  'struct Policy<schemaId: Bytes<32>, conditions: Vector<4, struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>>, revealSlot: struct Maybe<is_some: Boolean, value: Uint<0..256>>>',
                                  policy_0)
     }
-    if (!(typeof(rule_0) === 'object' && Array.isArray(rule_0.slots) && rule_0.slots.length === 8 && rule_0.slots.every((t) => typeof(t) === 'object' && typeof(t.sensitive) === 'boolean' && typeof(t.minWidth) === 'bigint' && t.minWidth >= 0n && t.minWidth <= 18446744073709551615n))) {
+    if (!(typeof(rule_0) === 'object' && Array.isArray(rule_0.slots) && rule_0.slots.length === 8 && rule_0.slots.every((t) => typeof(t) === 'object' && typeof(t.sensitive) === 'boolean' && typeof(t.minWidth) === 'bigint' && t.minWidth >= 0n && t.minWidth <= 18446744073709551615n && typeof(t.step) === 'bigint' && t.step >= 0n && t.step <= 18446744073709551615n))) {
       __compactRuntime.typeError('respectsSensitiveSlots',
                                  'argument 2',
-                                 'policy.compact line 118 char 1',
-                                 'struct SchemaRule<slots: Vector<8, struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>>>>',
+                                 'policy.compact line 128 char 1',
+                                 'struct SchemaRule<slots: Vector<8, struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>, step: Uint<0..18446744073709551616>>>>',
                                  rule_0)
     }
     return _dummyContract._respectsSensitiveSlots_0(policy_0, rule_0);
+  },
+  ruleForSlot: (...args_0) => {
+    if (args_0.length !== 2) {
+      throw new __compactRuntime.CompactError(`ruleForSlot: expected 2 arguments (as invoked from Typescript), received ${args_0.length}`);
+    }
+    const rule_0 = args_0[0];
+    const index_0 = args_0[1];
+    if (!(typeof(rule_0) === 'object' && Array.isArray(rule_0.slots) && rule_0.slots.length === 8 && rule_0.slots.every((t) => typeof(t) === 'object' && typeof(t.sensitive) === 'boolean' && typeof(t.minWidth) === 'bigint' && t.minWidth >= 0n && t.minWidth <= 18446744073709551615n && typeof(t.step) === 'bigint' && t.step >= 0n && t.step <= 18446744073709551615n))) {
+      __compactRuntime.typeError('ruleForSlot',
+                                 'argument 1',
+                                 'policy.compact line 137 char 1',
+                                 'struct SchemaRule<slots: Vector<8, struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>, step: Uint<0..18446744073709551616>>>>',
+                                 rule_0)
+    }
+    if (!(typeof(index_0) === 'bigint' && index_0 >= 0n && index_0 <= 255n)) {
+      __compactRuntime.typeError('ruleForSlot',
+                                 'argument 2',
+                                 'policy.compact line 137 char 1',
+                                 'Uint<0..256>',
+                                 index_0)
+    }
+    return _dummyContract._ruleForSlot_0(rule_0, index_0);
+  },
+  conditionOnGrid: (...args_0) => {
+    if (args_0.length !== 3) {
+      throw new __compactRuntime.CompactError(`conditionOnGrid: expected 3 arguments (as invoked from Typescript), received ${args_0.length}`);
+    }
+    const rule_0 = args_0[0];
+    const c_0 = args_0[1];
+    const g_0 = args_0[2];
+    if (!(typeof(rule_0) === 'object' && Array.isArray(rule_0.slots) && rule_0.slots.length === 8 && rule_0.slots.every((t) => typeof(t) === 'object' && typeof(t.sensitive) === 'boolean' && typeof(t.minWidth) === 'bigint' && t.minWidth >= 0n && t.minWidth <= 18446744073709551615n && typeof(t.step) === 'bigint' && t.step >= 0n && t.step <= 18446744073709551615n))) {
+      __compactRuntime.typeError('conditionOnGrid',
+                                 'argument 1',
+                                 'policy.compact line 146 char 1',
+                                 'struct SchemaRule<slots: Vector<8, struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>, step: Uint<0..18446744073709551616>>>>',
+                                 rule_0)
+    }
+    if (!(typeof(c_0) === 'object' && typeof(c_0.claimIndex) === 'bigint' && c_0.claimIndex >= 0n && c_0.claimIndex <= 255n && typeof(c_0.op) === 'number' && c_0.op >= 0 && c_0.op <= 6 && typeof(c_0.value) === 'bigint' && c_0.value >= 0n && c_0.value <= 18446744073709551615n && typeof(c_0.value2) === 'bigint' && c_0.value2 >= 0n && c_0.value2 <= 18446744073709551615n && Array.isArray(c_0.set) && c_0.set.length === 4 && c_0.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n))) {
+      __compactRuntime.typeError('conditionOnGrid',
+                                 'argument 2',
+                                 'policy.compact line 146 char 1',
+                                 'struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>',
+                                 c_0)
+    }
+    if (!(typeof(g_0) === 'object' && typeof(g_0.lo) === 'bigint' && g_0.lo >= 0n && g_0.lo <= 18446744073709551615n && typeof(g_0.hi) === 'bigint' && g_0.hi >= 0n && g_0.hi <= 18446744073709551615n)) {
+      __compactRuntime.typeError('conditionOnGrid',
+                                 'argument 3',
+                                 'policy.compact line 146 char 1',
+                                 'struct GridPoint<lo: Uint<0..18446744073709551616>, hi: Uint<0..18446744073709551616>>',
+                                 g_0)
+    }
+    return _dummyContract._conditionOnGrid_0(rule_0, c_0, g_0);
+  },
+  boundsOnGrid: (...args_0) => {
+    if (args_0.length !== 3) {
+      throw new __compactRuntime.CompactError(`boundsOnGrid: expected 3 arguments (as invoked from Typescript), received ${args_0.length}`);
+    }
+    const policy_0 = args_0[0];
+    const rule_0 = args_0[1];
+    const grid_0 = args_0[2];
+    if (!(typeof(policy_0) === 'object' && policy_0.schemaId.buffer instanceof ArrayBuffer && policy_0.schemaId.BYTES_PER_ELEMENT === 1 && policy_0.schemaId.length === 32 && Array.isArray(policy_0.conditions) && policy_0.conditions.length === 4 && policy_0.conditions.every((t) => typeof(t) === 'object' && typeof(t.claimIndex) === 'bigint' && t.claimIndex >= 0n && t.claimIndex <= 255n && typeof(t.op) === 'number' && t.op >= 0 && t.op <= 6 && typeof(t.value) === 'bigint' && t.value >= 0n && t.value <= 18446744073709551615n && typeof(t.value2) === 'bigint' && t.value2 >= 0n && t.value2 <= 18446744073709551615n && Array.isArray(t.set) && t.set.length === 4 && t.set.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n)) && typeof(policy_0.revealSlot) === 'object' && typeof(policy_0.revealSlot.is_some) === 'boolean' && typeof(policy_0.revealSlot.value) === 'bigint' && policy_0.revealSlot.value >= 0n && policy_0.revealSlot.value <= 255n)) {
+      __compactRuntime.typeError('boundsOnGrid',
+                                 'argument 1',
+                                 'policy.compact line 153 char 1',
+                                 'struct Policy<schemaId: Bytes<32>, conditions: Vector<4, struct Condition<claimIndex: Uint<0..256>, op: Enum<Op, ignore, gte, lte, eq, neq, between, inSet>, value: Uint<0..18446744073709551616>, value2: Uint<0..18446744073709551616>, set: Vector<4, Uint<0..18446744073709551616>>>>, revealSlot: struct Maybe<is_some: Boolean, value: Uint<0..256>>>',
+                                 policy_0)
+    }
+    if (!(typeof(rule_0) === 'object' && Array.isArray(rule_0.slots) && rule_0.slots.length === 8 && rule_0.slots.every((t) => typeof(t) === 'object' && typeof(t.sensitive) === 'boolean' && typeof(t.minWidth) === 'bigint' && t.minWidth >= 0n && t.minWidth <= 18446744073709551615n && typeof(t.step) === 'bigint' && t.step >= 0n && t.step <= 18446744073709551615n))) {
+      __compactRuntime.typeError('boundsOnGrid',
+                                 'argument 2',
+                                 'policy.compact line 153 char 1',
+                                 'struct SchemaRule<slots: Vector<8, struct SlotRule<sensitive: Boolean, minWidth: Uint<0..18446744073709551616>, step: Uint<0..18446744073709551616>>>>',
+                                 rule_0)
+    }
+    if (!(Array.isArray(grid_0) && grid_0.length === 4 && grid_0.every((t) => typeof(t) === 'object' && typeof(t.lo) === 'bigint' && t.lo >= 0n && t.lo <= 18446744073709551615n && typeof(t.hi) === 'bigint' && t.hi >= 0n && t.hi <= 18446744073709551615n))) {
+      __compactRuntime.typeError('boundsOnGrid',
+                                 'argument 3',
+                                 'policy.compact line 153 char 1',
+                                 'Vector<4, struct GridPoint<lo: Uint<0..18446744073709551616>, hi: Uint<0..18446744073709551616>>>',
+                                 grid_0)
+    }
+    return _dummyContract._boundsOnGrid_0(policy_0, rule_0, grid_0);
   },
   revealedClaim: (...args_0) => {
     if (args_0.length !== 2) {
@@ -3714,14 +3904,14 @@ export const pureCircuits = {
     if (!(Array.isArray(claims_0) && claims_0.length === 8 && claims_0.every((t) => typeof(t) === 'bigint' && t >= 0n && t <= 18446744073709551615n))) {
       __compactRuntime.typeError('revealedClaim',
                                  'argument 1',
-                                 'policy.compact line 127 char 1',
+                                 'policy.compact line 162 char 1',
                                  'Vector<8, Uint<0..18446744073709551616>>',
                                  claims_0)
     }
     if (!(typeof(revealSlot_0) === 'object' && typeof(revealSlot_0.is_some) === 'boolean' && typeof(revealSlot_0.value) === 'bigint' && revealSlot_0.value >= 0n && revealSlot_0.value <= 255n)) {
       __compactRuntime.typeError('revealedClaim',
                                  'argument 2',
-                                 'policy.compact line 127 char 1',
+                                 'policy.compact line 162 char 1',
                                  'struct Maybe<is_some: Boolean, value: Uint<0..256>>',
                                  revealSlot_0)
     }

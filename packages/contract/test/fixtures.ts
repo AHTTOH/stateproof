@@ -41,9 +41,9 @@ export const SLOT = { status: 0n, jobCategory: 1n, months: 2n, salary: 3n } as c
 export const STATUS_ACTIVE = 1n;
 export const SALARY_MIN_WIDTH = 500n;
 
-const plain = { sensitive: false, minWidth: 0n };
+const plain = { sensitive: false, minWidth: 0n, step: 1n };
 export const careerRule = (): SchemaRule => ({
-  slots: [plain, plain, plain, { sensitive: true, minWidth: SALARY_MIN_WIDTH }, plain, plain, plain, plain],
+  slots: [plain, plain, plain, { sensitive: true, minWidth: SALARY_MIN_WIDTH, step: SALARY_MIN_WIDTH }, plain, plain, plain, plain],
 });
 
 export const claims = (values: readonly bigint[]): bigint[] => {

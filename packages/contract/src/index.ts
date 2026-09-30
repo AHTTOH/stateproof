@@ -4,3 +4,4 @@ export * from './signing.js';
 export * from './compiled.js';
 export * from './api.js';
 export * from './leak-scan.js';
+export * from './grid.js';

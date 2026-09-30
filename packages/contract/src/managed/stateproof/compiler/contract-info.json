@@ -1043,6 +1043,13 @@
                   "type-name": "Uint",
                   "maxval": 18446744073709551615
                 }
+              },
+              {
+                "name": "step",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 18446744073709551615
+                }
               }
             ]
           }
@@ -1190,12 +1197,411 @@
                           "type-name": "Uint",
                           "maxval": 18446744073709551615
                         }
+                      },
+                      {
+                        "name": "step",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
                       }
                     ]
                   }
                 }
               }
             ]
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "ruleForSlot",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "rule",
+          "type": {
+            "type-name": "Struct",
+            "name": "SchemaRule",
+            "elements": [
+              {
+                "name": "slots",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 8,
+                  "type": {
+                    "type-name": "Struct",
+                    "name": "SlotRule",
+                    "elements": [
+                      {
+                        "name": "sensitive",
+                        "type": {
+                          "type-name": "Boolean"
+                        }
+                      },
+                      {
+                        "name": "minWidth",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "step",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "index",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 255
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Struct",
+        "name": "SlotRule",
+        "elements": [
+          {
+            "name": "sensitive",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "minWidth",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 18446744073709551615
+            }
+          },
+          {
+            "name": "step",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 18446744073709551615
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "conditionOnGrid",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "rule",
+          "type": {
+            "type-name": "Struct",
+            "name": "SchemaRule",
+            "elements": [
+              {
+                "name": "slots",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 8,
+                  "type": {
+                    "type-name": "Struct",
+                    "name": "SlotRule",
+                    "elements": [
+                      {
+                        "name": "sensitive",
+                        "type": {
+                          "type-name": "Boolean"
+                        }
+                      },
+                      {
+                        "name": "minWidth",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "step",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "c",
+          "type": {
+            "type-name": "Struct",
+            "name": "Condition",
+            "elements": [
+              {
+                "name": "claimIndex",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 255
+                }
+              },
+              {
+                "name": "op",
+                "type": {
+                  "type-name": "Enum",
+                  "name": "Op",
+                  "elements": [
+                    "ignore",
+                    "gte",
+                    "lte",
+                    "eq",
+                    "neq",
+                    "between",
+                    "inSet"
+                  ]
+                }
+              },
+              {
+                "name": "value",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 18446744073709551615
+                }
+              },
+              {
+                "name": "value2",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 18446744073709551615
+                }
+              },
+              {
+                "name": "set",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 4,
+                  "type": {
+                    "type-name": "Uint",
+                    "maxval": 18446744073709551615
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "g",
+          "type": {
+            "type-name": "Struct",
+            "name": "GridPoint",
+            "elements": [
+              {
+                "name": "lo",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 18446744073709551615
+                }
+              },
+              {
+                "name": "hi",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 18446744073709551615
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "boundsOnGrid",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "policy",
+          "type": {
+            "type-name": "Struct",
+            "name": "Policy",
+            "elements": [
+              {
+                "name": "schemaId",
+                "type": {
+                  "type-name": "Bytes",
+                  "length": 32
+                }
+              },
+              {
+                "name": "conditions",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 4,
+                  "type": {
+                    "type-name": "Struct",
+                    "name": "Condition",
+                    "elements": [
+                      {
+                        "name": "claimIndex",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 255
+                        }
+                      },
+                      {
+                        "name": "op",
+                        "type": {
+                          "type-name": "Enum",
+                          "name": "Op",
+                          "elements": [
+                            "ignore",
+                            "gte",
+                            "lte",
+                            "eq",
+                            "neq",
+                            "between",
+                            "inSet"
+                          ]
+                        }
+                      },
+                      {
+                        "name": "value",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "value2",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "set",
+                        "type": {
+                          "type-name": "Vector",
+                          "length": 4,
+                          "type": {
+                            "type-name": "Uint",
+                            "maxval": 18446744073709551615
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "name": "revealSlot",
+                "type": {
+                  "type-name": "Struct",
+                  "name": "Maybe",
+                  "elements": [
+                    {
+                      "name": "is_some",
+                      "type": {
+                        "type-name": "Boolean"
+                      }
+                    },
+                    {
+                      "name": "value",
+                      "type": {
+                        "type-name": "Uint",
+                        "maxval": 255
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "rule",
+          "type": {
+            "type-name": "Struct",
+            "name": "SchemaRule",
+            "elements": [
+              {
+                "name": "slots",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 8,
+                  "type": {
+                    "type-name": "Struct",
+                    "name": "SlotRule",
+                    "elements": [
+                      {
+                        "name": "sensitive",
+                        "type": {
+                          "type-name": "Boolean"
+                        }
+                      },
+                      {
+                        "name": "minWidth",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "step",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "grid",
+          "type": {
+            "type-name": "Vector",
+            "length": 4,
+            "type": {
+              "type-name": "Struct",
+              "name": "GridPoint",
+              "elements": [
+                {
+                  "name": "lo",
+                  "type": {
+                    "type-name": "Uint",
+                    "maxval": 18446744073709551615
+                  }
+                },
+                {
+                  "name": "hi",
+                  "type": {
+                    "type-name": "Uint",
+                    "maxval": 18446744073709551615
+                  }
+                }
+              ]
+            }
           }
         }
       ],
@@ -1308,6 +1714,13 @@
                       },
                       {
                         "name": "minWidth",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "step",
                         "type": {
                           "type-name": "Uint",
                           "maxval": 18446744073709551615
@@ -1518,6 +1931,33 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "name": "grid",
+          "type": {
+            "type-name": "Vector",
+            "length": 4,
+            "type": {
+              "type-name": "Struct",
+              "name": "GridPoint",
+              "elements": [
+                {
+                  "name": "lo",
+                  "type": {
+                    "type-name": "Uint",
+                    "maxval": 18446744073709551615
+                  }
+                },
+                {
+                  "name": "hi",
+                  "type": {
+                    "type-name": "Uint",
+                    "maxval": 18446744073709551615
+                  }
+                }
+              ]
+            }
           }
         },
         {
@@ -1909,6 +2349,13 @@
                   },
                   {
                     "name": "minWidth",
+                    "type": {
+                      "type-name": "Uint",
+                      "maxval": 18446744073709551615
+                    }
+                  },
+                  {
+                    "name": "step",
                     "type": {
                       "type-name": "Uint",
                       "maxval": 18446744073709551615

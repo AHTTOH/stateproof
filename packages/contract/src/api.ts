@@ -13,6 +13,7 @@ import {
   type Witnesses,
 } from './managed/stateproof/contract/index.js';
 import { CompiledStateProofContract, type StateProofCircuitId } from './compiled.js';
+import { gridForPolicy } from './grid.js';
 import {
   adminPrivateState,
   holderPrivateState,
@@ -97,15 +98,20 @@ export const rotateIssuerEpoch = async (
 export const deactivateIssuer = async (contract: DeployedStateProof, issuerId: Uint8Array): Promise<TxReceipt> =>
   receiptOf((await contract.callTx.deactivateIssuer(issuerId)).public);
 
+// `rule` is the schema's registered rule (ledger.schemaRules); the grid is derived from it.
 export const createRequest = async (
   contract: DeployedStateProof,
   requestId: Uint8Array,
   policy: Policy,
+  rule: SchemaRule,
   referenceTime: bigint,
   expiresAt: bigint,
   subjectCommit: { is_some: boolean; value: bigint } = NO_SUBJECT,
 ): Promise<TxReceipt> =>
-  receiptOf((await contract.callTx.createRequest(requestId, policy, referenceTime, expiresAt, subjectCommit)).public);
+  receiptOf(
+    (await contract.callTx.createRequest(requestId, policy, gridForPolicy(policy, rule), referenceTime, expiresAt, subjectCommit))
+      .public,
+  );
 
 // Loads the holder's credential into private state right before proving, so the
 // witnesses see exactly the credential the holder picked for this request.

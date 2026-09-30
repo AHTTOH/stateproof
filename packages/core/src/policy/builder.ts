@@ -5,7 +5,7 @@ import { MAX_CONDITIONS, SET_SIZE } from '../constants.js';
 import { encodeClaimValue, type ClaimInput } from '../encoding/claims.js';
 import { claimLabel, getClaim, getSchema, schemaIdBytes, schemaRule, type ClaimDefinition, type CredentialSchema } from '../schemas/index.js';
 import { PolicyInputError } from './input-error.js';
-import { slotVerdict } from './evaluate.js';
+import { offGridBounds, slotVerdict } from './evaluate.js';
 import { operatorByName, operatorsForClaim, type OperatorName } from './operators.js';
 
 export interface ConditionInput {
@@ -73,6 +73,16 @@ const buildCondition = (schema: CredentialSchema, input: ConditionInput): Condit
 
 const assertProtectedClaims = (schema: CredentialSchema, policy: Policy): void => {
   const rule = schemaRule(schema);
+  const [offGrid] = offGridBounds(policy, rule);
+  if (offGrid) {
+    const claim = schema.claims.find((c) => c.slot === offGrid.slot)!;
+    throw new PolicyInputError(
+      'protectedOffGrid',
+      `${claimLabel(claim, 'en')} is protected: bounds must be multiples of ${offGrid.step}`,
+      claim.key,
+      Number(offGrid.step),
+    );
+  }
   for (const claim of schema.claims) {
     const verdict = slotVerdict(policy, rule, claim.slot);
     if (verdict === 'ok') continue;

@@ -82,7 +82,7 @@
       "type": "integer",
       "unit": "× 10,000 KRW",
       "operators": ["gte", "lte", "between"],
-      "sensitive": { "minWidth": 500 },
+      "sensitive": { "minWidth": 500, "step": 500 },
       "i18n": {
         "ko": {
           "label": "직전 연봉",

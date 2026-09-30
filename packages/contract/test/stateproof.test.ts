@@ -258,6 +258,50 @@ describe('AC-8..9 minimal disclosure: the chain refuses over-asking verifiers', 
   });
 });
 
+describe('AC-11 repeated queries cannot narrow a protected value below one grid cell', () => {
+  const create = (w: ReturnType<typeof world>, conditions: ReturnType<typeof cond>[], grid?: { lo: bigint; hi: bigint }[]) => () =>
+    w.sim.asVerifier().createRequest(randomBytes32(), policy(conditions), NOW, NOW + DAY, undefined, grid);
+
+  it('refuses thresholds that are not multiples of the salary grid step', () => {
+    const w = world();
+    refuse(create(w, [cond(SLOT.salary, Op.gte, 5_100n)]), /sit on its grid/);
+    refuse(create(w, [cond(SLOT.salary, Op.between, 5_000n, 5_600n)]), /sit on its grid/);
+  });
+
+  it('refuses a verifier that lies about the grid position', () => {
+    const w = world();
+    const lying = [{ lo: 11n, hi: 0n }, ...Array.from({ length: 3 }, () => ({ lo: 0n, hi: 0n }))];
+    refuse(create(w, [cond(SLOT.salary, Op.gte, 5_000n)], lying), /sit on its grid/);
+  });
+
+  it('accepts on-grid thresholds and bands', () => {
+    const w = world();
+    expect(create(w, [cond(SLOT.salary, Op.gte, 5_500n)])).not.toThrow();
+    expect(create(w, [cond(SLOT.salary, Op.between, 4_500n, 6_000n)])).not.toThrow();
+  });
+
+  it('leaves at least one full grid cell after any set of accepted one-sided questions', () => {
+    // An adversary asks "salary >= t" for every allowed t and the applicant answers truthfully.
+    // The tightest interval consistent with all answers is still [k*step, (k+1)*step).
+    const salary = 5_437n;
+    const step = SALARY_MIN_WIDTH;
+    let lo = 0n;
+    let hi = 20_000n;
+    for (let t = 0n; t <= 20_000n; t += step) {
+      if (salary >= t) lo = t;
+      else hi = hi < t ? hi : t;
+    }
+    expect(hi - lo).toBe(step);
+  });
+
+  it('refuses a schema registered with a zero grid step', () => {
+    const w = world();
+    const bad = careerRule();
+    const slots = bad.slots.map((s, i) => (i === 5 ? { ...s, step: 0n } : s));
+    refuse(() => w.sim.asAdmin(w.adminSecret).registerSchema(randomBytes32(), { slots }), /Grid step must be positive/);
+  });
+});
+
 describe('AC-10 reference time follows the chain clock', () => {
   it('refuses a reference time in the future', () => {
     const w = world();

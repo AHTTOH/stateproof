@@ -15,7 +15,7 @@
       "label": "Date of birth",
       "type": "date",
       "operators": ["gte", "lte", "between"],
-      "sensitive": { "minWidth": 365 },
+      "sensitive": { "minWidth": 365, "step": 1 },
       "i18n": {
         "ko": {
           "label": "생년월일"

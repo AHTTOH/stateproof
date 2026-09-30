@@ -34,7 +34,9 @@ export type Policy = { schemaId: Uint8Array;
                        revealSlot: { is_some: boolean, value: bigint }
                      };
 
-export type SlotRule = { sensitive: boolean; minWidth: bigint };
+export type SlotRule = { sensitive: boolean; minWidth: bigint; step: bigint };
+
+export type GridPoint = { lo: bigint; hi: bigint };
 
 export type SchemaRule = { slots: SlotRule[] };
 
@@ -87,6 +89,7 @@ export type ImpureCircuits<PS> = {
   createRequest(context: __compactRuntime.CircuitContext<PS>,
                 requestId_0: Uint8Array,
                 policy_0: Policy,
+                grid_0: GridPoint[],
                 referenceTime_0: bigint,
                 expiresAt_0: bigint,
                 subjectCommit_0: { is_some: boolean, value: bigint }): __compactRuntime.CircuitResults<PS, []>;
@@ -110,6 +113,7 @@ export type ProvableCircuits<PS> = {
   createRequest(context: __compactRuntime.CircuitContext<PS>,
                 requestId_0: Uint8Array,
                 policy_0: Policy,
+                grid_0: GridPoint[],
                 referenceTime_0: bigint,
                 expiresAt_0: bigint,
                 subjectCommit_0: { is_some: boolean, value: bigint }): __compactRuntime.CircuitResults<PS, []>;
@@ -152,6 +156,9 @@ export type PureCircuits = {
   slotBounds(conditions_0: Condition[], slot_0: bigint): Bounds;
   slotRespected(policy_0: Policy, r_0: SlotRule, slot_0: bigint): boolean;
   respectsSensitiveSlots(policy_0: Policy, rule_0: SchemaRule): boolean;
+  ruleForSlot(rule_0: SchemaRule, index_0: bigint): SlotRule;
+  conditionOnGrid(rule_0: SchemaRule, c_0: Condition, g_0: GridPoint): boolean;
+  boundsOnGrid(policy_0: Policy, rule_0: SchemaRule, grid_0: GridPoint[]): boolean;
   revealedClaim(claims_0: bigint[],
                 revealSlot_0: { is_some: boolean, value: bigint }): { is_some: boolean,
                                                                       value: bigint
@@ -221,6 +228,17 @@ export type Circuits<PS> = {
   respectsSensitiveSlots(context: __compactRuntime.CircuitContext<PS>,
                          policy_0: Policy,
                          rule_0: SchemaRule): __compactRuntime.CircuitResults<PS, boolean>;
+  ruleForSlot(context: __compactRuntime.CircuitContext<PS>,
+              rule_0: SchemaRule,
+              index_0: bigint): __compactRuntime.CircuitResults<PS, SlotRule>;
+  conditionOnGrid(context: __compactRuntime.CircuitContext<PS>,
+                  rule_0: SchemaRule,
+                  c_0: Condition,
+                  g_0: GridPoint): __compactRuntime.CircuitResults<PS, boolean>;
+  boundsOnGrid(context: __compactRuntime.CircuitContext<PS>,
+               policy_0: Policy,
+               rule_0: SchemaRule,
+               grid_0: GridPoint[]): __compactRuntime.CircuitResults<PS, boolean>;
   revealedClaim(context: __compactRuntime.CircuitContext<PS>,
                 claims_0: bigint[],
                 revealSlot_0: { is_some: boolean, value: bigint }): __compactRuntime.CircuitResults<PS, { is_some: boolean,
@@ -242,6 +260,7 @@ export type Circuits<PS> = {
   createRequest(context: __compactRuntime.CircuitContext<PS>,
                 requestId_0: Uint8Array,
                 policy_0: Policy,
+                grid_0: GridPoint[],
                 referenceTime_0: bigint,
                 expiresAt_0: bigint,
                 subjectCommit_0: { is_some: boolean, value: bigint }): __compactRuntime.CircuitResults<PS, []>;

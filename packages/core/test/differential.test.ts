@@ -1,12 +1,13 @@
 // Differential tests: the TypeScript mirror (policy/evaluate.ts) and the compiled circuits
 // must agree on every input. Seeds are fixed so a failure reproduces exactly.
 import { describe, expect, it } from 'vitest';
-import { Op, pureCircuits, type Condition, type Policy } from '@stateproof/contract';
+import { Op, pureCircuits, unsafeGridForPolicy, type Condition, type Policy } from '@stateproof/contract';
 import {
   CLAIM_SLOTS,
   MAX_CONDITIONS,
   SET_SIZE,
   SCHEMAS,
+  offGridBounds,
   conditionHoldsTs,
   policyHoldsTs,
   respectsSensitiveSlotsTs,
@@ -104,5 +105,30 @@ describe('differential: TS mirror vs compiled circuits', () => {
     }
     expect(accepted).toBeGreaterThan(500);
     expect(accepted).toBeLessThan(11_500);
+  });
+
+  it('the grid rule agrees on 12,000 policies (TS offGridBounds vs compiled boundsOnGrid)', () => {
+    const g = makeGen(4);
+    let onGrid = 0;
+    for (let i = 0; i < 12_000; i++) {
+      const schema = SCHEMAS[i % SCHEMAS.length];
+      const rule = schemaRule(schema);
+      const slot = schema.claims.find((c) => c.sensitive)!.slot;
+      const step = rule.slots[slot].step;
+      const policy = g.policy(schemaIdBytes(schema));
+      // Half the bounds snapped to the grid, so both outcomes are frequent.
+      const aimed = {
+        ...policy,
+        conditions: policy.conditions.map((c) => {
+          const snap = (v: bigint) => (g.int(2) === 0 ? (v / step) * step : v);
+          return { ...c, claimIndex: BigInt(slot), value: snap(c.value), value2: snap(c.value2) };
+        }),
+      };
+      const expected = offGridBounds(aimed, rule).length === 0;
+      expect(pureCircuits.boundsOnGrid(aimed, rule, unsafeGridForPolicy(aimed, rule))).toBe(expected);
+      if (expected) onGrid++;
+    }
+    expect(onGrid).toBeGreaterThan(500);
+    expect(onGrid).toBeLessThan(11_500);
   });
 });

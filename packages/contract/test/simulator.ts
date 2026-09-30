@@ -7,7 +7,8 @@ import {
   sampleContractAddress,
   type JubjubPoint,
 } from '@midnight-ntwrk/compact-runtime';
-import { Contract, ledger, type Ledger, type Policy, type SchemaRule } from '../src/managed/stateproof/contract/index.js';
+import { Contract, ledger, type GridPoint, type Ledger, type Policy, type SchemaRule } from '../src/managed/stateproof/contract/index.js';
+import { unsafeGridForPolicy } from '../src/grid.js';
 import {
   adminPrivateState,
   emptyPrivateState,
@@ -108,16 +109,25 @@ export class StateProofSimulator {
     return this.getLedger();
   }
 
+  // The grid defaults to the one derived from the schema's registered rule (rounding down
+  // off-grid bounds, so the circuit gets to refuse them); tests may pass their own.
   createRequest(
     requestId: Uint8Array,
     policy: Policy,
     referenceTime: bigint,
     expiresAt: bigint,
     subjectCommit: { is_some: boolean; value: bigint } = { is_some: false, value: 0n },
+    grid?: GridPoint[],
   ): Ledger {
+    const state = this.getLedger();
+    const points =
+      grid ??
+      (state.schemaRules.member(policy.schemaId)
+        ? unsafeGridForPolicy(policy, state.schemaRules.lookup(policy.schemaId))
+        : policy.conditions.map(() => ({ lo: 0n, hi: 0n })));
     this.record(
       'createRequest',
-      this.contract.impureCircuits.createRequest(this.context, requestId, policy, referenceTime, expiresAt, subjectCommit),
+      this.contract.impureCircuits.createRequest(this.context, requestId, policy, points, referenceTime, expiresAt, subjectCommit),
     );
     return this.getLedger();
   }

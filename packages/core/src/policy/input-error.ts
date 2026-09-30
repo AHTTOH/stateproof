@@ -12,7 +12,8 @@ export type PolicyInputErrorCode =
   // Mirrors createRequest's minimal-disclosure rule for sensitive claims.
   | 'protectedExact'
   | 'protectedRevealed'
-  | 'protectedTooNarrow';
+  | 'protectedTooNarrow'
+  | 'protectedOffGrid';
 
 export class PolicyInputError extends Error {
   constructor(

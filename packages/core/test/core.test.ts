@@ -70,8 +70,8 @@ describe('schemas and claim encoding', () => {
 
   it('marks salary and birth date as the protected claims', () => {
     expect(schemaRule(getSchema('career')).slots.map((s) => s.sensitive)).toEqual([false, false, false, true, false, false, false, false]);
-    expect(schemaRule(getSchema('career')).slots[3].minWidth).toBe(500n);
-    expect(schemaRule(getSchema('youth-work')).slots[0]).toEqual({ sensitive: true, minWidth: 365n });
+    expect(schemaRule(getSchema('career')).slots[3]).toEqual({ sensitive: true, minWidth: 500n, step: 500n });
+    expect(schemaRule(getSchema('youth-work')).slots[0]).toEqual({ sensitive: true, minWidth: 365n, step: 1n });
   });
 
   it('refuses a schema that marks an enum sensitive or allows exact operators on a sensitive claim', () => {
@@ -79,7 +79,7 @@ describe('schemas and claim encoding', () => {
     const salary = career.claims[3];
     expect(() => validateSchema({ ...career, claims: [...career.claims.slice(0, 3), { ...salary, operators: ['gte', 'eq'] }, career.claims[4]] })).toThrow(/only ranges, not eq/);
     const status = career.claims[0];
-    expect(() => validateSchema({ ...career, claims: [{ ...status, sensitive: { minWidth: 1 } }, ...career.claims.slice(1)] })).toThrow(/enum claims cannot be sensitive/);
+    expect(() => validateSchema({ ...career, claims: [{ ...status, sensitive: { minWidth: 1, step: 1 } }, ...career.claims.slice(1)] })).toThrow(/enum claims cannot be sensitive/);
   });
 
   it('round-trips subjects through the slot encoding', () => {
@@ -136,9 +136,11 @@ describe('policy builder', () => {
       }
     };
     expect(code({ ...salaryAsk, conditions: [{ claim: 'annualSalary', op: 'eq', value: 5_210 }] })).toBe('operatorNotAllowed');
-    expect(code({ ...salaryAsk, conditions: [{ claim: 'annualSalary', op: 'between', value: 5_000, value2: 5_100 }] })).toBe('protectedTooNarrow');
-    expect(code({ ...salaryAsk, conditions: [{ claim: 'annualSalary', op: 'gte', value: 5_210 }, { claim: 'annualSalary', op: 'lte', value: 5_210 }] })).toBe('protectedTooNarrow');
+    expect(code({ ...salaryAsk, conditions: [{ claim: 'annualSalary', op: 'between', value: 5_000, value2: 5_100 }] })).toBe('protectedOffGrid');
+    expect(code({ ...salaryAsk, conditions: [{ claim: 'annualSalary', op: 'between', value: 5_000, value2: 5_000 }] })).toBe('protectedTooNarrow');
+    expect(code({ ...salaryAsk, conditions: [{ claim: 'annualSalary', op: 'gte', value: 5_500 }, { claim: 'annualSalary', op: 'lte', value: 5_500 }] })).toBe('protectedTooNarrow');
     expect(code({ ...salaryAsk, reveal: 'annualSalary' })).toBe('protectedRevealed');
+    expect(code({ ...salaryAsk, conditions: [{ claim: 'annualSalary', op: 'gte', value: 5_100 }] })).toBe('protectedOffGrid');
     expect(code({ ...salaryAsk, conditions: [{ claim: 'annualSalary', op: 'between', value: 5_000, value2: 5_500 }] })).toBe('accepted');
   });
 

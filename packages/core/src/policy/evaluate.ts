@@ -68,3 +68,19 @@ export const slotVerdict = (policy: Policy, rule: SchemaRule, slot: number): Slo
 
 export const respectsSensitiveSlotsTs = (policy: Policy, rule: SchemaRule): boolean =>
   rule.slots.every((_, slot) => slotVerdict(policy, rule, slot) === 'ok');
+
+// Bounds on protected slots that are not multiples of the slot's grid step.
+export const offGridBounds = (policy: Policy, rule: SchemaRule): { slot: number; value: bigint; step: bigint }[] =>
+  policy.conditions.flatMap((c) => {
+    const slot = Number(c.claimIndex);
+    const r = rule.slots[slot];
+    if (!r || !r.sensitive || c.op === Op.ignore) return [];
+    const values = c.op === Op.between ? [c.value, c.value2] : [c.value];
+    return values.filter((v) => v % r.step !== 0n).map((value) => ({ slot, value, step: r.step }));
+  });
+
+// Every grid cell a protected slot can be narrowed to is still [k*step, (k+1)*step).
+export const gridCellOf = (value: bigint, step: bigint): { lo: bigint; hi: bigint } => {
+  const lo = (value / step) * step;
+  return { lo, hi: lo + step };
+};

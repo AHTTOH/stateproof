@@ -28,8 +28,9 @@ export interface ClaimDefinition {
   readonly operators: readonly OperatorName[];
   readonly codes?: Readonly<Record<string, number>>;
   // Protected value (salary, birth date): verifiers may only ask for a range at least
-  // minWidth wide. Enforced on chain by createRequest (SchemaRule) and mirrored here.
-  readonly sensitive?: { readonly minWidth: number };
+  // minWidth wide whose bounds are multiples of step. Enforced on chain by createRequest
+  // (SchemaRule) and mirrored here.
+  readonly sensitive?: { readonly minWidth: number; readonly step: number };
   readonly i18n: Readonly<Record<TranslatedLocale, ClaimText>>;
 }
 
@@ -84,6 +85,9 @@ export const validateSchema = (raw: CredentialSchema): CredentialSchema => {
       if (!Number.isInteger(claim.sensitive.minWidth) || claim.sensitive.minWidth < 1) {
         throw new Error(`${raw.id}.${claim.key}: sensitive.minWidth must be a positive integer`);
       }
+      if (!Number.isInteger(claim.sensitive.step) || claim.sensitive.step < 1) {
+        throw new Error(`${raw.id}.${claim.key}: sensitive.step must be a positive integer`);
+      }
       if (claim.type === 'enum') throw new Error(`${raw.id}.${claim.key}: enum claims cannot be sensitive`);
       const bad = claim.operators.filter((op) => !ranges.includes(op));
       if (bad.length > 0) throw new Error(`${raw.id}.${claim.key}: sensitive claims allow only ranges, not ${bad.join(', ')}`);
@@ -108,7 +112,9 @@ export const SCHEMAS: readonly CredentialSchema[] = [
 export const schemaRule = (schema: CredentialSchema): SchemaRule => ({
   slots: Array.from({ length: CLAIM_SLOTS }, (_, slot) => {
     const claim = schema.claims.find((c) => c.slot === slot);
-    return claim?.sensitive ? { sensitive: true, minWidth: BigInt(claim.sensitive.minWidth) } : { sensitive: false, minWidth: 0n };
+    return claim?.sensitive
+      ? { sensitive: true, minWidth: BigInt(claim.sensitive.minWidth), step: BigInt(claim.sensitive.step) }
+      : { sensitive: false, minWidth: 0n, step: 1n };
   }),
 });
 
