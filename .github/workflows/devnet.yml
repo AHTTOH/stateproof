@@ -83,6 +83,27 @@ jobs:
             sleep 20
           done
           exit 1
+      # The operator commands one by one against a second contract, with the committed demo
+      # issuers (public keys only) and demo personas: what the Preprod runbook runs.
+      - name: operator commands (deploy, register, demo-requests, prove)
+        shell: bash
+        env:
+          CI: 'true'
+        run: |
+          set -o pipefail
+          mkdir -p logs
+          export STATEPROOF_ADMIN_SECRET="$(openssl rand -hex 32)"
+          {
+            npm run cli -- deploy --network undeployed
+            npm run cli -- register-schemas --network undeployed
+            npm run cli -- register-issuers --network undeployed
+            npm run cli -- demo-requests --network undeployed --ttl-days 1
+            req() { jq -r --arg k "$1" '.undeployed.requests[] | select(.kind == $k) | .'"$2" config/demo-requests.v2.json; }
+            npm run cli -- prove --network undeployed --persona minji --schema career --request "$(req career-open requestId)"
+            npm run cli -- prove --network undeployed --persona haneul --schema youth-work --request "$(req youth-work-open requestId)"
+            npm run cli -- prove --network undeployed --persona minji --schema career --request "$(req career-sealed requestId)" --nonce "$(req career-sealed sealNonce)"
+          } 2>&1 | tee logs/operator-commands.log
+          jq '.undeployed' config/deployments.json
       - name: run record summary
         if: always()
         run: |
