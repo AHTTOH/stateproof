@@ -1,7 +1,6 @@
 // Contract Policy struct -> what the holder and verifier read, in a display language.
 import { Op, type Condition, type Policy } from '@stateproof/contract';
 import { MAX_CLAIM_VALUE } from '../constants.js';
-import { bytes32ToLabel } from '../encoding/bytes.js';
 import { decodeClaimValue } from '../encoding/claims.js';
 import type { Locale } from '../locale.js';
 import { claimLabel, claimUnit, claimValueText, schemaByIdBytes, type ClaimDefinition, type CredentialSchema } from '../schemas/index.js';
@@ -10,7 +9,6 @@ import { formatCondition, formatConditionValue, withUnit, type ConditionParts } 
 
 export interface PolicyDescription {
   readonly schema: CredentialSchema;
-  readonly issuerId: string;
   readonly conditions: readonly string[];
   readonly revealed: string | null;
   readonly notDisclosed: readonly string[];
@@ -116,7 +114,6 @@ export const describePolicy = (policy: Policy, locale: Locale): PolicyDescriptio
   const pinnedSlots = pinnedSlotsOf(schema, active);
   return {
     schema,
-    issuerId: bytes32ToLabel(policy.issuerId),
     conditions: active.map((c) => describeCondition(schema, c, locale)),
     revealed: revealedClaim ? claimLabel(revealedClaim, locale) : null,
     notDisclosed: schema.claims

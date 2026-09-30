@@ -4,8 +4,9 @@ import { CLAIM_SLOTS } from '../constants.js';
 import { labelToBytes32 } from '../encoding/bytes.js';
 import { TRANSLATED_LOCALES, type Locale, type TranslatedLocale } from '../locale.js';
 import { OPERATORS, type OperatorName } from '../policy/operators.js';
-import employment from './employment.json' with { type: 'json' };
-import identity from './identity.json' with { type: 'json' };
+import type { SchemaRule } from '@stateproof/contract';
+import career from './career.json' with { type: 'json' };
+import youthWork from './youth-work.json' with { type: 'json' };
 
 export type ClaimType = 'enum' | 'integer' | 'date';
 
@@ -26,6 +27,9 @@ export interface ClaimDefinition {
   // afterwards (age, months employed) allow "at least" only, which stays true over time.
   readonly operators: readonly OperatorName[];
   readonly codes?: Readonly<Record<string, number>>;
+  // Protected value (salary, birth date): verifiers may only ask for a range at least
+  // minWidth wide. Enforced on chain by createRequest (SchemaRule) and mirrored here.
+  readonly sensitive?: { readonly minWidth: number };
   readonly i18n: Readonly<Record<TranslatedLocale, ClaimText>>;
 }
 
@@ -75,6 +79,15 @@ export const validateSchema = (raw: CredentialSchema): CredentialSchema => {
     if (claim.type === 'enum' && (!claim.codes || Object.keys(claim.codes).length === 0)) {
       throw new Error(`${raw.id}.${claim.key}: enum claim needs codes`);
     }
+    if (claim.sensitive) {
+      const ranges: readonly OperatorName[] = ['gte', 'lte', 'between'];
+      if (!Number.isInteger(claim.sensitive.minWidth) || claim.sensitive.minWidth < 1) {
+        throw new Error(`${raw.id}.${claim.key}: sensitive.minWidth must be a positive integer`);
+      }
+      if (claim.type === 'enum') throw new Error(`${raw.id}.${claim.key}: enum claims cannot be sensitive`);
+      const bad = claim.operators.filter((op) => !ranges.includes(op));
+      if (bad.length > 0) throw new Error(`${raw.id}.${claim.key}: sensitive claims allow only ranges, not ${bad.join(', ')}`);
+    }
     validateClaimText(raw.id, claim);
     slots.add(claim.slot);
     keys.add(claim.key);
@@ -87,9 +100,20 @@ export const validateSchema = (raw: CredentialSchema): CredentialSchema => {
 };
 
 export const SCHEMAS: readonly CredentialSchema[] = [
-  validateSchema(employment as CredentialSchema),
-  validateSchema(identity as CredentialSchema),
+  validateSchema(career as CredentialSchema),
+  validateSchema(youthWork as CredentialSchema),
 ];
+
+// On-chain form of the schema's protection rule, registered once with registerSchema.
+export const schemaRule = (schema: CredentialSchema): SchemaRule => ({
+  slots: Array.from({ length: CLAIM_SLOTS }, (_, slot) => {
+    const claim = schema.claims.find((c) => c.slot === slot);
+    return claim?.sensitive ? { sensitive: true, minWidth: BigInt(claim.sensitive.minWidth) } : { sensitive: false, minWidth: 0n };
+  }),
+});
+
+export const sensitiveClaims = (schema: CredentialSchema): readonly ClaimDefinition[] =>
+  schema.claims.filter((c) => c.sensitive !== undefined);
 
 export const getSchema = (id: string): CredentialSchema => {
   const schema = SCHEMAS.find((s) => s.id === id);

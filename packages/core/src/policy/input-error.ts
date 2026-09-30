@@ -8,7 +8,11 @@ export type PolicyInputErrorCode =
   | 'invalidValue'
   | 'boundsReversed'
   | 'setEmpty'
-  | 'setTooLarge';
+  | 'setTooLarge'
+  // Mirrors createRequest's minimal-disclosure rule for sensitive claims.
+  | 'protectedExact'
+  | 'protectedRevealed'
+  | 'protectedTooNarrow';
 
 export class PolicyInputError extends Error {
   constructor(

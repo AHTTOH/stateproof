@@ -8,6 +8,8 @@ export * from './policy/operators.js';
 export * from './policy/builder.js';
 export * from './policy/input-error.js';
 export * from './policy/describe.js';
+export * from './policy/evaluate.js';
 export * from './policy/phrases.js';
 export * from './signing/index.js';
+export * from './subject/index.js';
 export * from './receipt/index.js';

@@ -1,0 +1,116 @@
+{
+  "id": "career",
+  "version": 2,
+  "title": "Career and Salary Credential",
+  "i18n": {
+    "ko": {
+      "title": "경력·처우 증명서"
+    }
+  },
+  "label": "stateproof:career:v2",
+  "claims": [
+    {
+      "key": "employmentStatus",
+      "slot": 0,
+      "label": "Employment status",
+      "type": "enum",
+      "operators": ["eq", "neq", "inSet"],
+      "i18n": {
+        "ko": {
+          "label": "재직 상태",
+          "values": {
+            "Active": "재직 중",
+            "Left": "퇴사"
+          }
+        }
+      },
+      "codes": {
+        "Active": 1,
+        "Left": 2
+      }
+    },
+    {
+      "key": "jobCategory",
+      "slot": 1,
+      "label": "Job family",
+      "type": "enum",
+      "operators": ["eq", "neq", "inSet"],
+      "i18n": {
+        "ko": {
+          "label": "직무",
+          "values": {
+            "Engineering": "개발",
+            "Design": "디자인",
+            "Product": "기획",
+            "Marketing": "마케팅",
+            "Sales": "영업",
+            "Operations": "운영",
+            "Finance": "재무·회계",
+            "HR": "인사"
+          }
+        }
+      },
+      "codes": {
+        "Engineering": 1,
+        "Design": 2,
+        "Product": 3,
+        "Marketing": 4,
+        "Sales": 5,
+        "Operations": 6,
+        "Finance": 7,
+        "HR": 8
+      }
+    },
+    {
+      "key": "careerMonths",
+      "slot": 2,
+      "label": "Months in this job family",
+      "type": "integer",
+      "unit": "months",
+      "operators": ["gte"],
+      "i18n": {
+        "ko": {
+          "label": "직무 경력",
+          "unit": "개월"
+        }
+      }
+    },
+    {
+      "key": "annualSalary",
+      "slot": 3,
+      "label": "Last annual salary",
+      "type": "integer",
+      "unit": "× 10,000 KRW",
+      "operators": ["gte", "lte", "between"],
+      "sensitive": { "minWidth": 500 },
+      "i18n": {
+        "ko": {
+          "label": "직전 연봉",
+          "unit": "만원"
+        }
+      }
+    },
+    {
+      "key": "employmentType",
+      "slot": 4,
+      "label": "Employment type",
+      "type": "enum",
+      "operators": ["eq", "neq", "inSet"],
+      "i18n": {
+        "ko": {
+          "label": "고용 형태",
+          "values": {
+            "Permanent": "정규직",
+            "Contract": "계약직",
+            "PartTime": "시간제"
+          }
+        }
+      },
+      "codes": {
+        "Permanent": 1,
+        "Contract": 2,
+        "PartTime": 3
+      }
+    }
+  ]
+}

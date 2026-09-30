@@ -1,10 +1,11 @@
 // Human-level policy input -> contract Policy struct. Reading it back is in describe.ts.
+// The builder refuses exactly what the chain would refuse, before any transaction is built.
 import { Op, type Condition, type Policy } from '@stateproof/contract';
 import { MAX_CONDITIONS, SET_SIZE } from '../constants.js';
-import { labelToBytes32 } from '../encoding/bytes.js';
 import { encodeClaimValue, type ClaimInput } from '../encoding/claims.js';
-import { getClaim, getSchema, schemaIdBytes, type ClaimDefinition, type CredentialSchema } from '../schemas/index.js';
+import { claimLabel, getClaim, getSchema, schemaIdBytes, schemaRule, type ClaimDefinition, type CredentialSchema } from '../schemas/index.js';
 import { PolicyInputError } from './input-error.js';
+import { slotVerdict } from './evaluate.js';
 import { operatorByName, operatorsForClaim, type OperatorName } from './operators.js';
 
 export interface ConditionInput {
@@ -17,7 +18,6 @@ export interface ConditionInput {
 
 export interface PolicyInput {
   readonly schema: string;
-  readonly issuerId: string;
   readonly conditions: readonly ConditionInput[];
   readonly reveal: string | null;
 }
@@ -71,6 +71,24 @@ const buildCondition = (schema: CredentialSchema, input: ConditionInput): Condit
   }
 };
 
+const assertProtectedClaims = (schema: CredentialSchema, policy: Policy): void => {
+  const rule = schemaRule(schema);
+  for (const claim of schema.claims) {
+    const verdict = slotVerdict(policy, rule, claim.slot);
+    if (verdict === 'ok') continue;
+    const label = claimLabel(claim, 'en');
+    const width = claim.sensitive?.minWidth ?? 0;
+    switch (verdict) {
+      case 'exact':
+        throw new PolicyInputError('protectedExact', `${label} is protected: ask for a range, not a single value`, claim.key, null);
+      case 'revealed':
+        throw new PolicyInputError('protectedRevealed', `${label} is protected and cannot be revealed`, claim.key, null);
+      case 'tooNarrow':
+        throw new PolicyInputError('protectedTooNarrow', `${label} is protected: the allowed range must be at least ${width} wide`, claim.key, width);
+    }
+  }
+};
+
 export const buildPolicy = (input: PolicyInput): Policy => {
   const schema = getSchema(input.schema);
   if (input.conditions.length === 0) throw new PolicyInputError('noConditions', 'A policy needs at least one condition', null, null);
@@ -82,10 +100,32 @@ export const buildPolicy = (input: PolicyInput): Policy => {
     input.reveal === null
       ? { is_some: false, value: 0n }
       : { is_some: true, value: BigInt(getClaim(schema, input.reveal).slot) };
-  return {
+  const policy: Policy = {
     schemaId: schemaIdBytes(schema),
-    issuerId: labelToBytes32(input.issuerId),
     conditions: [...conditions, ...Array.from({ length: MAX_CONDITIONS - conditions.length }, ignoredCondition)],
     revealSlot,
   };
+  assertProtectedClaims(schema, policy);
+  return policy;
 };
+
+// 만 나이: someone is at least `age` on `referenceDate` exactly when they were born on or
+// before the same calendar day `age` years earlier. For a 29 February that does not exist in
+// the target year, the latest qualifying birth date is 28 February.
+export const latestBirthDateForAge = (referenceDate: string, age: number): string => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(referenceDate);
+  if (!m) throw new Error(`Expected YYYY-MM-DD, got ${referenceDate}`);
+  if (!Number.isInteger(age) || age < 0) throw new Error('Age must be a non-negative integer');
+  const year = Number(m[1]) - age;
+  let day = Number(m[3]);
+  const month = Number(m[2]);
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  if (day > daysInMonth) day = daysInMonth;
+  return `${String(year).padStart(4, '0')}-${m[2]}-${String(day).padStart(2, '0')}`;
+};
+
+export const minimumAgeCondition = (referenceDate: string, age: number): ConditionInput => ({
+  claim: 'birthDate',
+  op: 'lte',
+  value: latestBirthDateForAge(referenceDate, age),
+});

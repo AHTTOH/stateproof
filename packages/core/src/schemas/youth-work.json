@@ -1,0 +1,112 @@
+{
+  "id": "youth-work",
+  "version": 2,
+  "title": "Part-time Work Credential",
+  "i18n": {
+    "ko": {
+      "title": "알바 증명서"
+    }
+  },
+  "label": "stateproof:youth-work:v2",
+  "claims": [
+    {
+      "key": "birthDate",
+      "slot": 0,
+      "label": "Date of birth",
+      "type": "date",
+      "operators": ["gte", "lte", "between"],
+      "sensitive": { "minWidth": 365 },
+      "i18n": {
+        "ko": {
+          "label": "생년월일"
+        }
+      }
+    },
+    {
+      "key": "region",
+      "slot": 1,
+      "label": "Region of residence",
+      "type": "enum",
+      "operators": ["eq", "neq", "inSet"],
+      "i18n": {
+        "ko": {
+          "label": "거주 시·도",
+          "values": {
+            "Seoul": "서울",
+            "Busan": "부산",
+            "Daegu": "대구",
+            "Incheon": "인천",
+            "Gwangju": "광주",
+            "Daejeon": "대전",
+            "Ulsan": "울산",
+            "Sejong": "세종",
+            "Gyeonggi": "경기",
+            "Chungbuk": "충북",
+            "Chungnam": "충남",
+            "Jeonnam": "전남",
+            "Gyeongbuk": "경북",
+            "Gyeongnam": "경남",
+            "Jeju": "제주",
+            "Gangwon": "강원",
+            "Jeonbuk": "전북"
+          }
+        }
+      },
+      "codes": {
+        "Seoul": 11,
+        "Busan": 26,
+        "Daegu": 27,
+        "Incheon": 28,
+        "Gwangju": 29,
+        "Daejeon": 30,
+        "Ulsan": 31,
+        "Sejong": 36,
+        "Gyeonggi": 41,
+        "Chungbuk": 43,
+        "Chungnam": 44,
+        "Jeonnam": 46,
+        "Gyeongbuk": 47,
+        "Gyeongnam": 48,
+        "Jeju": 50,
+        "Gangwon": 51,
+        "Jeonbuk": 52
+      }
+    },
+    {
+      "key": "studentStatus",
+      "slot": 2,
+      "label": "Student status",
+      "type": "enum",
+      "operators": ["eq", "neq", "inSet"],
+      "i18n": {
+        "ko": {
+          "label": "학적",
+          "values": {
+            "Enrolled": "재학",
+            "OnLeave": "휴학",
+            "NotStudent": "해당 없음"
+          }
+        }
+      },
+      "codes": {
+        "Enrolled": 1,
+        "OnLeave": 2,
+        "NotStudent": 3
+      }
+    },
+    {
+      "key": "partTimeMonths",
+      "slot": 3,
+      "label": "Months of part-time work",
+      "type": "integer",
+      "unit": "months",
+      "operators": ["gte"],
+      "i18n": {
+        "ko": {
+          "label": "알바 경력",
+          "unit": "개월"
+        }
+      }
+    }
+  ]
+}

@@ -37,6 +37,20 @@ export const createHolderSecret = (): Uint8Array => randomBytes32();
 
 export const holderCommitOf = (holderSecret: Uint8Array): bigint => pureCircuits.holderCommitment(holderSecret);
 
+// What the holder app sends to an issuer to ask for a credential. By construction it
+// carries the commitment only; the type has no place for the secret.
+export interface IssuanceRequest {
+  readonly schema: string;
+  readonly holderCommit: string;
+}
+
+export const createIssuanceRequest = (schema: string, holderSecret: Uint8Array): IssuanceRequest => ({
+  schema,
+  holderCommit: bigintToHex(holderCommitOf(holderSecret)),
+});
+
+export const holderCommitFromRequest = (request: IssuanceRequest): bigint => hexToBigint(request.holderCommit);
+
 export const issueCredential = (input: Omit<UnsignedCredentialInput, 'salt'>, keyPair: IssuerKeyPair): CredentialDocument => {
   const full: UnsignedCredentialInput = { ...input, salt: randomBytes32() };
   const signature = signCredential(unsignedContractCredential(full), keyPair);

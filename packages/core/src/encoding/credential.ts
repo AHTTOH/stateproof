@@ -1,5 +1,7 @@
 // Credential document: the JSON a holder stores and imports. W3C VC shaped, with
 // the fields the circuit needs carried explicitly so nothing is re-derived loosely.
+// It never contains the holder secret: the holder keeps that separately and the issuer
+// only ever saw its commitment.
 import type { Credential, Signature } from '@stateproof/contract';
 import { CREDENTIAL_FORMAT, SIGNATURE_TYPE } from '../constants.js';
 import { getSchema, schemaByIdBytes, schemaIdBytes } from '../schemas/index.js';
@@ -10,11 +12,11 @@ export interface CredentialDocument {
   readonly format: typeof CREDENTIAL_FORMAT;
   readonly type: readonly string[];
   readonly schema: string;
-  readonly issuer: { readonly id: string; readonly name: string };
+  readonly issuer: { readonly id: string; readonly name: string; readonly epoch: number };
   readonly issuedAt: string;
   readonly expiresAt: string;
   readonly credentialSubject: CredentialSubject;
-  readonly binding: { readonly holderCommit: string; readonly salt: string };
+  readonly binding: { readonly holderCommit: string; readonly subjectId: string; readonly salt: string };
   readonly proof: {
     readonly type: typeof SIGNATURE_TYPE;
     readonly r: { readonly x: string; readonly y: string };
@@ -34,7 +36,9 @@ export const toContractCredential = (doc: CredentialDocument): Credential => {
   return {
     schemaId: schemaIdBytes(schema),
     issuerId: labelToBytes32(doc.issuer.id),
+    epoch: BigInt(doc.issuer.epoch),
     holderCommit: hexToBigint(doc.binding.holderCommit),
+    subjectId: hexToBigint(doc.binding.subjectId),
     claims: encodeSubject(schema, doc.credentialSubject),
     issuedAt: toUnixSeconds(doc.issuedAt),
     expiresAt: toUnixSeconds(doc.expiresAt),
@@ -52,20 +56,26 @@ export const toContractSignature = (doc: CredentialDocument): Signature => {
 
 export interface UnsignedCredentialInput {
   readonly schema: string;
-  readonly issuer: { readonly id: string; readonly name: string };
+  readonly issuer: { readonly id: string; readonly name: string; readonly epoch: number };
   readonly issuedAt: string;
   readonly expiresAt: string;
   readonly credentialSubject: CredentialSubject;
+  // From the holder's issuance request. The issuer never sees the secret behind it.
   readonly holderCommit: bigint;
+  // Computed by the issuer from the documents it checked (subjectIdFor).
+  readonly subjectId: bigint;
   readonly salt: Uint8Array;
 }
 
 export const unsignedContractCredential = (input: UnsignedCredentialInput): Credential => {
   const schema = getSchema(input.schema);
+  if (!Number.isSafeInteger(input.issuer.epoch) || input.issuer.epoch < 0) throw new Error('Issuer epoch must be a non-negative integer');
   return {
     schemaId: schemaIdBytes(schema),
     issuerId: labelToBytes32(input.issuer.id),
+    epoch: BigInt(input.issuer.epoch),
     holderCommit: input.holderCommit,
+    subjectId: input.subjectId,
     claims: encodeSubject(schema, input.credentialSubject),
     issuedAt: toUnixSeconds(input.issuedAt),
     expiresAt: toUnixSeconds(input.expiresAt),
@@ -83,7 +93,7 @@ export const buildCredentialDocument = (input: UnsignedCredentialInput, signatur
     issuedAt: input.issuedAt,
     expiresAt: input.expiresAt,
     credentialSubject: input.credentialSubject,
-    binding: { holderCommit: bigintToHex(input.holderCommit), salt: toHex(input.salt) },
+    binding: { holderCommit: bigintToHex(input.holderCommit), subjectId: bigintToHex(input.subjectId), salt: toHex(input.salt) },
     proof: {
       type: SIGNATURE_TYPE,
       r: { x: bigintToHex(signature.r.x), y: bigintToHex(signature.r.y) },
