@@ -22,10 +22,20 @@ export struct Policy {
 
 // Per-slot protection registered with the schema. A sensitive slot (salary, birth date)
 // can only be asked about as a range at least `minWidth` wide: no exact value, no
-// "not equal", no set membership and no reveal.
+// "not equal", no set membership and no reveal. Every bound must also sit on the slot's
+// grid (a multiple of `step`), so repeated requests with shifted thresholds cannot
+// narrow the value below one grid cell either.
 export struct SlotRule {
   sensitive: Boolean,
   minWidth: Uint<64>,
+  step: Uint<64>,
+}
+
+// Grid position of each condition's bounds, supplied by the verifier alongside the policy:
+// value == lo * step and (for between) value2 == hi * step. Ignored for other slots.
+export struct GridPoint {
+  lo: Uint<64>,
+  hi: Uint<64>,
 }
 
 export struct SchemaRule {
@@ -121,6 +131,31 @@ export pure circuit respectsSensitiveSlots(policy: Policy, rule: SchemaRule): Bo
     true,
     rule.slots,
     slotIndexes()
+  );
+}
+
+export pure circuit ruleForSlot(rule: SchemaRule, index: Uint<8>): SlotRule {
+  return fold(
+    (acc: SlotRule, r: SlotRule, slot: Uint<8>): SlotRule => slot == index ? r : acc,
+    SlotRule { sensitive: false, minWidth: 0, step: 1 },
+    rule.slots,
+    slotIndexes()
+  );
+}
+
+export pure circuit conditionOnGrid(rule: SchemaRule, c: Condition, g: GridPoint): Boolean {
+  const r = ruleForSlot(rule, c.claimIndex);
+  const loOk = c.value == g.lo * r.step;
+  const hiOk = c.op != Op.between || c.value2 == g.hi * r.step;
+  return !r.sensitive || c.op == Op.ignore || (loOk && hiOk);
+}
+
+export pure circuit boundsOnGrid(policy: Policy, rule: SchemaRule, grid: Vector<4, GridPoint>): Boolean {
+  return fold(
+    (acc: Boolean, c: Condition, g: GridPoint): Boolean => acc && conditionOnGrid(rule, c, g),
+    true,
+    policy.conditions,
+    grid
   );
 }
 

@@ -78,8 +78,12 @@ constructor() {
 export circuit registerSchema(schemaId: Bytes<32>, rule: SchemaRule): [] {
   requireAdmin();
   const id = disclose(schemaId);
+  const r = disclose(rule);
   assert(!schemaRules.member(id), "Schema already registered");
-  schemaRules.insert(id, disclose(rule));
+  for (const slot of r.slots) {
+    assert(slot.step > 0, "Grid step must be positive");
+  }
+  schemaRules.insert(id, r);
 }
 
 export circuit registerIssuer(issuerId: Bytes<32>, schemaId: Bytes<32>, publicKey: JubjubPoint, slot: Uint<64>): [] {
@@ -136,6 +140,7 @@ export circuit deactivateIssuer(issuerId: Bytes<32>): [] {
 export circuit createRequest(
   requestId: Bytes<32>,
   policy: Policy,
+  grid: Vector<4, GridPoint>,
   referenceTime: Uint<64>,
   expiresAt: Uint<64>,
   subjectCommit: Maybe<Field>
@@ -147,8 +152,9 @@ export circuit createRequest(
   assert(!requests.member(id), "Request id already used");
   assert(schemaRules.member(publicPolicy.schemaId), "Schema is not registered");
   assertWellFormedPolicy(publicPolicy);
-  assert(respectsSensitiveSlots(publicPolicy, schemaRules.lookup(publicPolicy.schemaId)),
-         "Policy narrows a protected value too far");
+  const rule = schemaRules.lookup(publicPolicy.schemaId);
+  assert(respectsSensitiveSlots(publicPolicy, rule), "Policy narrows a protected value too far");
+  assert(boundsOnGrid(publicPolicy, rule, disclose(grid)), "Bounds on a protected value must sit on its grid");
   // The reference time decides credential validity, so it must follow the chain clock.
   assert(blockTimeGte(reference), "Reference time is in the future");
   assert(blockTimeLt((reference + referenceTolerance()) as Uint<64>), "Reference time is too old");
