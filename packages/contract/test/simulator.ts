@@ -7,11 +7,12 @@ import {
   sampleContractAddress,
   type JubjubPoint,
 } from '@midnight-ntwrk/compact-runtime';
-import { Contract, ledger, type Ledger, type Policy } from '../src/managed/stateproof/contract/index.js';
+import { Contract, ledger, type Ledger, type Policy, type SchemaRule } from '../src/managed/stateproof/contract/index.js';
 import {
   adminPrivateState,
   emptyPrivateState,
   holderPrivateState,
+  issuerPrivateState,
   witnesses,
   type HolderProofInputs,
   type StateProofPrivateState,
@@ -19,9 +20,16 @@ import {
 
 const DUMMY_COIN_PUBLIC_KEY = '0'.repeat(64);
 
+export interface CallRecord {
+  readonly circuit: string;
+  // Public transcript of the call, as the chain would see it.
+  readonly transcript: unknown;
+}
+
 export class StateProofSimulator {
   readonly contract = new Contract<StateProofPrivateState>(witnesses);
   private context: CircuitContext<StateProofPrivateState>;
+  readonly calls: CallRecord[] = [];
 
   constructor(adminSecret: Uint8Array, blockTimeSeconds: bigint) {
     const { currentPrivateState, currentContractState, currentZswapLocalState } = this.contract.initialState(
@@ -45,12 +53,22 @@ export class StateProofSimulator {
     return ledger(this.context.currentQueryContext.state);
   }
 
+  // Printed ledger state: every stored cell, as the indexer would serve it.
+  stateDump(): string {
+    return String(this.context.currentQueryContext.state);
+  }
+
   private withPrivateState(privateState: StateProofPrivateState): void {
     this.context = { ...this.context, currentPrivateState: privateState };
   }
 
   asAdmin(adminSecret: Uint8Array): this {
     this.withPrivateState(adminPrivateState(adminSecret));
+    return this;
+  }
+
+  asIssuer(secretScalar: bigint): this {
+    this.withPrivateState(issuerPrivateState(secretScalar));
     return this;
   }
 
@@ -64,24 +82,47 @@ export class StateProofSimulator {
     return this;
   }
 
-  registerIssuer(issuerId: Uint8Array, publicKey: JubjubPoint): Ledger {
-    this.context = this.contract.impureCircuits.registerIssuer(this.context, issuerId, publicKey).context;
+  private record<T extends { context: CircuitContext<StateProofPrivateState>; proofData?: unknown }>(circuit: string, result: T): T {
+    this.context = result.context;
+    this.calls.push({ circuit, transcript: result.proofData });
+    return result;
+  }
+
+  registerSchema(schemaId: Uint8Array, rule: SchemaRule): Ledger {
+    this.record('registerSchema', this.contract.impureCircuits.registerSchema(this.context, schemaId, rule));
     return this.getLedger();
   }
 
-  createRequest(requestId: Uint8Array, policy: Policy, referenceTime: bigint, expiresAt: bigint): Ledger {
-    this.context = this.contract.impureCircuits.createRequest(
-      this.context,
-      requestId,
-      policy,
-      referenceTime,
-      expiresAt,
-    ).context;
+  registerIssuer(issuerId: Uint8Array, schemaId: Uint8Array, publicKey: JubjubPoint, slot: bigint): Ledger {
+    this.record('registerIssuer', this.contract.impureCircuits.registerIssuer(this.context, issuerId, schemaId, publicKey, slot));
     return this.getLedger();
   }
 
-  submitProof(requestId: Uint8Array): Ledger {
-    this.context = this.contract.impureCircuits.submitProof(this.context, requestId).context;
+  rotateIssuerEpoch(issuerId: Uint8Array): Ledger {
+    this.record('rotateIssuerEpoch', this.contract.impureCircuits.rotateIssuerEpoch(this.context, issuerId));
     return this.getLedger();
+  }
+
+  deactivateIssuer(issuerId: Uint8Array): Ledger {
+    this.record('deactivateIssuer', this.contract.impureCircuits.deactivateIssuer(this.context, issuerId));
+    return this.getLedger();
+  }
+
+  createRequest(
+    requestId: Uint8Array,
+    policy: Policy,
+    referenceTime: bigint,
+    expiresAt: bigint,
+    subjectCommit: { is_some: boolean; value: bigint } = { is_some: false, value: 0n },
+  ): Ledger {
+    this.record(
+      'createRequest',
+      this.contract.impureCircuits.createRequest(this.context, requestId, policy, referenceTime, expiresAt, subjectCommit),
+    );
+    return this.getLedger();
+  }
+
+  submitProof(requestId: Uint8Array): Uint8Array {
+    return this.record('submitProof', this.contract.impureCircuits.submitProof(this.context, requestId)).result;
   }
 }

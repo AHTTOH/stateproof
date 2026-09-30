@@ -3,7 +3,14 @@ import * as CompiledStateProof from './managed/stateproof/contract/index.js';
 import { witnesses, type StateProofPrivateState } from './witnesses.js';
 
 // Circuit ids, used by zk-config providers to locate keys/<id>.prover and zkir/<id>.bzkir.
-export const STATEPROOF_CIRCUITS = ['registerIssuer', 'createRequest', 'submitProof'] as const;
+export const STATEPROOF_CIRCUITS = [
+  'registerSchema',
+  'registerIssuer',
+  'rotateIssuerEpoch',
+  'deactivateIssuer',
+  'createRequest',
+  'submitProof',
+] as const;
 export type StateProofCircuitId = (typeof STATEPROOF_CIRCUITS)[number];
 
 // Compiled artifacts directory, relative to this package's src/.

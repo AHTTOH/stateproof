@@ -48,6 +48,50 @@
       }
     },
     {
+      "name": "issuerLeafDomain",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "subjectDomain",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "subjectCommitDomain",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "pseudonymDomain",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
       "name": "credentialRoot",
       "pure": true,
       "proof": false,
@@ -73,7 +117,20 @@
                 }
               },
               {
+                "name": "epoch",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 4294967295
+                }
+              },
+              {
                 "name": "holderCommit",
+                "type": {
+                  "type-name": "Field"
+                }
+              },
+              {
+                "name": "subjectId",
                 "type": {
                   "type-name": "Field"
                 }
@@ -174,6 +231,114 @@
       }
     },
     {
+      "name": "subjectIdOf",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "digest",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "subjectCommitment",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "subjectId",
+          "type": {
+            "type-name": "Field"
+          }
+        },
+        {
+          "name": "nonce",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Field"
+      }
+    },
+    {
+      "name": "pseudonymFor",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "requestId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "secret",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "issuerLeaf",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "issuerId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "schemaId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "publicKey",
+          "type": {
+            "type-name": "Alias",
+            "name": "JubjubPoint",
+            "type": {
+              "type-name": "Opaque",
+              "tsType": "JubjubPoint"
+            }
+          }
+        },
+        {
+          "name": "epoch",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 4294967295
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
       "name": "derivePublicKey",
       "pure": true,
       "proof": false,
@@ -192,6 +357,38 @@
           "type-name": "Opaque",
           "tsType": "JubjubPoint"
         }
+      }
+    },
+    {
+      "name": "samePoint",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "a",
+          "type": {
+            "type-name": "Alias",
+            "name": "JubjubPoint",
+            "type": {
+              "type-name": "Opaque",
+              "tsType": "JubjubPoint"
+            }
+          }
+        },
+        {
+          "name": "b",
+          "type": {
+            "type-name": "Alias",
+            "name": "JubjubPoint",
+            "type": {
+              "type-name": "Opaque",
+              "tsType": "JubjubPoint"
+            }
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
       }
     },
     {
@@ -268,6 +465,21 @@
       ],
       "result-type": {
         "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "slotIndexes",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+      ],
+      "result-type": {
+        "type-name": "Vector",
+        "length": 8,
+        "type": {
+          "type-name": "Uint",
+          "maxval": 255
+        }
       }
     },
     {
@@ -407,13 +619,6 @@
                 }
               },
               {
-                "name": "issuerId",
-                "type": {
-                  "type-name": "Bytes",
-                  "length": 32
-                }
-              },
-              {
                 "name": "conditions",
                 "type": {
                   "type-name": "Vector",
@@ -523,13 +728,6 @@
                 }
               },
               {
-                "name": "issuerId",
-                "type": {
-                  "type-name": "Bytes",
-                  "length": 32
-                }
-              },
-              {
                 "name": "conditions",
                 "type": {
                   "type-name": "Vector",
@@ -623,6 +821,389 @@
       }
     },
     {
+      "name": "slotBounds",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "conditions",
+          "type": {
+            "type-name": "Vector",
+            "length": 4,
+            "type": {
+              "type-name": "Struct",
+              "name": "Condition",
+              "elements": [
+                {
+                  "name": "claimIndex",
+                  "type": {
+                    "type-name": "Uint",
+                    "maxval": 255
+                  }
+                },
+                {
+                  "name": "op",
+                  "type": {
+                    "type-name": "Enum",
+                    "name": "Op",
+                    "elements": [
+                      "ignore",
+                      "gte",
+                      "lte",
+                      "eq",
+                      "neq",
+                      "between",
+                      "inSet"
+                    ]
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "type-name": "Uint",
+                    "maxval": 18446744073709551615
+                  }
+                },
+                {
+                  "name": "value2",
+                  "type": {
+                    "type-name": "Uint",
+                    "maxval": 18446744073709551615
+                  }
+                },
+                {
+                  "name": "set",
+                  "type": {
+                    "type-name": "Vector",
+                    "length": 4,
+                    "type": {
+                      "type-name": "Uint",
+                      "maxval": 18446744073709551615
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "slot",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 255
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Struct",
+        "name": "Bounds",
+        "elements": [
+          {
+            "name": "lo",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 18446744073709551615
+            }
+          },
+          {
+            "name": "hi",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 18446744073709551615
+            }
+          },
+          {
+            "name": "exact",
+            "type": {
+              "type-name": "Boolean"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "slotRespected",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "policy",
+          "type": {
+            "type-name": "Struct",
+            "name": "Policy",
+            "elements": [
+              {
+                "name": "schemaId",
+                "type": {
+                  "type-name": "Bytes",
+                  "length": 32
+                }
+              },
+              {
+                "name": "conditions",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 4,
+                  "type": {
+                    "type-name": "Struct",
+                    "name": "Condition",
+                    "elements": [
+                      {
+                        "name": "claimIndex",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 255
+                        }
+                      },
+                      {
+                        "name": "op",
+                        "type": {
+                          "type-name": "Enum",
+                          "name": "Op",
+                          "elements": [
+                            "ignore",
+                            "gte",
+                            "lte",
+                            "eq",
+                            "neq",
+                            "between",
+                            "inSet"
+                          ]
+                        }
+                      },
+                      {
+                        "name": "value",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "value2",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "set",
+                        "type": {
+                          "type-name": "Vector",
+                          "length": 4,
+                          "type": {
+                            "type-name": "Uint",
+                            "maxval": 18446744073709551615
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "name": "revealSlot",
+                "type": {
+                  "type-name": "Struct",
+                  "name": "Maybe",
+                  "elements": [
+                    {
+                      "name": "is_some",
+                      "type": {
+                        "type-name": "Boolean"
+                      }
+                    },
+                    {
+                      "name": "value",
+                      "type": {
+                        "type-name": "Uint",
+                        "maxval": 255
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "r",
+          "type": {
+            "type-name": "Struct",
+            "name": "SlotRule",
+            "elements": [
+              {
+                "name": "sensitive",
+                "type": {
+                  "type-name": "Boolean"
+                }
+              },
+              {
+                "name": "minWidth",
+                "type": {
+                  "type-name": "Uint",
+                  "maxval": 18446744073709551615
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "slot",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 255
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "respectsSensitiveSlots",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "policy",
+          "type": {
+            "type-name": "Struct",
+            "name": "Policy",
+            "elements": [
+              {
+                "name": "schemaId",
+                "type": {
+                  "type-name": "Bytes",
+                  "length": 32
+                }
+              },
+              {
+                "name": "conditions",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 4,
+                  "type": {
+                    "type-name": "Struct",
+                    "name": "Condition",
+                    "elements": [
+                      {
+                        "name": "claimIndex",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 255
+                        }
+                      },
+                      {
+                        "name": "op",
+                        "type": {
+                          "type-name": "Enum",
+                          "name": "Op",
+                          "elements": [
+                            "ignore",
+                            "gte",
+                            "lte",
+                            "eq",
+                            "neq",
+                            "between",
+                            "inSet"
+                          ]
+                        }
+                      },
+                      {
+                        "name": "value",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "value2",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      },
+                      {
+                        "name": "set",
+                        "type": {
+                          "type-name": "Vector",
+                          "length": 4,
+                          "type": {
+                            "type-name": "Uint",
+                            "maxval": 18446744073709551615
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "name": "revealSlot",
+                "type": {
+                  "type-name": "Struct",
+                  "name": "Maybe",
+                  "elements": [
+                    {
+                      "name": "is_some",
+                      "type": {
+                        "type-name": "Boolean"
+                      }
+                    },
+                    {
+                      "name": "value",
+                      "type": {
+                        "type-name": "Uint",
+                        "maxval": 255
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "rule",
+          "type": {
+            "type-name": "Struct",
+            "name": "SchemaRule",
+            "elements": [
+              {
+                "name": "slots",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 8,
+                  "type": {
+                    "type-name": "Struct",
+                    "name": "SlotRule",
+                    "elements": [
+                      {
+                        "name": "sensitive",
+                        "type": {
+                          "type-name": "Boolean"
+                        }
+                      },
+                      {
+                        "name": "minWidth",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
       "name": "revealedClaim",
       "pure": true,
       "proof": false,
@@ -682,12 +1263,84 @@
       }
     },
     {
+      "name": "referenceTolerance",
+      "pure": true,
+      "proof": false,
+      "arguments": [
+      ],
+      "result-type": {
+        "type-name": "Uint",
+        "maxval": 18446744073709551615
+      }
+    },
+    {
+      "name": "registerSchema",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "schemaId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "rule",
+          "type": {
+            "type-name": "Struct",
+            "name": "SchemaRule",
+            "elements": [
+              {
+                "name": "slots",
+                "type": {
+                  "type-name": "Vector",
+                  "length": 8,
+                  "type": {
+                    "type-name": "Struct",
+                    "name": "SlotRule",
+                    "elements": [
+                      {
+                        "name": "sensitive",
+                        "type": {
+                          "type-name": "Boolean"
+                        }
+                      },
+                      {
+                        "name": "minWidth",
+                        "type": {
+                          "type-name": "Uint",
+                          "maxval": 18446744073709551615
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
       "name": "registerIssuer",
       "pure": false,
       "proof": true,
       "arguments": [
         {
           "name": "issuerId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "schemaId",
           "type": {
             "type-name": "Bytes",
             "length": 32
@@ -702,6 +1355,51 @@
               "type-name": "Opaque",
               "tsType": "JubjubPoint"
             }
+          }
+        },
+        {
+          "name": "slot",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 18446744073709551615
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "rotateIssuerEpoch",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "issuerId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "deactivateIssuer",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "issuerId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
           }
         }
       ],
@@ -731,13 +1429,6 @@
             "elements": [
               {
                 "name": "schemaId",
-                "type": {
-                  "type-name": "Bytes",
-                  "length": 32
-                }
-              },
-              {
-                "name": "issuerId",
                 "type": {
                   "type-name": "Bytes",
                   "length": 32
@@ -842,6 +1533,27 @@
             "type-name": "Uint",
             "maxval": 18446744073709551615
           }
+        },
+        {
+          "name": "subjectCommit",
+          "type": {
+            "type-name": "Struct",
+            "name": "Maybe",
+            "elements": [
+              {
+                "name": "is_some",
+                "type": {
+                  "type-name": "Boolean"
+                }
+              },
+              {
+                "name": "value",
+                "type": {
+                  "type-name": "Field"
+                }
+              }
+            ]
+          }
         }
       ],
       "result-type": {
@@ -864,9 +1576,8 @@
         }
       ],
       "result-type": {
-        "type-name": "Tuple",
-        "types": [
-        ]
+        "type-name": "Bytes",
+        "length": 32
       }
     }
   ],
@@ -878,6 +1589,14 @@
       "result type": {
         "type-name": "Bytes",
         "length": 32
+      }
+    },
+    {
+      "name": "issuerSecret",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Field"
       }
     },
     {
@@ -903,7 +1622,20 @@
             }
           },
           {
+            "name": "epoch",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 4294967295
+            }
+          },
+          {
             "name": "holderCommit",
+            "type": {
+              "type-name": "Field"
+            }
+          },
+          {
+            "name": "subjectId",
             "type": {
               "type-name": "Field"
             }
@@ -979,6 +1711,80 @@
         "type-name": "Bytes",
         "length": 32
       }
+    },
+    {
+      "name": "issuerPublicKey",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Alias",
+        "name": "JubjubPoint",
+        "type": {
+          "type-name": "Opaque",
+          "tsType": "JubjubPoint"
+        }
+      }
+    },
+    {
+      "name": "issuerPath",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Struct",
+        "name": "MerkleTreePath",
+        "elements": [
+          {
+            "name": "leaf",
+            "type": {
+              "type-name": "Bytes",
+              "length": 32
+            }
+          },
+          {
+            "name": "path",
+            "type": {
+              "type-name": "Vector",
+              "length": 6,
+              "type": {
+                "type-name": "Struct",
+                "name": "MerkleTreePathEntry",
+                "elements": [
+                  {
+                    "name": "sibling",
+                    "type": {
+                      "type-name": "Struct",
+                      "name": "MerkleTreeDigest",
+                      "elements": [
+                        {
+                          "name": "field",
+                          "type": {
+                            "type-name": "Field"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "goes_left",
+                    "type": {
+                      "type-name": "Boolean"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "requestNonce",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
     }
   ],
   "contracts": [
@@ -1004,17 +1810,120 @@
         "length": 32
       },
       "value": {
-        "type-name": "Alias",
-        "name": "JubjubPoint",
-        "type": {
-          "type-name": "Opaque",
-          "tsType": "JubjubPoint"
-        }
+        "type-name": "Struct",
+        "name": "IssuerRecord",
+        "elements": [
+          {
+            "name": "schemaId",
+            "type": {
+              "type-name": "Bytes",
+              "length": 32
+            }
+          },
+          {
+            "name": "publicKey",
+            "type": {
+              "type-name": "Alias",
+              "name": "JubjubPoint",
+              "type": {
+                "type-name": "Opaque",
+                "tsType": "JubjubPoint"
+              }
+            }
+          },
+          {
+            "name": "epoch",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 4294967295
+            }
+          },
+          {
+            "name": "slot",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 18446744073709551615
+            }
+          },
+          {
+            "name": "active",
+            "type": {
+              "type-name": "Boolean"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "issuerSlots",
+      "index": 2,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Uint",
+        "maxval": 18446744073709551615
+      },
+      "value": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "issuerTree",
+      "index": 3,
+      "exported": true,
+      "storage": "MerkleTree",
+      "depth": 6,
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "schemaRules",
+      "index": 4,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Bytes",
+        "length": 32
+      },
+      "value": {
+        "type-name": "Struct",
+        "name": "SchemaRule",
+        "elements": [
+          {
+            "name": "slots",
+            "type": {
+              "type-name": "Vector",
+              "length": 8,
+              "type": {
+                "type-name": "Struct",
+                "name": "SlotRule",
+                "elements": [
+                  {
+                    "name": "sensitive",
+                    "type": {
+                      "type-name": "Boolean"
+                    }
+                  },
+                  {
+                    "name": "minWidth",
+                    "type": {
+                      "type-name": "Uint",
+                      "maxval": 18446744073709551615
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
       }
     },
     {
       "name": "requests",
-      "index": 2,
+      "index": 5,
       "exported": true,
       "storage": "Map",
       "key": {
@@ -1033,13 +1942,6 @@
               "elements": [
                 {
                   "name": "schemaId",
-                  "type": {
-                    "type-name": "Bytes",
-                    "length": 32
-                  }
-                },
-                {
-                  "name": "issuerId",
                   "type": {
                     "type-name": "Bytes",
                     "length": 32
@@ -1144,25 +2046,9 @@
               "type-name": "Uint",
               "maxval": 18446744073709551615
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "results",
-      "index": 3,
-      "exported": true,
-      "storage": "Map",
-      "key": {
-        "type-name": "Bytes",
-        "length": 32
-      },
-      "value": {
-        "type-name": "Struct",
-        "name": "VerificationResult",
-        "elements": [
+          },
           {
-            "name": "revealed",
+            "name": "subjectCommit",
             "type": {
               "type-name": "Struct",
               "name": "Maybe",
@@ -1176,14 +2062,71 @@
                 {
                   "name": "value",
                   "type": {
-                    "type-name": "Uint",
-                    "maxval": 18446744073709551615
+                    "type-name": "Field"
                   }
                 }
               ]
             }
           }
         ]
+      }
+    },
+    {
+      "name": "answers",
+      "index": 6,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Bytes",
+        "length": 32
+      },
+      "value": {
+        "type-name": "Map",
+        "key": {
+          "type-name": "Bytes",
+          "length": 32
+        },
+        "value": {
+          "type-name": "Struct",
+          "name": "Answer",
+          "elements": [
+            {
+              "name": "revealed",
+              "type": {
+                "type-name": "Struct",
+                "name": "Maybe",
+                "elements": [
+                  {
+                    "name": "is_some",
+                    "type": {
+                      "type-name": "Boolean"
+                    }
+                  },
+                  {
+                    "name": "value",
+                    "type": {
+                      "type-name": "Uint",
+                      "maxval": 18446744073709551615
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "answerCounts",
+      "index": 7,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Bytes",
+        "length": 32
+      },
+      "value": {
+        "type-name": "Counter"
       }
     }
   ]
