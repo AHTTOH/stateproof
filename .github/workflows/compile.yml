@@ -1,0 +1,36 @@
+name: Compile contract
+
+# Compiles the Compact contract with the pinned compiler and uploads the full managed
+# output (JS bindings, zkir, proving and verifying keys) as an artifact. Developers on
+# Windows download it with `bash scripts/fetch-compiled.sh` instead of running WSL.
+on:
+  push:
+    branches: [v2, main]
+    paths:
+      - 'packages/contract/src/**/*.compact'
+      - 'scripts/compile.sh'
+      - '.github/workflows/compile.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: compactc 0.31.1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: midnightntwrk/setup-compact-action@836895c8fffbbea6bd986af2b17e8941ff29d1f8
+        with:
+          compact-version: '0.31.1'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compile with proving keys
+        run: bash scripts/compile.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: managed-stateproof
+          path: packages/contract/src/managed/stateproof
+          if-no-files-found: error
+          retention-days: 30

@@ -1,4 +1,4 @@
-// Generic predicate engine (PRD §14).
+// Generic predicate engine plus the minimal-disclosure rule for verifiers.
 // The policy is a public circuit input. Compact has no dynamic indexing or
 // dynamic-length loops, so every slot and every operator is computed and the
 // result is selected by the condition's own fields. One fixed circuit therefore
@@ -12,21 +12,43 @@ export struct Condition {
   set: Vector<4, Uint<64>>,
 }
 
+// No issuer id: the request accepts any issuer registered for the schema, and the
+// proof shows membership in that set without saying which issuer signed.
 export struct Policy {
   schemaId: Bytes<32>,
-  issuerId: Bytes<32>,
   conditions: Vector<4, Condition>,
   revealSlot: Maybe<Uint<8>>,
 }
 
+// Per-slot protection registered with the schema. A sensitive slot (salary, birth date)
+// can only be asked about as a range at least `minWidth` wide: no exact value, no
+// "not equal", no set membership and no reveal.
+export struct SlotRule {
+  sensitive: Boolean,
+  minWidth: Uint<64>,
+}
+
+export struct SchemaRule {
+  slots: Vector<8, SlotRule>,
+}
+
+export struct Bounds {
+  lo: Uint<64>,
+  hi: Uint<64>,
+  exact: Boolean,
+}
+
+export pure circuit slotIndexes(): Vector<8, Uint<8>> {
+  return [0, 1, 2, 3, 4, 5, 6, 7];
+}
+
 export pure circuit selectClaim(claims: Vector<8, Uint<64>>, index: Uint<8>): Uint<64> {
   assert(index < 8, "Claim index out of range");
-  const slots: Vector<8, Uint<8>> = [0, 1, 2, 3, 4, 5, 6, 7];
   return fold(
     (acc: Uint<64>, value: Uint<64>, slot: Uint<8>): Uint<64> => slot == index ? value : acc,
     0 as Uint<64>,
     claims,
-    slots
+    slotIndexes()
   );
 }
 
@@ -60,6 +82,46 @@ export pure circuit assertWellFormedPolicy(policy: Policy): [] {
     assert(condition.op != Op.between || condition.value <= condition.value2, "Between bounds are reversed");
   }
   assert(!policy.revealSlot.is_some || policy.revealSlot.value < 8, "Reveal slot out of range");
+}
+
+pure circuit maxU64(a: Uint<64>, b: Uint<64>): Uint<64> {
+  return a > b ? a : b;
+}
+
+pure circuit minU64(a: Uint<64>, b: Uint<64>): Uint<64> {
+  return a < b ? a : b;
+}
+
+// Intersection of every condition on one slot: the smallest range of values that a
+// passing proof leaves possible. `exact` marks operators that pin or exclude single values.
+export pure circuit slotBounds(conditions: Vector<4, Condition>, slot: Uint<8>): Bounds {
+  return fold(
+    (acc: Bounds, c: Condition): Bounds =>
+      c.claimIndex != slot || c.op == Op.ignore ? acc
+      : c.op == Op.gte ? Bounds { lo: maxU64(acc.lo, c.value), hi: acc.hi, exact: acc.exact }
+      : c.op == Op.lte ? Bounds { lo: acc.lo, hi: minU64(acc.hi, c.value), exact: acc.exact }
+      : c.op == Op.between ? Bounds { lo: maxU64(acc.lo, c.value), hi: minU64(acc.hi, c.value2), exact: acc.exact }
+      : Bounds { lo: acc.lo, hi: acc.hi, exact: true },
+    Bounds { lo: 0, hi: 18446744073709551615, exact: false },
+    conditions
+  );
+}
+
+export pure circuit slotRespected(policy: Policy, r: SlotRule, slot: Uint<8>): Boolean {
+  const b = slotBounds(policy.conditions, slot);
+  const revealsIt = policy.revealSlot.is_some && policy.revealSlot.value == slot;
+  const wideEnough = b.hi >= b.lo && b.hi >= b.lo + r.minWidth;
+  return !r.sensitive || (!b.exact && !revealsIt && wideEnough);
+}
+
+// Returns true when the policy respects every sensitive slot of the schema.
+export pure circuit respectsSensitiveSlots(policy: Policy, rule: SchemaRule): Boolean {
+  return fold(
+    (acc: Boolean, r: SlotRule, slot: Uint<8>): Boolean => acc && slotRespected(policy, r, slot),
+    true,
+    rule.slots,
+    slotIndexes()
+  );
 }
 
 export pure circuit revealedClaim(claims: Vector<8, Uint<64>>, revealSlot: Maybe<Uint<8>>): Maybe<Uint<64>> {

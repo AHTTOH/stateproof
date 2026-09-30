@@ -1,4 +1,5 @@
-// StateProof: prove that a credential satisfies a verifier's policy without revealing it.
+// StateProof v2: prove that a credential satisfies a verifier's policy without revealing it.
+// Product: JobProof (hiring). The contract itself is domain-agnostic.
 // SPDX-License-Identifier: Apache-2.0
 
 pragma language_version 0.23;
@@ -13,81 +14,189 @@ export struct Request {
   policy: Policy,
   referenceTime: Uint<64>,
   expiresAt: Uint<64>,
+  // Present when the request is for one named applicant: commitment to the applicant's
+  // subject id under a nonce that travels only in the private request link.
+  subjectCommit: Maybe<Field>,
 }
 
-export struct VerificationResult {
+export struct Answer {
   revealed: Maybe<Uint<64>>,
 }
 
-// Hash of the deployer's admin secret. Only the admin registers trusted issuers.
+export struct IssuerRecord {
+  schemaId: Bytes<32>,
+  publicKey: JubjubPoint,
+  epoch: Uint<32>,
+  slot: Uint<64>,
+  active: Boolean,
+}
+
+// How far a request's reference time may lag the chain clock (seconds).
+export pure circuit referenceTolerance(): Uint<64> {
+  return 3600;
+}
+
+// Hash of the deployer's admin secret. Only the admin registers issuers and schemas.
 export ledger admin: Bytes<32>;
-// issuerId -> issuer Schnorr public key.
-export ledger issuers: Map<Bytes<32>, JubjubPoint>;
+// issuerId -> public record. The set of issuers is public; which one signed a
+// credential is not.
+export ledger issuers: Map<Bytes<32>, IssuerRecord>;
+// slot -> issuerId, so two issuers never share a leaf position.
+export ledger issuerSlots: Map<Uint<64>, Bytes<32>>;
+// Current leaves issuerLeaf(issuerId, schemaId, publicKey, epoch). Proofs check the
+// current root only, so rotating an epoch or deactivating an issuer takes effect at once.
+export ledger issuerTree: MerkleTree<6, Bytes<32>>;
+// schemaId -> sensitive-slot rule every request for the schema must respect.
+export ledger schemaRules: Map<Bytes<32>, SchemaRule>;
 // requestId -> request. The policy is public on purpose: holders see exactly what is asked.
 export ledger requests: Map<Bytes<32>, Request>;
-// requestId -> result. Presence means VERIFIED; failed proofs never reach the chain.
-export ledger results: Map<Bytes<32>, VerificationResult>;
+// requestId -> pseudonym -> answer. Presence means VERIFIED; failed proofs never reach the chain.
+export ledger answers: Map<Bytes<32>, Map<Bytes<32>, Answer>>;
+export ledger answerCounts: Map<Bytes<32>, Counter>;
 
 witness adminSecret(): Bytes<32>;
+witness issuerSecret(): Field;
 witness credential(): Credential;
 witness credentialSignature(): Signature;
 witness holderSecret(): Bytes<32>;
+witness issuerPublicKey(): JubjubPoint;
+witness issuerPath(): MerkleTreePath<6, Bytes<32>>;
+witness requestNonce(): Bytes<32>;
 
 circuit adminKey(secret: Bytes<32>): Bytes<32> {
   return persistentHash<Vector<2, Bytes<32>>>([adminDomain(), secret]);
+}
+
+circuit requireAdmin(): [] {
+  assert(adminKey(adminSecret()) == admin, "Only the admin can do this");
 }
 
 constructor() {
   admin = disclose(adminKey(adminSecret()));
 }
 
-export circuit registerIssuer(issuerId: Bytes<32>, publicKey: JubjubPoint): [] {
-  assert(adminKey(adminSecret()) == admin, "Only the admin can register issuers");
-  assertUsablePoint(publicKey);
-  issuers.insert(disclose(issuerId), disclose(publicKey));
+export circuit registerSchema(schemaId: Bytes<32>, rule: SchemaRule): [] {
+  requireAdmin();
+  const id = disclose(schemaId);
+  assert(!schemaRules.member(id), "Schema already registered");
+  schemaRules.insert(id, disclose(rule));
+}
+
+export circuit registerIssuer(issuerId: Bytes<32>, schemaId: Bytes<32>, publicKey: JubjubPoint, slot: Uint<64>): [] {
+  requireAdmin();
+  const id = disclose(issuerId);
+  const schema = disclose(schemaId);
+  const key = disclose(publicKey);
+  const position = disclose(slot);
+  assert(!issuers.member(id), "Issuer already registered");
+  assert(!issuerSlots.member(position), "Issuer slot already used");
+  assert(position < 64, "Issuer slot out of range");
+  assert(schemaRules.member(schema), "Schema is not registered");
+  assertUsablePoint(key);
+  issuers.insert(id, IssuerRecord { schemaId: schema, publicKey: key, epoch: 0, slot: position, active: true });
+  issuerSlots.insert(position, id);
+  issuerTree.insertIndex(issuerLeaf(id, schema, key, 0), position);
+}
+
+// The issuer itself (knowing its signing key) moves to a new epoch. Every credential it
+// issued earlier stops verifying; it re-issues the ones that are still true.
+export circuit rotateIssuerEpoch(issuerId: Bytes<32>): [] {
+  const id = disclose(issuerId);
+  assert(issuers.member(id), "Unknown issuer");
+  const record = issuers.lookup(id);
+  assert(record.active, "Issuer is deactivated");
+  assert(samePoint(derivePublicKey(issuerSecret()), record.publicKey), "Only the issuer can rotate its epoch");
+  const next = (record.epoch + 1) as Uint<32>;
+  issuers.insert(id, IssuerRecord {
+    schemaId: record.schemaId,
+    publicKey: record.publicKey,
+    epoch: next,
+    slot: record.slot,
+    active: true
+  });
+  issuerTree.insertIndex(issuerLeaf(id, record.schemaId, record.publicKey, next), record.slot);
+}
+
+// Admin removes a compromised issuer from the set.
+export circuit deactivateIssuer(issuerId: Bytes<32>): [] {
+  requireAdmin();
+  const id = disclose(issuerId);
+  assert(issuers.member(id), "Unknown issuer");
+  const record = issuers.lookup(id);
+  issuers.insert(id, IssuerRecord {
+    schemaId: record.schemaId,
+    publicKey: record.publicKey,
+    epoch: record.epoch,
+    slot: record.slot,
+    active: false
+  });
+  issuerTree.insertIndexDefault(record.slot);
 }
 
 export circuit createRequest(
   requestId: Bytes<32>,
   policy: Policy,
   referenceTime: Uint<64>,
-  expiresAt: Uint<64>
+  expiresAt: Uint<64>,
+  subjectCommit: Maybe<Field>
 ): [] {
   const id = disclose(requestId);
   const publicPolicy = disclose(policy);
+  const reference = disclose(referenceTime);
+  const expiry = disclose(expiresAt);
   assert(!requests.member(id), "Request id already used");
-  assert(issuers.member(publicPolicy.issuerId), "Policy issuer is not registered");
+  assert(schemaRules.member(publicPolicy.schemaId), "Schema is not registered");
   assertWellFormedPolicy(publicPolicy);
-  assert(blockTimeLt(disclose(expiresAt)), "Request expiry must be in the future");
+  assert(respectsSensitiveSlots(publicPolicy, schemaRules.lookup(publicPolicy.schemaId)),
+         "Policy narrows a protected value too far");
+  // The reference time decides credential validity, so it must follow the chain clock.
+  assert(blockTimeGte(reference), "Reference time is in the future");
+  assert(blockTimeLt((reference + referenceTolerance()) as Uint<64>), "Reference time is too old");
+  assert(blockTimeLt(expiry), "Request expiry must be in the future");
   requests.insert(id, Request {
     policy: publicPolicy,
-    referenceTime: disclose(referenceTime),
-    expiresAt: disclose(expiresAt)
+    referenceTime: reference,
+    expiresAt: expiry,
+    subjectCommit: disclose(subjectCommit)
   });
+  answers.insert(id, default<Map<Bytes<32>, Answer>>);
+  answerCounts.insert(id, default<Counter>);
 }
 
-export circuit submitProof(requestId: Bytes<32>): [] {
+export circuit submitProof(requestId: Bytes<32>): Bytes<32> {
   const id = disclose(requestId);
   assert(requests.member(id), "Unknown request");
-  assert(!results.member(id), "Request already answered");
   const request = requests.lookup(id);
   assert(blockTimeLt(request.expiresAt), "Request expired");
 
   const cred = credential();
   const signature = credentialSignature();
+  const issuerKey = issuerPublicKey();
+  const path = issuerPath();
   assert(cred.schemaId == request.policy.schemaId, "Credential schema does not match the policy");
-  assert(cred.issuerId == request.policy.issuerId, "Credential issuer does not match the policy");
 
-  const issuerKey = issuers.lookup(request.policy.issuerId);
+  // The signer belongs to the current issuer set for this schema and epoch.
+  assert(path.leaf == issuerLeaf(cred.issuerId, cred.schemaId, issuerKey, cred.epoch),
+         "Issuer path does not belong to this credential");
+  assert(issuerTree.checkRoot(disclose(merkleTreePathRoot<6, Bytes<32>>(path))),
+         "Credential issuer is not in the current issuer set");
   const challenge = signingChallenge(credentialRoot(cred), issuerKey, signature.r);
   assert(isValidSignature(issuerKey, signature, challenge), "Invalid issuer signature");
 
   assert(cred.issuedAt <= request.referenceTime, "Credential is not valid yet");
   assert(request.referenceTime < cred.expiresAt, "Credential expired");
-  assert(holderCommitment(holderSecret()) == cred.holderCommit, "Credential is bound to another holder");
+  const secret = holderSecret();
+  assert(holderCommitment(secret) == cred.holderCommit, "Credential is bound to another holder");
+  assert(!request.subjectCommit.is_some
+         || subjectCommitment(cred.subjectId, requestNonce()) == request.subjectCommit.value,
+         "Credential belongs to a different person than the one this request is for");
   assert(policyHolds(cred.claims, request.policy), "Policy conditions are not satisfied");
 
-  results.insert(id, VerificationResult {
+  const pseudonym = disclose(pseudonymFor(id, secret));
+  assert(!answers.lookup(id).member(pseudonym), "This holder already answered this request");
+  answers.lookup(id).insert(pseudonym, Answer {
     revealed: disclose(revealedClaim(cred.claims, request.policy.revealSlot))
   });
+  answerCounts.lookup(id).increment(1);
+  return pseudonym;
 }
